@@ -1,0 +1,9 @@
+{{ rails_environment }}:
+  adapter: mysql2
+  encoding: utf8
+  host: {{ mnohub_config.database.host }}
+  database: {{ mnohub_config.database.database }}
+  pool: {{ mnohub_config.database.pool }}
+  timeout: {{ mnohub_config.database.timeout }}
+  username: {{ mnohub_config.database.username }}
+  password: {{ mnohub_config.database.password }}

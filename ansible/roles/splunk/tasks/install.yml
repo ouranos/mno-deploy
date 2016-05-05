@@ -1,0 +1,39 @@
+---
+
+- name: Splunk | Add splunk group
+  group: name=splunk state=present
+
+- name: Splunk | Add splunk user
+  user: name=splunk comment="Splunk service user" shell=/usr/sbin/nologin groups=splunk createhome=no 
+
+- name: Splunk | Make /opt writetable by splunk
+  file: path=/opt mode=777
+
+- name: Splunk | Checking if splunk is installed
+  stat: path=/opt/splunkforwarder
+  register: splunk_path
+
+- name: Splunk | Is splunk installed? 
+  debug: msg='splunk is already installed under /opt/splunkforwarder'
+  when: splunk_path.stat.exists
+
+- name: Splunk | Download Splunk binary
+  shell: "wget -O /tmp/splunkforwarder-6.3.2-aaff59bb082c-linux-2.6-amd64.deb 'http://www.splunk.com/bin/splunk/DownloadActivityServlet?architecture=x86_64&platform=linux&version=6.3.2&product=universalforwarder&filename=splunkforwarder-6.3.2-aaff59bb082c-linux-2.6-amd64.deb&wget=true'"
+  when: splunk_path.stat.exists == false
+
+- name: Splunk | Install splunk binary
+  shell: "dpkg -i /tmp/splunkforwarder-6.3.2-aaff59bb082c-linux-2.6-amd64.deb"
+  when: splunk_path.stat.exists == false
+
+- name: Splunk | Accept license and start splunk
+  shell: /opt/splunkforwarder/bin/splunk start --accept-license --answer-yes --auto-ports --no-prompt
+  sudo: yes
+  sudo_user: splunk
+  when: splunk_path.stat.exists == false
+
+- name: Splunk | Enable boot-start
+  shell: /opt/splunkforwarder/bin/splunk enable boot-start
+  when: splunk_path.stat.exists == false
+
+- name: Splunk | Make /etc/init.d/splunk executable
+  file: path=/etc/init.d/splunk mode=755

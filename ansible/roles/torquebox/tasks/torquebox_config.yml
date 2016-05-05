@@ -1,0 +1,110 @@
+- name: Torquebox | Configuration standalone-ha.xml
+  template:
+    src: standalone-ha.xml
+    dest: /opt/torquebox/jboss/standalone/configuration/standalone-ha.xml
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    mode: 0755
+
+- name: Torquebox | Configuration standalone.conf
+  template:
+    src: standalone.conf
+    dest: /opt/torquebox/jboss/bin/standalone.conf
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    mode: 0755
+
+- name: Torquebox | Configuration torquebox.conf
+  template:
+    src: torquebox.conf
+    dest: /etc/init/torquebox.conf
+    mode: 0644
+  when: ansible_os_family == "Debian"
+
+- name: Torquebox | Systemd sysconfig
+  template:
+    src: torquebox_sysconfig
+    dest: /etc/sysconfig/torquebox
+    mode: 0644
+  when: ansible_os_family == "RedHat"
+
+- name: Torquebox | Configuration torquebox.service
+  template:
+    src: torquebox_systemd.service
+    dest: /etc/systemd/system/torquebox.service
+    mode: 0644
+  when: ansible_os_family == "RedHat"
+
+- name: Torquebox | Configuration torquebox_init.rb
+  template:
+    src: torquebox_init.rb
+    dest: /opt/torquebox/torquebox_init.rb
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    mode: 0755
+
+- name: Torquebox | Configuration torquebox.sh
+  template:
+    src: torquebox-debian
+    dest: /etc/profile.d/torquebox.sh
+    mode: 0755
+  when: ansible_os_family == "Debian"
+
+- name: Torquebox | Configuration torquebox.sh
+  template:
+    src: torquebox-rhel
+    dest: /etc/profile.d/torquebox.sh
+    mode: 0755
+  when: ansible_os_family == "RedHat"
+
+- name: Torquebox | Create directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+  with_items:
+    - /opt/torquebox/jboss/standalone/log
+    - /var/run/torquebox
+
+- name: Torquebox | Set directory permissions
+  file:
+    path: "/opt/torquebox-{{ torquebox.version }}"
+    mode: 0755
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    state: directory
+    recurse: yes
+
+- name: Torquebox | Set log directory permissions
+  file:
+    path: /var/log/torquebox
+    mode: 0755
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    state: directory
+    recurse: yes
+
+- name: Torquebox | Install gem bundler
+  command: "/opt/torquebox/jruby/bin/jruby -S gem install {{ item }}"
+  sudo_user: "{{ torquebox.owner }}"
+  with_items:
+    - bundler
+    - webmock
+
+- name: Torquebox | Install backstage
+  command: "cd /tmp; source /etc/profile.d/torquebox.sh; jruby -S {{ item }}"
+  sudo_user: "{{ torquebox.owner }}"
+  with_items:
+    - gem install torquebox-rake-support
+    - gem install torquebox-backstage
+    - gem install torquebox
+    - backstage deploy --secure={{ torquebox.backstage.admin }}:{{ torquebox.backstage.password }}
+  ignore_errors: yes
+
+- name: Torquebox | Start service
+  service:
+    name: torquebox
+    enabled: yes
+    state: started

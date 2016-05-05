@@ -1,0 +1,186 @@
+---
+
+- name: MNOE Frontend | Release folder
+  set_fact: release_folder="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: MNOE Frontend | Download application from S3 ({{ frontend_project }}-{{ frontend_version }}.tar.gz)
+  s3:
+    bucket: "{{ mno_pkgs_bucket }}"
+    object: "{{ s3_file }}"
+    dest: "{{ deploy_directory }}/{{ frontend_project }}-{{ frontend_version }}.tar.gz"
+    mode: get
+    region: "{{ mno_pkgs_s3_aws_region }}"
+    aws_access_key: "{{ mno_pkgs_s3_aws_access_key }}"
+    aws_secret_key: "{{ mno_pkgs_s3_aws_secret_key }}"
+
+- name: MNOE Frontend | Replace version
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    state: absent
+
+- name: MNOE Frontend | Create version directory (/apps/mnoe/releases/XXX)
+  file: path={{ deploy_directory }}/releases/{{ release_folder }} owner=deployer group=deployer state=directory
+
+- name: MNOE Frontend | Extract current version
+  command: "tar -xzf {{ deploy_directory }}/{{ frontend_project }}-{{ frontend_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
+
+- name: MNOE Frontend | Clean up tar file
+  file:
+    path: "{{ deploy_directory }}/{{ frontend_project }}-{{ frontend_version }}.tar.gz"
+    state: absent
+
+- name: MNOE Frontend | Clean up gems
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/bundle"
+    state: absent
+
+- name: MNOE Frontend | Clean up gems
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor"
+    state: directory
+
+- name: MNOE Frontend | Database file database.yml
+  template:
+    src: database.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/database.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNOE Frontend | Configuration file config/application.yml
+  template:
+    src: application.yml
+    dest: "{{ deploy_directory }}/shared/config/application.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNOE Frontend | Replace config/application.yml
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/config/application.yml"
+    state: absent
+
+- name: MNOE Frontend | Symbolic link to config/application.yml
+  file:
+    src: "{{ deploy_directory }}/shared/config/application.yml"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/application.yml"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: MNOE Frontend | Configure settings file
+  template:
+    src: settings_environment.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/settings/{{ rails_environment }}.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNOE Frontend | Replace robots.txt file
+  template:
+    src: robots.txt
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/public/robots.txt"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNOE Frontend | Set directory permissions
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    mode: 0755
+    owner: deployer
+    group: deployer
+    state: directory
+    recurse: yes
+
+- name: MNOE Frontend | Symbolic link to gems
+  file:
+    src: "{{ deploy_directory }}/shared/vendor_bundle"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/bundle"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: MNOE Frontend | Move precompiled assets files
+  shell: mv {{ deploy_directory }}/releases/{{ release_folder }}/public/{{ item }}/* {{ deploy_directory }}/shared/{{ item }}/
+  with_items:
+    - assets
+    - styles
+    - scripts
+  ignore_errors: true
+
+- name: MNOE Frontend | Symbolic link to assets
+  file:
+    src: "{{ deploy_directory }}/shared/{{ item }}"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/public/{{ item }}"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+  with_items:
+    - assets
+    - styles
+    - scripts
+  ignore_errors: true
+
+- name: MNOE Frontend | Run bundle install
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
+  sudo_user: deployer
+  environment: "{{ default_environment }}"
+
+- name: MNOE Frontend | Migrate the database
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
+  environment: "{{ default_environment }}"
+  sudo_user: deployer
+  when: not mnoe.skip_migrations
+
+- name: MNOE Frontend | Assets precompile
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake assets:precompile"
+  sudo_user: deployer
+  environment: "{{ default_environment }}"
+  when: not mnoe.skip_precompile
+
+- name: MNOE Frontend | Replace previous version
+  file:
+    path: "{{ deploy_directory }}/current"
+    state: absent
+
+- name: MNOE Frontend | Symbolic link to current version
+  file:
+    src: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    dest: "{{ deploy_directory }}/current"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: MNOE Frontend | Clean directories
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/{{ item }}"
+    state: absent
+  with_items:
+    - log
+    - tmp
+    - solr
+    - geocoder
+    - downloads
+
+- name: MNOE Frontend | Symbolic links to shared directories
+  file:
+    src: "{{ deploy_directory }}/shared/{{ item }}"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/{{ item }}"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+  with_items:
+    - log
+    - tmp
+    - solr
+    - geocoder
+    - downloads
+
+- name: MNOE Frontend | Restart puma service
+  service: name=puma state=restarted

@@ -1,0 +1,24 @@
+---
+
+torquebox:
+  cluster: 'true'
+  version: 3.1.2
+  owner: torquebox
+  group: torquebox
+  s3_cluster:
+    prefix: "{{ environment_name }}-{{ maestrano_component }}"
+    password: df57y8r3515SDf7d87S81h5g25h145cx7h8t154e7w87415212fdgfv54f1e5
+  messaging:
+    redelivery_delay: 120000
+    redistribution_delay: 120000
+    max_delivery_attempts: 1
+  java_opts:
+    xms: "{{ (0.2 * ansible_memtotal_mb)|int }}m" # Minimum 20% of server memory
+    xmx: "{{ (0.7 * ansible_memtotal_mb)|int }}m" # Allocate 70% of server memory
+    max_perm_size: 512m
+    home: /usr/lib/jvm/jre-1.7.0-openjdk
+  backstage:
+    admin: admin
+    password: password
+jruby:
+  version: 1.7.19

@@ -1,0 +1,14 @@
+---
+
+deploy_directory: /apps/mnohub
+default_environment:
+  RAILS_ENV: "{{ rails_environment }}"
+  JAVA: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+  PATH: /opt/jruby/current/bin:{{ ansible_env.PATH }}
+
+mnohub_config:
+  sidekiq_worker_threads: 25
+  java_opts:
+    xms: 1024m
+    xmx: 2048m
+    max_perm_size: 512m

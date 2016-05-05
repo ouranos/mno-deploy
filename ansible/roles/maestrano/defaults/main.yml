@@ -1,0 +1,8 @@
+---
+
+server_name: "{{ maestrano.dns_record.record }}"
+deploy_directory: "/apps/mnohub"
+default_environment:
+  RAILS_ENV: "{{ rails_environment }}"
+  PATH: /usr/local/rvm/gems/ruby-2.2.0/bin:/usr/local/rvm/gems/ruby-2.2.0@global/bin:/usr/local/rvm/rubies/ruby-2.2.0/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/rvm/bin
+  GEM_PATH: /usr/local/rvm/gems/ruby-2.2.0:/usr/local/rvm/gems/ruby-2.2.0@global

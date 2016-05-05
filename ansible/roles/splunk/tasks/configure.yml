@@ -1,0 +1,41 @@
+---
+
+- name: Splunk | Add /etc/hosts entries
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items: "{{ splunk.extra_hosts }}"
+
+- name: Splunk | Certificates directory
+  file: path=/opt/splunkforwarder/etc/auth/{{ item.group }} state=directory mode=0755 owner=splunk group=splunk
+  with_items: "{{ splunk.outputs }}"
+
+- name: Splunk | Create CA certificates
+  copy:
+    content: "{{ item.ssl_root_ca }}"
+    dest: "/opt/splunkforwarder/etc/auth/{{ item.group }}/cacert.pem"
+    owner: splunk
+    group: splunk
+    mode: 0750
+  with_items: "{{ splunk.outputs }}"
+
+- name: Splunk | Create forwarder certificates
+  copy:
+    content: "{{ item.ssl_cert }}"
+    dest: "/opt/splunkforwarder/etc/auth/{{ item.group }}/forwarder.pem"
+    owner: splunk
+    group: splunk
+    mode: 0750
+  with_items: "{{ splunk.outputs }}"
+
+- name: Splunk | template /opt/splunkforwarder/etc/system/local/outputs.conf
+  template:
+    src: outputs.conf
+    dest: "/opt/splunkforwarder/etc/system/local/outputs.conf"
+    mode: 0755
+
+- name: Splunk | Restart
+  shell: "/opt/splunkforwarder/bin/splunk restart"

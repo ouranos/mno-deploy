@@ -1,0 +1,12 @@
+---
+
+- name: Run common
+  hosts: localhost
+  connection: local
+  become: yes
+  become_user: root
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - common

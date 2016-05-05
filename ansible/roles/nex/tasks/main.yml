@@ -1,0 +1,11 @@
+---
+
+- name: Nex! | Setup RDS instance
+  include: rds.yml
+
+- name: Nex! | Setup deployment directories
+  include: setup.yml
+
+- name: Nex! | Deploy new version
+  include: deploy.yml
+  tags: [deploy]

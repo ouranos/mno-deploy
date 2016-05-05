@@ -1,0 +1,28 @@
+# Rails secret key
+SECRET_KEY_BASE: {{ frontend_config.rails_secret_key }}
+
+# Database
+database_hostname: {{ rds.endpoint }}
+database_name: {{ mnoe_database_name }}
+database_username: {{ mnoe_database_username }}
+database_password: {{ mnoe_database_password }}
+
+# Emailing platform - Mandrill
+mandrill_key: {{ frontend_config.mandrill_key }}
+mailer_default_host: {{ frontend_config.public_dns.host }}
+
+{% if frontend_config.intercom is defined %}
+# Intercom configuration
+intercom_app_id: {{ frontend_config.intercom.app_id }}
+{% if frontend_config.intercom.api_secret is defined %}
+intercom_api_secret: {{ frontend_config.intercom.api_secret }}
+{% endif %}
+{% endif %}
+
+# Newrelic api key
+newrelic_license_key: {{ newrelic_license_key }}
+
+{% if frontend_config.google_tag_container is defined %}
+# Google Tag Manager
+google_tag_container: {{ frontend_config.google_tag_container }}
+{% endif %}

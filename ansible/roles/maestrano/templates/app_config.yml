@@ -1,0 +1,62 @@
+# {{ ansible_managed }}
+
+# maestrano_host:
+#   Used to define the default_url_options in ApplicationController
+#   Note that this option is NOT used to configure the asset host
+#   For that, see the environment/*.rb files
+#
+# contact_email:
+#   The email address displayed when customers are invited to contact us
+#
+# support_email:
+#   The email address displayed when customers need support
+#
+# feedback_email:
+#   The email address displayed when customers want to provide feedback
+#
+# loveus_email:
+#   The email address we like :)
+{{ rails_environment }}:
+  maestrano_host: {{ mnohub_config.public_dns.host }}
+  contact_email: {{ mnohub_config.general.contact_email }}
+  support_email: {{ mnohub_config.general.support_email }}
+  feedback_email: {{ mnohub_config.general.feedback_email }}
+  loveus_email: {{ mnohub_config.general.loveus_email }}
+  ceo_email: '{{ mnohub_config.general.ceo_email }}'
+  account_manager_email: '{{ mnohub_config.general.account_manager_email }}'
+  mcluster_host: http://{{ nex.dns_record.record }}
+  mcluster_admin_token: <%= ENV['mcluster_admin_token'] %>
+  mcluster_admin_password: <%= ENV['mcluster_admin_password'] %>
+  http_enabled: {{ mnohub_config.general.http_enabled }}
+  delay_job: {{ mnohub_config.general.delay_job }}
+  sync_intervall: {{ mnohub_config.general.sync_intervall }} #seconds
+  private_access_mode: {{ mnohub_config.general.private_access_mode }}
+  payment_gateway_mode: {{ mnohub_config.general.payment_gateway_mode }}
+  open_exchange_rate_id: <%= ENV['open_exchange_rate_id'] %>
+  apps_domain: {{ mnohub_config.general.apps_domain }}
+  virtual_email_domain: {{ mnohub_config.general.virtual_email_domain }}
+  available_regions: {{ mnohub_config.general.available_regions }}
+  fallback_region: {{ mnohub_config.general.fallback_region }}
+  mnoe_lockdown_region: {{ mnohub_config.general.mnoe_lockdown_region }}
+  support_rate_pips: {{ mnohub_config.general.support_rate_pips }}
+  cdn_assets: {{ mnohub_config.general.cdn_assets }}
+  mandrill_webhook_token: <%= ENV['mandrill_webhook_token'] %>
+  online_resolving_disabled: true
+  sendgrid_smtp:
+    login: <%= ENV['sendgrid_smtp_login'] %>
+    password: <%= ENV['sendgrid_smtp_password'] %>
+  zendesk:
+    api_url: https://maestrano.zendesk.com/api/v2
+    username: <%= ENV['zendesk_username'] %>
+    token: <%= ENV['zendesk_token'] %>
+# Billing currencies
+{% if mnohub_config.billing is defined %}
+  billing_currencies: {{ mnohub_config.billing.currencies }}
+  default_billing_currency: {{ mnohub_config.billing.default_currency }}
+{% endif %}
+{% if mnohub_config.mcluster_autostop_disabled is defined %}
+  autostop_disabled: {{ mnohub_config.mcluster_autostop_disabled }}
+{% endif %}
+{% if mnohub_config.general.organization_initial_credit is defined %}
+  organization_initial_credit: {{ mnohub_config.general.organization_initial_credit }}
+{% endif %}

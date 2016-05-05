@@ -1,0 +1,19 @@
+[Unit]
+Description=Maestrano delayed_job
+After=network.target
+
+[Service]
+Type=simple
+User=deployer
+Environment=RAILS_ENV={{ rails_environment }} PATH=/usr/local/rvm/gems/ruby-2.2.0/bin:/usr/local/rvm/gems/ruby-2.2.0@global/bin:/usr/local/rvm/rubies/ruby-2.2.0/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/rvm/bin GEM_PATH=/usr/local/rvm/gems/ruby-2.2.0:/usr/local/rvm/gems/ruby-2.2.0@global
+{% if proxy_host is defined and proxy_port is defined %}
+Environment=http_proxy=http://{{ proxy_host }}:{{ proxy_port }}
+Environment=https_proxy=http://{{ proxy_host }}:{{ proxy_port }}
+Environment=no_proxy={{ proxy_ignore }}
+{% endif %}
+WorkingDirectory={{ deploy_directory }}/current
+ExecStart=/usr/local/rvm/gems/ruby-2.2.0/bin/bundle exec rake jobs:work
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target

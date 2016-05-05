@@ -1,0 +1,26 @@
+documentation:
+  api_v2_base_url: http://maestrano.github.io/connec
+authentication:
+  admin:
+    client_id: {{ connec_config.authentication.admin.client_id }}
+    client_key: {{ connec_config.authentication.admin.client_key }}
+  accept_mno_trusted_headers: false
+idm:
+  protocol: {{ mnohub_config.private_dns.scheme }}
+  host: {{ mnohub_config.private_dns.host }}
+  port: {{ 443 if mnohub_config.private_dns.scheme == 'https' else 80 }}
+  cache: 60
+maestrano:
+  protocol: {{ mnohub_config.private_dns.scheme }}
+  verify_ssl: false
+  webhook: {{ mnohub_config.private_dns.host }}/webhook/connec/async_jobs
+  encryption:
+    key: {{ mnohub_config.secrets.encryption_key }}
+  sync:
+    callback: {{ mnohub_config.private_dns.host }}/webhook/sync/:group_id/callback
+oauth:
+  {{ connec_config.oauth | to_json }}
+sidekiq:
+  admin:
+    username: {{ connec_config.sidekiq.admin.username }}
+    password: {{ connec_config.sidekiq.admin.password }}

@@ -1,0 +1,17 @@
+---
+
+- name: Configure Connec! MongoDB cluster
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  pre_tasks:
+    # Create and mount filesystem
+    - filesystem: fstype=ext4 dev=/dev/xvdf
+    - mount: name=/data src=/dev/xvdf fstype=ext4 state=mounted
+  roles:
+    - common
+    - role: ntp
+    - newrelic
+    - role: mongodb

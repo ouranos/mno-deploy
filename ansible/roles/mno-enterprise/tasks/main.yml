@@ -1,0 +1,27 @@
+---
+
+- name: Maestrano Enterprise | Detect if initial setup
+  stat:
+    path: "{{ deploy_directory }}"
+  register: deploy_directory_path
+
+- name: Maestrano Enterprise | Setup RDS instance
+  include: rds.yml
+
+- name: Maestrano Enterprise | Initial application setup
+  include: initial_setup.yml
+
+- name: Maestrano Enterprise | Deploy application version
+  include: deploy.yml
+  tags: [deploy]
+
+- name: Maestrano Enterprise | Deploy application version
+  include: deploy.yml
+
+- name: Maestrano Enterprise | Run/Reload Puma (Debian)
+  include: puma_deb.yml
+  when: ansible_os_family == "Debian"
+
+- name: Maestrano Enterprise | Run/Reload Puma (RHEL)
+  include: puma_rhel.yml
+  when: ansible_os_family == "RedHat"

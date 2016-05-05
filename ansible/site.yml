@@ -1,0 +1,10 @@
+---
+
+- name: Create the complete Infrastructure running inside a VPC
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - ec2-infra

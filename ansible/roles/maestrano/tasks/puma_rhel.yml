@@ -1,0 +1,13 @@
+---
+
+- name: Maestrano | Add /etc/systemd/system/puma.service
+  template: src=puma.service dest=/etc/systemd/system/puma.service force=yes mode=0755
+
+- name: MNOE Hub | Add /etc/systemd/system/delayed_job.service
+  template: src=delayed_job.service dest=/etc/systemd/system/delayed_job.service force=yes mode=0755
+
+- name: Maestrano | Add puma to systemd
+  service: name=puma state=started enabled=yes
+
+- name: MNOE Hub | Add delayed_job to systemd
+  service: name=delayed_job state=started enabled=yes

@@ -1,0 +1,13 @@
+---
+
+- name: Torquebox S3 | Create Torquebox Clustering Bucket
+  s3: bucket={{ torquebox.s3_cluster.location }} mode=create
+  ignore_errors: true
+
+- name: MnoHub S3 | Create Public Asset Bucket
+  s3: bucket={{ s3_buckets.public }} mode=create
+  ignore_errors: true
+
+- name: MnoHub S3 | Create Private Asset Bucket
+  s3: bucket={{ s3_buckets.private }} mode=create
+  ignore_errors: true

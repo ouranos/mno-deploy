@@ -1,0 +1,21 @@
+---
+
+- name: MnoHub | Setup RDS instance
+  include: rds.yml
+
+- name: MnoHub | Setup deployment directories
+  include: setup.yml
+
+- name: MnoHub | Deploy new version
+  include: deploy.yml
+  tags: [deploy]
+
+- name: MnoHub | Run/Reload Puma/Sidekiq Runtime (Debian)
+  include: runtime_deb.yml
+  tags: [deploy]
+  when: ansible_os_family == "Debian"
+
+- name: MnoHub | Run/Reload Puma/Sidekiq Runtime (RHEL)
+  include: runtime_rhel.yml
+  tags: [deploy]
+  when: ansible_os_family == "RedHat"

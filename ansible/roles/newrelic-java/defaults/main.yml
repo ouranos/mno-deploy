@@ -1,0 +1,9 @@
+---
+
+newrelic_license_key: changeme
+newrelic_app_name: My Application
+newrelic:
+  version: 3.25.0
+  owner: torquebox
+  group: torquebox
+  install_path: /opt

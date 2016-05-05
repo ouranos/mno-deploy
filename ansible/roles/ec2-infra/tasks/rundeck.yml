@@ -1,0 +1,67 @@
+---
+
+# Rundeck Configuration
+
+- set_fact: maestrano_component="rundeck-server-local"
+
+- name: Create Rundeck ELB
+  ec2_elb_lb:
+    name: "{{ rundeck.elastic_load_balancer.name }}"
+    state: present
+    scheme: "{{ rundeck.elastic_load_balancer.scheme | default('internet-facing')}}"
+    connection_draining_timeout: "{{ rundeck.elastic_load_balancer.connection_draining_timeout }}"
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    subnets: "{{ rundeck.elastic_load_balancer.subnets }}"
+    security_group_ids: "{{ rundeck.elastic_load_balancer.security_group_ids }}"
+    listeners: "{{ rundeck.elastic_load_balancer.listeners }}"
+    health_check: "{{ rundeck.elastic_load_balancer.health_check }}"
+  register: rundeck_elastic_load_balancer
+
+- name: Add DNS record for ELB
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ rundeck.dns_record.record }}"
+    type: "{{ rundeck.dns_record.type }}"
+    value: "{{ rundeck_elastic_load_balancer.elb.dns_name }}"
+    alias: "{{ rundeck.dns_record.alias }}"
+    ttl: "{{ rundeck.dns_record.ttl }}"
+    private_zone: "{{ route53.zone.private_zone }}"
+    alias_hosted_zone_id: "{{ rundeck.elastic_load_balancer.alias_hosted_zone_id }}"
+    overwrite: "{{ rundeck.dns_record.overwrite }}"
+
+# Create a Rundeck instance
+- name: Launch Rundeck instance
+  ec2:
+    keypair: "{{ keypair }}"
+    instance_type: "{{ rundeck.instance_type }}"
+    image: "{{ rundeck.image_id }}"
+    group_id: "{{ rundeck.security_groups }}"
+    assign_public_ip: no
+    source_dest_check: no
+    wait: yes
+    vpc_subnet_id: "{{ rundeck.subnet_id }}"
+    instance_tags: "{ 'Name': '{{ vpc_base_name }}-rundeck', 'Environment': '{{ environment_name }}', 'Application': 'Rundeck' }"
+    exact_count: 1
+    count_tag: { "Name": "{{ vpc_base_name }}-rundeck" }
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+  when: not rundeck.skip
+  register: rundeck_instance
+
+# Register instance into ELB
+- name: Register Rundeck instance ELB
+  ec2_elb:
+    instance_id: "{{ item.id }}"
+    ec2_elbs: "{{ rundeck_elastic_load_balancer.elb.name }}"
+    state: present
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    wait: False
+  with_items: rundeck_instance.tagged_instances

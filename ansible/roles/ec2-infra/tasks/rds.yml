@@ -1,0 +1,43 @@
+---
+
+- name: Maestrano RDS | Create RDS subnets
+  rds_subnet_group:
+    name: "{{ environment_name }}-maestrano-rds-subnet"
+    description: Subnet Group for Maestrano RDS instance
+    state: present
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    subnets: "{{ rds.subnets }}"
+  register: rds_subnet_maestrano
+
+- name: Maestrano RDS | Create RDS instance
+  rds:
+    command: create
+    instance_name: "{{ rds.name }}"
+    db_engine: "{{ rds.db_engine }}"
+    size: "{{ rds.size }}"
+    instance_type: "{{ rds.instance_type }}"
+    multi_zone: "{{ rds.multi_zone }}"
+    subnet: "{{ environment_name }}-maestrano-rds-subnet"
+    vpc_security_groups: "{{ rds.vpc_security_groups }}"
+    username: "{{ rds.username }}"
+    password: "{{ rds.password }}"
+    wait: yes
+    wait_timeout: 1200
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    tags: "{{ rds.tags }}"
+  register: rds_maestrano
+
+- name: Maestrano RDS | Add DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ rds.endpoint }}"
+    type: CNAME
+    value: "{{ rds_maestrano.instance.endpoint }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"

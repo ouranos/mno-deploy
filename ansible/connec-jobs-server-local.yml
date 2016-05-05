@@ -1,0 +1,19 @@
+---
+
+- name: Configure Connec! instances
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - role: common
+    - role: ntp
+    - { role: swapfile, swapfile_swappiness: 10 }
+    - { role: newrelic, when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
+    - role: splunk
+    - role: jruby
+    - { role: jdauphant.nginx, keep_only_specified: true }
+    - { role: connec, connec_config: {component: 'jobs', newrelic: {common: {app_name: 'Connec Jobs'}}} }
+    - { role: logrotate, logrotate_scripts: [{name: sidekiq, path: "{{ deploy_directory }}/shared/log/sidekiq.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: connec, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }

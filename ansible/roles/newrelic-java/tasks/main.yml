@@ -1,0 +1,66 @@
+---
+
+- name: NewRelic | Download NewRelic java agent
+  get_url:
+    url: "http://download.newrelic.com/newrelic/java-agent/newrelic-api/{{ newrelic.version }}/newrelic-java-{{ newrelic.version }}.zip"
+    dest: /tmp/newrelic-java.zip
+    mode: 0755
+
+- name: NewRelic | Create NewRelic group
+  group:
+    name: "{{ newrelic.group }}"
+
+- name: NewRelic | Create NewRelic user
+  user:
+    name: "{{ newrelic.owner }}"
+    group: "{{ newrelic.group }}"
+    createhome: no
+
+- name: NewRelic | Replace agent
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ newrelic.install_path }}/newrelic-java-{{ newrelic.version }}"
+    - "{{ newrelic.install_path }}/newrelic"
+
+- name: NewRelic | Extract NewRelic java agent
+  command: "unzip /tmp/newrelic-java.zip -d {{ newrelic.install_path }}"
+
+- name: NewRelic | Rename directory
+  command: "mv {{ newrelic.install_path }}/newrelic {{ newrelic.install_path }}/newrelic-java-{{ newrelic.version }}"
+
+- name: NewRelic | Symbolic link
+  file:
+    src: "{{ newrelic.install_path }}/newrelic-java-{{ newrelic.version }}"
+    dest: "{{ newrelic.install_path }}/newrelic"
+    owner: "{{ newrelic.owner }}"
+    group: "{{ newrelic.group }}"
+    state: link
+    force: yes
+
+- name: NewRelic | Set directory permissions
+  file:
+    path: "{{ newrelic.install_path }}/newrelic-java-{{ newrelic.version }}"
+    mode: 0755
+    owner: "{{ newrelic.owner }}"
+    group: "{{ newrelic.group }}"
+    state: directory
+    recurse: yes
+
+- name: NewRelic | Set log directory permissions
+  file:
+    path: "{{ newrelic.install_path }}/newrelic-java-{{ newrelic.version }}/log"
+    mode: 0755
+    owner: "{{ newrelic.owner }}"
+    group: "{{ newrelic.group }}"
+    state: directory
+    recurse: yes
+
+- name: NewRelic | Configuration newrelic.yml
+  template: 
+    src: newrelic.yml
+    dest: "{{ newrelic.install_path }}/newrelic/newrelic.yml"
+    owner: "{{ newrelic.owner }}"
+    group: "{{ newrelic.group }}"
+    mode: 0755

@@ -1,0 +1,18 @@
+---
+
+- name: Impac | Setup deployment directories
+  include: setup.yml
+
+- name: Impac | Deploy new version
+  include: deploy.yml
+  tags: [deploy]
+
+- name: Impac | Run/Reload Puma Runtime (Debian)
+  include: runtime_deb.yml
+  tags: [deploy]
+  when: ansible_os_family == "Debian"
+
+- name: Impac | Run/Reload Puma Runtime (RHEL)
+  include: runtime_rhel.yml
+  tags: [deploy]
+  when: ansible_os_family == "RedHat"

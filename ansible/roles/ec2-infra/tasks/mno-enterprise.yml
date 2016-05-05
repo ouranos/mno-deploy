@@ -1,0 +1,67 @@
+---
+
+# Maestrano Enterprise Configuration
+
+- set_fact: maestrano_component="mno-enterprise-server-local"
+
+- name: Create Maestrano Enterprise ELB
+  ec2_elb_lb:
+    name: "{{ mnoe.elastic_load_balancer.name }}"
+    state: present
+    scheme: "{{ mnoe.elastic_load_balancer.scheme | default('internet-facing')}}"
+    connection_draining_timeout: "{{ mnoe.elastic_load_balancer.connection_draining_timeout }}"
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    subnets: "{{ mnoe.elastic_load_balancer.subnets }}"
+    security_group_ids: "{{ mnoe.elastic_load_balancer.security_group_ids }}"
+    listeners: "{{ mnoe.elastic_load_balancer.listeners }}"
+    health_check: "{{ mnoe.elastic_load_balancer.health_check }}"
+  register: mnoe_elastic_load_balancer
+
+- name: Add DNS record for ELB
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ mnoe.dns_record.record }}"
+    type: "{{ mnoe.dns_record.type }}"
+    value: "{{ mnoe_elastic_load_balancer.elb.dns_name }}"
+    alias: "{{ mnoe.dns_record.alias }}"
+    ttl: "{{ mnoe.dns_record.ttl }}"
+    private_zone: "{{ route53.zone.private_zone }}"
+    alias_hosted_zone_id: "{{ mnoe.elastic_load_balancer.alias_hosted_zone_id }}"
+    overwrite: "{{ mnoe.dns_record.overwrite }}"
+
+- name: Create Maestrano Enterprise Launch Configuration
+  ec2_lc:
+    name: "{{ mnoe.launch_configuration.name }}"
+    key_name: "{{ mnoe.launch_configuration.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ mnoe.launch_configuration.image_id }}"
+    instance_type: "{{ mnoe.launch_configuration.instance_type }}"
+    security_groups: "{{ mnoe.launch_configuration.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+
+- name: Create Maestrano Enterprise Auto Scaling Group
+  ec2_asg:
+    name: "{{ mnoe.auto_scaling_group.name }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    launch_config_name: "{{ mnoe.launch_configuration.name }}"
+    min_size: "{{ mnoe.auto_scaling_group.min_size }}"
+    max_size: "{{ mnoe.auto_scaling_group.max_size }}"
+    desired_capacity: "{{ mnoe.auto_scaling_group.desired_capacity }}"
+    vpc_zone_identifier: "{{ mnoe.auto_scaling_group.vpc_zone_identifier }}"
+    availability_zones: "{{ mnoe.auto_scaling_group.availability_zones }}"
+    load_balancers: "{{ mnoe.elastic_load_balancer.name }}"
+    tags: "{{ mnoe.auto_scaling_group.tags }}"
+  register: mnoe_auto_scaling_group

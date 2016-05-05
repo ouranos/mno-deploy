@@ -1,0 +1,183 @@
+# UAT Configuration
+# This file is used to store the general application configuration
+#
+# Configuration parameters gets stored in the CNF global variable
+# E.g. CNF['action_job_polling_frequency']
+#
+
+#=====================================================================
+# General Application Configuration
+#=====================================================================
+# Define the public and private facing URL from which the
+# Nex! API can be accessed
+# The private URL should be accessible from the VPC / Private Network
+# in which racks are launched
+# The private DNS can be the same as the public one
+nex_public_proto: {{ nex_config.public_dns.scheme }}
+nex_public_dns: {{ nex_config.public_dns.host }}
+nex_private_proto: {{ nex_config.private_dns.scheme }}
+nex_private_dns: {{ nex_config.private_dns.host }}
+
+# Define publicly acessible IDP host. Used to configure
+# the cubes.
+hub_idp_proto: {{ mnohub_config.public_dns.scheme }}
+hub_idp_host: {{ mnohub_config.public_dns.host }}
+
+# Define publicly acessible HUB API host. Used to configure
+# the cubes.
+hub_api_proto: {{ mnohub_config.public_dns.scheme }}
+hub_api_host: {{ mnohub_config.public_dns.host }}
+
+# Define publicly acessible Connec! API host. Used to configure
+# the cubes.
+connec_api_proto: {{ nex_config.connec_api.scheme }}
+connec_api_host: {{ nex_config.connec_api.host }}
+
+# How frequently should action monitoring jobs be reenqueued
+# E.g.: monitoring a cube/server in provisioning mode
+action_job_polling_frequency: 10 #seconds
+
+# Whether cloud provisioning (server,cubes,ssh calls) should be disabled or not
+stub_infrastructure_calls: false
+
+# Email to use for notification emails
+alerting_notification_email: {{ nex_config.alerting_email }}
+
+# How frequently should Nex evaluate the Infrastructure sizing
+# and potentially launch/remove racks
+auto_scale_job_interval: 10 #minutes
+
+# How frequently should StorageRacks be backed up
+auto_backup_job_interval: 360 #minutes
+
+# How frequently should racks and cubes be monitored
+grid_monitoring_job_interval: 1200 #seconds = 20mins
+
+# Describe how splunk should be configured on the racks
+# DISABLED
+# splunk_host: splunk.maestrano.io
+# splunk_host_port: 9697
+
+
+#=====================================================================
+# Infrastructure Configuration
+#=====================================================================
+# Short version describing the environment
+# Used in filenames, URLs etc.
+env_tag: {{ nex_config.env_tag }}
+
+# Cube DNS configuration: under whhich apps are launched
+# Used by the routing grid to optimize traffic routing
+app_subdomain: {{ nex_config.app_subdomain }}
+
+# DEPRECATED: new routing infrastructure removes the need to
+# manage the actual cube domain
+# Time to Live (TTL) of cube dns entry
+app_dns_ttl: 60 #seconds
+
+# This is the domain under which Racks will be registered
+# This domain should be dedicated to the Nex application
+# (e.g.: use delegated domain in AWS Route53)
+rack_subdomain: {{ nex_config.rack_subdomain }}
+rack_dns_ttl: 20 #seconds
+
+# Whether to enable dynamic certificate lookup on The
+# routing infrastructure.
+# NOTE: Nex! is not yet able to store custom certificates
+# so setting this to true is useless for the moment
+allow_custom_cube_ssl_certs: false
+
+# Where to redirect users on error or when
+# the application is not found or not started
+# Used by the routing infrastrure
+web_error_redirect_domain: {{ nex_config.routing.error_redirect_domain }}
+web_nf_redirect_domain: {{ nex_config.routing.not_found_redirect_url }}
+
+# Details of the SMTP gateway that should be used on the
+# ComputeRacks to relay hosted apps emails
+email_smtp: smtp.mandrillapp.com
+email_domain: {{ nex_config.mandrill.domain }}
+email_api_endpoint: https://mandrillapp.com/api/1.0
+
+# Specify which regions are currently managed by Nex!
+regions:
+  - {{ nex_config.region }}
+
+# Configure bastion boxes (one per region)
+# Nex! Orchestration Service is in same VPC as the
+# Routing/Compute/Storage racks. No need for bastion
+# host
+# admin:
+#   bastion:
+#     key_pair: global-dev
+#     ssh_user: ec2-user
+#     ip_address:
+#       {{ nex_config.region }}: '52.74.199.184'
+
+# Routing Infrastructure configuration
+routing:
+  nginx:
+    type: 'c4.large'
+    security_group: {{ nex_config.network.routing_security_group }}
+    key_pair: {{ nex_config.ec2_keypair }}
+    ssh_user: {{ nex_config.ssh_user }}
+    os: {{ default_base_ami_os }}
+    ami:
+      {{ nex_config.region }}: {{ default_base_ami }}
+    zone:
+      {{ nex_config.region }}: '{{ nex_config.region }}a'
+    vpc:
+      {{ nex_config.region }}: {{ nex_config.network.vpc_id }}
+    subnet:
+      {{ nex_config.region }}: {{ nex_config.network.routing_subnet }}
+    elb:
+      {{ nex_config.region }}: {{ nex_config.network.routing_elb_name }}
+    # DEPRECATED: upon migrating all cube instances to the new
+    # routing system, we will not need to keep this value anymore
+    elb_dns:
+      {{ nex_config.region }}: {{ nex_config.network.routing_elb_dns }}
+
+# Compute Infrastructure configuration
+compute:
+  lxc:
+    disabled: true
+    # type: 'm1.small'
+    # security_group: 'bio-bio-dsilo-nex-compute'
+    # key_pair: global-dev
+    # ssh_user: ec2-user
+    # ami:
+    #   {{ nex_config.region }}: 'ami-6d8ecf57'
+    # zone:
+    #   {{ nex_config.region }}: '{{ nex_config.region }}a'
+  docker:
+    type: 'm3.xlarge'
+    security_group: {{ nex_config.network.compute_security_group }}
+    key_pair: {{ nex_config.ec2_keypair }}
+    ssh_user: {{ nex_config.ssh_user }}
+    os: {{ default_base_ami_os }}
+    ami:
+      {{ nex_config.region }}: {{ default_base_ami }}
+    zone:
+      {{ nex_config.region }}: '{{ nex_config.region }}a'
+    vpc:
+      {{ nex_config.region }}: {{ nex_config.network.vpc_id }}
+    subnet:
+      {{ nex_config.region }}: {{ nex_config.network.compute_subnet }}
+
+# Storage Infrastructure configuration
+storage:
+  rsync:
+    type: 'm3.medium'
+    storage_size: 1000 # 1TB
+    security_group: {{ nex_config.network.storage_security_group }}
+    key_pair: {{ nex_config.ec2_keypair }}
+    ssh_user: {{ nex_config.ssh_user }}
+    os: {{ default_base_ami_os }}
+    ami:
+      {{ nex_config.region }}: {{ default_base_ami }}
+    zone:
+      {{ nex_config.region }}: '{{ nex_config.region }}a'
+    vpc:
+      {{ nex_config.region }}: {{ nex_config.network.vpc_id }}
+    subnet:
+      {{ nex_config.region }}: {{ nex_config.network.storage_subnet }}

@@ -1,0 +1,113 @@
+---
+
+# MongoDB cluster Configuration
+
+- set_fact: maestrano_component="mongodb-server-local"
+
+- set_fact: mongodb_master=''
+- set_fact: mongodb_bind_ip="{{ mongo.cluster.dns.replica1 }}"
+
+- name: Mongo Cluster | Create Read Replicas | Zone 1
+  ec2:
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    zone: "{{ aws_availability_zone1 }}"
+    key_name: "{{ mongo.launch_configuration.key_name }}"
+    instance_type: "{{ mongo.launch_configuration.instance_type }}"
+    image: "{{ mongo.launch_configuration.image_id }}"
+    group_id: "{{ mongo.launch_configuration.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 30
+        device_type: gp2 # SSD
+      - device_name: /dev/sdf
+        volume_size: "{{ mongo.size }}"
+        encrypted: "{{ mongo.encrypted }}"
+        device_type: gp2 # SSD
+    vpc_subnet_id: "{{ mongo.cluster.vpc_zone_identifier[0] }}"
+    instance_tags: "{{ mongo.cluster.tags }}"
+    count_tag:
+      - Name
+      - InitialMaster: "False"
+    exact_count: 1
+  register: mongo_replicas_zone1
+
+- set_fact: mongodb_master=''
+- set_fact: mongodb_bind_ip="{{ mongo.cluster.dns.replica2 }}"
+- name: Mongo Cluster | Create Read Replicas | Zone 2
+  ec2:
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    zone: "{{ aws_availability_zone2 }}"
+    key_name: "{{ mongo.launch_configuration.key_name }}"
+    instance_type: "{{ mongo.launch_configuration.instance_type }}"
+    image: "{{ mongo.launch_configuration.image_id }}"
+    group_id: "{{ mongo.launch_configuration.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 30
+        device_type: gp2 # SSD
+      - device_name: /dev/sdf
+        volume_size: "{{ mongo.size }}"
+        encrypted: "{{ mongo.encrypted }}"
+        device_type: gp2 # SSD
+    vpc_subnet_id: "{{ mongo.cluster.vpc_zone_identifier[1] }}"
+    instance_tags: "{{ mongo.cluster.tags }}"
+    count_tag:
+      - Name
+      - InitialMaster: "False"
+    exact_count: 1
+  register: mongo_replicas_zone2
+
+- set_fact: mongodb_master=true
+- set_fact: mongodb_bind_ip="{{ mongo.cluster.dns.master }}"
+- name: Mongo Cluster | Create Initial Master
+  ec2:
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    region: "{{ aws_region }}"
+    zone: "{{ aws_availability_zone1 }}"
+    key_name: "{{ mongo.launch_configuration.key_name }}"
+    instance_type: "{{ mongo.launch_configuration.instance_type }}"
+    image: "{{ mongo.launch_configuration.image_id }}"
+    group_id: "{{ mongo.launch_configuration.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 30
+        device_type: gp2 # SSD
+      - device_name: /dev/sdf
+        volume_size: "{{ mongo.size }}"
+        encrypted: "{{ mongo.encrypted }}"
+        device_type: gp2 # SSD
+    vpc_subnet_id: "{{ mongo.cluster.vpc_zone_identifier[0] }}"
+    instance_tags: "{{ mongo.cluster.master_tags }}"
+    count_tag:
+      - Name
+      - InitialMaster: "True"
+    exact_count: 1
+  register: mongo_replica_master
+
+- name: Mongo Cluster | Add DNS record for Replicas
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ item.dns }}"
+    type: A
+    value: "{{ item.instance.tagged_instances[0].private_ip }}"
+    alias: False
+    ttl: "{{ mongo.dns_record.ttl }}"
+    private_zone: "{{ route53.zone.private_zone }}"
+    alias_hosted_zone_id: "{{ mongo.elastic_load_balancer.alias_hosted_zone_id }}"
+    overwrite: "{{ mongo.dns_record.overwrite }}"
+  with_items:
+    - dns: "{{ mongo.cluster.dns.master }}"
+      instance: "{{ mongo_replica_master }}"
+    - dns: "{{ mongo.cluster.dns.replica1 }}"
+      instance: "{{ mongo_replicas_zone1 }}"
+    - dns: "{{ mongo.cluster.dns.replica2 }}"
+      instance: "{{ mongo_replicas_zone2 }}"

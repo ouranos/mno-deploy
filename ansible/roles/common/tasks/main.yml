@@ -1,0 +1,123 @@
+---
+- name: General | Sudoers | Disable requiretty
+  lineinfile: dest=/etc/sudoers state=present regexp='^Defaults(\s+)requiretty' line='Defaults !requiretty'
+
+- name: General | Add ssh user keys
+  authorized_key:
+    user: "{{ item['name'] }}"
+    key: "{{ lookup('file', item.file) }}"
+  with_items: ssh_users
+  ignore_errors: true
+  tags: [ssh]
+
+- name: General | Sudoers | Keep proxy config via sudo
+  lineinfile: dest=/etc/sudoers state=present line='Defaults env_keep += "ftp_proxy http_proxy https_proxy no_proxy"'
+
+- name: General | Proxy | Configure proxy profile /etc/profile.d/proxy.sh
+  template:
+    src: proxy.sh
+    dest: /etc/profile.d/proxy.sh
+    owner: root
+    group: root
+    mode: 0644
+  when: proxy_host is defined and proxy_port is defined
+
+- name: General | SELinux | Disable SELinux in config file
+  template:
+    src: selinux_config.rhel
+    dest: /etc/selinux/config
+  ignore_errors: true
+
+- name: General | SELinux | Disable SELinux online
+  command: setenforce 0
+  ignore_errors: true
+
+- name: General | Install packages
+  apt: "name={{ item }} state=present update_cache=yes cache_valid_time=3600"
+  with_items:
+    - ntp
+    - curl
+    - git
+    - python-pip
+    - unzip
+    - ruby
+  when: ansible_os_family == "Debian"
+
+- name: General | Install packages
+  yum: "name={{ item }} state=present"
+  with_items:
+    - ntp
+    - curl
+    - git
+    - unzip
+    - geoip
+    - gd
+    - mysql
+    - ruby
+  when: ansible_os_family == "RedHat"
+
+- name: General | Git HTTP Proxy
+  command: "git config --global http.proxy http://{{ proxy_host }}:{{ proxy_port }}"
+  when: proxy_host is defined and proxy_port is defined
+  environment:
+    HOME: /root
+
+- name: General | Git HTTPS Proxy
+  command: "git config --global https.proxy http://{{ proxy_host }}:{{ proxy_port }}"
+  when: proxy_host is defined and proxy_port is defined
+  environment:
+    HOME: /root
+
+- name: General | Install development packages
+  shell: "yum groupinstall -y development"
+  when: ansible_os_family == "RedHat"
+
+- name: General | Install development packages
+  yum: "name={{ item }} state=present enablerepo=rhui-REGION-rhel-server-optional"
+  with_items:
+    - patch
+    - libyaml
+    - glibc-headers
+    - autoconf
+    - gcc-c++
+    - glibc-devel
+    - readline-devel
+    - zlib-devel
+    - libffi-devel
+    - openssl-devel
+    - bzip2
+    - automake
+    - libtool
+    - bison
+    - sqlite-devel
+    - curl-devel
+    - mysql-devel
+    - ruby-devel
+  when: ansible_os_family == "RedHat"
+
+- name: General | Check if python tools are installed
+  command: rpm -q python-pip
+  when: ansible_os_family == "RedHat"
+  failed_when: rpm_check.rc > 1
+  register: rpm_check
+
+- name: General | Install python tools
+  shell: "{{ item }}"
+  with_items:
+    - rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+    - yum -y update
+    - yum -y install python-pip
+  when: ansible_os_family == "RedHat" and rpm_check.rc == 1
+  ignore_errors: true
+
+- name: General | Install boto package
+  command: pip install boto --upgrade
+
+- name: General | Add Internal SSL CA Bundle
+  template: src=ssl_internal_bundle.crt dest=/etc/pki/ca-trust/source/anchors/mno-internal-ca.crt
+  register: sslcafile
+  when: ansible_os_family == "RedHat" and ssl_internal_bundle is defined
+
+- name: General | Enable Internal SSL CA
+  shell: "update-ca-trust"
+  when: ansible_os_family == "RedHat" and ssl_internal_bundle is defined and sslcafile is defined and sslcafile.changed

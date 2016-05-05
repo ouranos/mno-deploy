@@ -1,0 +1,8 @@
+- include: torquebox.yml
+  tags: [torquebox]
+
+- include: jruby.yml
+  tags: [jruby]
+
+- include: torquebox_config.yml
+  tags: [torquebox_config]

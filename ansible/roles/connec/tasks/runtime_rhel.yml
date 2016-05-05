@@ -1,0 +1,29 @@
+---
+
+- name: Connec | Copy puma.rb config
+  template: src=puma-http.rb dest={{deploy_directory}}/shared/config/puma.rb owner=deployer group=deployer mode=0755
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add /etc/systemd/system/puma.service
+  template: src=puma.service dest=/etc/systemd/system/puma.service force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add /etc/systemd/system/puma-env.conf
+  template: src=puma-env.conf dest=/etc/systemd/system/puma-env.conf force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add puma to systemd
+  service: name=puma state=restarted enabled=yes
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add /etc/systemd/system/sidekiq.service
+  template: src=sidekiq.service dest=/etc/systemd/system/sidekiq.service force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'jobs'
+
+- name: Connec | Add /etc/systemd/system/sidekiq-env.conf
+  template: src=sidekiq-env.conf dest=/etc/systemd/system/sidekiq-env.conf force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'jobs'
+
+- name: Connec | Add sidekiq to systemd
+  service: name=sidekiq state=restarted enabled=yes
+  when: connec_config.component is defined and connec_config.component == 'jobs'

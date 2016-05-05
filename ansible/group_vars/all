@@ -1,0 +1,1226 @@
+---
+
+#=======================================================================
+#=======================================================================
+# Application versions
+#=======================================================================
+#=======================================================================
+mnohub_version: changeme
+mnohub_folder: develop
+connec_version: changeme
+connec_folder: develop
+impac_version: changeme
+impac_folder: develop
+nex_app_orchestrator_version: changeme
+nex_app_orchestrator_folder: develop
+frontend_project: changeme
+frontend_version: changeme
+frontend_folder: develop
+
+#=======================================================================
+#=======================================================================
+# AWS Keys
+#=======================================================================
+#=======================================================================
+# AWS Access Keys used to provision the infrastructure
+# These keys should be exported before running the provisioning
+# tasks (ec2-infra)
+aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') }}"
+aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') }}"
+aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+
+# These keys are used by the EC2 instances to retrieve applications packages
+# such as Connec!, Impac! etc. from the 'mnoe-packages' S3 bucket
+# These keys should be different for each enterprise customer
+mno_pkgs_bucket: mnoe-packages
+mno_pkgs_s3_aws_access_key: "changeme-with-tenant-specific-mno-key-to-mnoe-packages"
+mno_pkgs_s3_aws_secret_key: "changeme-with-tenant-specific-mno-secret-to-mnoe-packages"
+mno_pkgs_s3_aws_region: "ap-southeast-2"
+
+# These keys are used by the EC2 instances retrieve to retrieve the
+# mno-infrastructure package (ansible scripts) from the dedicated dropbox
+# S3 bucket used by maestrano to drop packages
+# This package should be hosted on a private S3 bucket by the enterprise
+# tenant itself.
+# Note: the dropbox could eventually be used to host application packages
+# such as Connec!, Impac! etc.
+tenant_dropbox_bucket: 'changeme-with-dropbox-bucket-name'
+tenant_dropbox_s3_aws_access_key: "changeme-with-s3-tenant-key"
+tenant_dropbox_s3_aws_secret_key: "changeme-with-s3-tenant-secret"
+tenant_dropbox_s3_aws_region: "ap-southeast-2"
+
+# Dropbox paths
+dropbox_mno_infrastructure_builds_path: '/mno-infrastructure/develop'
+
+#=======================================================================
+#=======================================================================
+# General Environment configuration
+#=======================================================================
+#=======================================================================
+environment_name: test
+application_name: maestrano
+rails_environment: uat
+keypair: maestrano
+
+timezone: Australia/Sydney
+aws_availability_zone1: "{{ aws_region }}a"
+aws_availability_zone2: "{{ aws_region }}b"
+aws_availability_zones: ["{{ aws_availability_zone1 }}", "{{ aws_availability_zone2 }}"]
+
+default_base_ami: ami-7163104b # Ubuntu 14.04 (PV)
+default_base_ami_os: ubuntu
+# default_base_ami: ami-ff9cecc5 # Amazon Linux AMI 2015.03 (PV)
+# default_base_ami_os: rhel
+# default_base_ami: ami-d3daace9 # Red Hat Enterprise Linux 7.1
+# default_base_ami_os: rhel
+default_instance_type: m1.medium
+
+# Used to restrict SSH access to the jumpbox/NAT
+inbound_ip_range: 103.237.93.231/32
+
+# New Relic
+newrelic_license_key:
+newrelic_app_name: My Application
+newrelic_plugins:
+  mongodb: false
+
+# Splunk configuration
+splunk:
+  skip: true
+  username: admin
+  password: changeme
+  extra_hosts: []
+  outputs: []
+  maestrano:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+  mno_enterprise:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+  mnohub:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/torquebox/torquebox.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+  connec:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+  impac:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+  nex:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/torquebox/torquebox.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+
+# Private Route53 Zone
+route53:
+  skip: false
+  zone:
+    id: changeme # TO BE SET AFTER THE CREATION OF THE HOSTED ZONE
+    name: "{{ environment_name }}.local"
+    private_zone: true
+
+dns:
+  base: "{{ environment_name }}.{{ route53.zone.name }}"
+
+# List of user SSH keys
+ssh_users: []
+
+#=======================================================================
+#=======================================================================
+# Infrastructure configuration
+#=======================================================================
+#=======================================================================
+# S3 Buckets
+s3_buckets:
+  public: generic-public-assets
+  private: generic-private-assets
+  torquebox: generic-torquebox-cluster
+
+
+# VPC naming
+vpc_base_name: "{{ application_name }}-{{ environment_name }}-{{ rails_environment }}"
+vpc_short_name: "{{ application_name }}-{{ environment_name }}"
+
+# Resources tagging
+vpc_tags:
+  Name: "{{ vpc.name }}"
+  Environment: "{{ environment_name }}"
+
+subnets_tags:
+  - Application: "{{ application_name }}"
+  - Environment: "{{ environment_name }}"
+  - Rails_Environment: "{{ rails_environment }}"
+
+asg_tags:
+  - Application: "{{ application_name }}"
+    Environment: "{{ environment_name }}"
+    Rails_Environment: "{{ rails_environment }}"
+
+# EC2 VPC
+# /*\ DO NOT CHANGE THE ORDER OF SUBNETS /*\
+# If you override this, you should keep the same hierarchy (public | private | elb)
+vpc:
+  skip: false
+  name: "{{ vpc_base_name }}-vpc"
+  cidr_block: 192.168.14.0/23
+  subnets:
+    #0
+    - cidr: 192.168.15.128/26
+      az: "{{ aws_availability_zone1 }}"
+      resource_tags: "{ 'Name': '{{ vpc_base_name }}-public_tier_a', 'Tier': 'public' }"
+    #1
+    - cidr: 192.168.15.192/26
+      az: "{{ aws_availability_zone2 }}"
+      resource_tags: "{ 'Name': '{{ vpc_base_name }}-public_tier_b', 'Tier': 'public' }"
+    #2
+    - cidr: 192.168.14.0/25
+      az: "{{ aws_availability_zone1 }}"
+      resource_tags: "{ 'Name': '{{ vpc_base_name }}-private_tier_a', 'Tier': 'private' }"
+    #3
+    - cidr: 192.168.14.128/25
+      az: "{{ aws_availability_zone2 }}"
+      resource_tags: "{ 'Name': '{{ vpc_base_name }}-private_tier_b', 'Tier': 'private' }"
+    #4
+    - cidr: 192.168.15.0/26
+      az: "{{ aws_availability_zone1 }}"
+      resource_tags: "{ 'Name': '{{ vpc_base_name }}-elb_tier_a', 'Tier': 'elb' }"
+    #5
+    - cidr: 192.168.15.64/26
+      az: "{{ aws_availability_zone2 }}"
+      resource_tags: "{ 'Name': '{{ vpc_base_name }}-elb_tier_b', 'Tier': 'elb' }"
+  internet_gateway: True
+  route_tables:
+    - subnets:
+      - "{{ created_vpc.subnets[0].cidr }}" # Public subnet
+      - "{{ created_vpc.subnets[1].cidr }}" # Public subnet
+      routes:
+        - dest: 0.0.0.0/0
+          gw: "{{ vpc_nat_instance.tagged_instances[0].id }}"
+    - subnets:
+      - "{{ created_vpc.subnets[2].cidr }}" # Private subnet
+      - "{{ created_vpc.subnets[3].cidr }}" # Private subnet
+      routes:
+        - dest: 0.0.0.0/0
+          gw: "{{ vpc_nat_instance.tagged_instances[0].id }}"
+    - subnets:
+      - "{{ created_vpc.subnets[4].cidr }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].cidr }}" # ELB subnet
+      routes:
+        - dest: 0.0.0.0/0
+          gw: igw
+
+# Declare variable used when registering the VPC
+created_vpc:
+
+# EC2 Security Groups
+security_groups_tag: true
+security_groups:
+  #0
+  - name: "{{ vpc_base_name }}-ssh-inbound"
+    description: Allow inbound management connections from maestrano
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ inbound_ip_range }}"
+    rules_egress:
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: 0.0.0.0/0
+  #1
+  - name: "{{ vpc_base_name }}-private"
+    description: Default SG for services VPC Private tier
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ vpc.cidr_block }}"
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: "{{ vpc.cidr_block }}"
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress:
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: 0.0.0.0/0
+  #2
+  - name: "{{ vpc_base_name }}-elb"
+    description: Default SG for services VPC ELB tier
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: 0.0.0.0/0
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: 0.0.0.0/0
+    rules_egress:
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: 0.0.0.0/0
+  #3
+  - name: "{{ vpc_base_name }}-public"
+    description: Default SG for services VPC Public tier
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ vpc.cidr_block }}"
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: "{{ vpc.cidr_block }}"
+      - proto: tcp
+        from_port: 443
+        to_port: 443
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress:
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: 0.0.0.0/0
+  #4
+  - name: "{{ vpc_base_name }}-rds"
+    description: RDS access
+    rules:
+      - proto: tcp
+        from_port: 3306
+        to_port: 3306
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+  #5
+  - name: "{{ vpc_base_name }}-mongo"
+    description: MongoDB cluster access
+    rules:
+      - proto: tcp
+        from_port: 27017
+        to_port: 27017
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+  #6
+  - name: "{{ vpc_base_name }}-nat"
+    description: NAT security configuration
+    rules:
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress:
+      - proto: all
+        from_port: 0
+        to_port: 65535
+        cidr_ip: 0.0.0.0/0
+    when: not vpc_nat.skip
+  #7
+  - name: "{{ vpc_base_name }}-torquebox"
+    description: TorqueBox cluster access
+    rules:
+      - proto: tcp
+        from_port: 1024
+        to_port: 65535
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+  #8
+  - name: "{{ vpc_base_name }}-redis"
+    description: Redis access
+    rules:
+      - proto: tcp
+        from_port: 6379
+        to_port: 6379
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+
+nex_security_groups:
+  #0
+  - name: "{{ vpc_base_name }}-nex-routing"
+    description: Nex! Compute Servers
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        cidr_ip: "0.0.0.0/0"
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+  #1
+  - name: "{{ vpc_base_name }}-nex-compute"
+    description: Nex! Compute Servers
+    rules:
+      - proto: tcp
+        from_port: 80
+        to_port: 80
+        group_name: "{{ vpc_base_name }}-nex-routing"
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+  #2
+  - name: "{{ vpc_base_name }}-nex-storage"
+    description: Nex! Compute Servers
+    rules:
+      - proto: tcp
+        from_port: 873
+        to_port: 873
+        group_name: "{{ vpc_base_name }}-nex-compute"
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: "{{ vpc.cidr_block }}"
+    rules_egress: []
+
+# VPC NAT
+vpc_nat:
+  skip: false
+  ami_name: amzn-ami-vpc-nat-hvm-2016.03.0.x86_64-ebs
+  instance_type: t2.micro
+  spot_price: None
+  subnet_id: "{{ created_vpc.subnets[4].id }}"
+
+# IAM roles
+iam:
+  skip: true
+
+
+# Maestrano configuration
+# Note: Maestrano website - should not be used as "MnoHub" anymore
+maestrano:
+  skip: false
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-mnohub-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-mnohub-dns"
+    record: "api-hub.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-mnohub-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+      - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-mnohub-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    min_size: 0
+    max_size: 4
+    desired_capacity: 0
+    tags:
+      - Name: "{{ vpc_short_name }}-mnohub"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "Maestrano server"
+
+# MnoHub configuration
+mnohub:
+  skip: true # new mnohub is not yet part of the default implementation
+  redis:
+    name: "{{ environment_name }}-mnohub-redis"
+    node_type: cache.t2.micro
+    num_nodes: 1
+    endpoint: "{{ environment_name }}-mnohub-redis.{{ dns.base }}"
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-mnohub-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-mnohub-dns"
+    record: "api-hub.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-mnohub-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+      - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+      - "{{ created_security_groups.results[7].group_id }}" # TorqueBox cluster security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-mnohub-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    min_size: 0
+    max_size: 4
+    desired_capacity: 0
+    tags:
+      - Name: "{{ vpc_short_name }}-mnohub"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "MnoHub server"
+
+# Nex! configuration
+nex:
+  skip: false
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-nex-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  apps_elastic_load_balancer:
+    name: "{{ vpc_short_name }}-nex-apps-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+  dns_record:
+    name: "{{ vpc_short_name }}-nex-dns"
+    record: "api-nex.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-nex-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+      - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+      - "{{ created_security_groups.results[7].group_id }}" # TorqueBox cluster security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-nex-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    min_size: 0
+    max_size: 4
+    desired_capacity: 0
+    tags:
+      - Name: "{{ vpc_short_name }}-nex-app-orchestrator"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "Nex! server"
+
+# Connec! configuration
+connec:
+  skip: false
+  redis:
+    name: "{{ environment_name }}-connec-redis"
+    node_type: cache.t2.micro
+    num_nodes: 1
+    endpoint: "{{ environment_name }}-connec-redis.{{ dns.base }}"
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-connec-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-connec-dns"
+    record: "api-connec.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    api:
+      name: "{{ vpc_short_name }}-connec-api-lc"
+      image_id: "{{ default_base_ami }}"
+      key_name: "{{ keypair }}"
+      instance_type: "{{ default_instance_type }}"
+      spot_price: None
+      security_groups:
+        - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+        - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+        - "{{ created_security_groups.results[5].group_id }}" # MongoDB security group
+    jobs:
+      name: "{{ vpc_short_name }}-connec-jobs-lc"
+      image_id: "{{ default_base_ami }}"
+      key_name: "{{ keypair }}"
+      instance_type: "{{ default_instance_type }}"
+      spot_price: None
+      security_groups:
+        - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+        - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+        - "{{ created_security_groups.results[5].group_id }}" # MongoDB security group
+  auto_scaling_group:
+    api:
+      name: "{{ vpc_short_name }}-connec-api-asg"
+      availability_zones: "{{ aws_availability_zones }}"
+      vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+      min_size: 0
+      max_size: 4
+      desired_capacity: 0
+      tags:
+        - Name: "{{ vpc_short_name }}-connec-api"
+          Environment: "{{ environment_name }}"
+          Rails_Environment: "{{ rails_environment }}"
+          Description: "Connec! API server"
+    jobs:
+      name: "{{ vpc_short_name }}-connec-jobs-asg"
+      availability_zones: "{{ aws_availability_zones }}"
+      vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+      min_size: 0
+      max_size: 4
+      desired_capacity: 0
+      tags:
+        - Name: "{{ vpc_short_name }}-connec-jobs"
+          Environment: "{{ environment_name }}"
+          Rails_Environment: "{{ rails_environment }}"
+          Description: "Connec! Jobs server"
+
+# Impac! configuration
+impac:
+  skip: false
+  redis:
+    name: "{{ environment_name }}-impac-redis"
+    node_type: cache.t2.micro
+    num_nodes: 1
+    endpoint: "{{ environment_name }}-impac-redis.{{ dns.base }}"
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-impac-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-impac-dns"
+    record: "api-impac.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-impac-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-impac-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    min_size: 0
+    max_size: 4
+    desired_capacity: 0
+    tags:
+      - Name: "{{ vpc_short_name }}-impac"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "Impac! server"
+
+# MongoDB cluster configuration
+mongo:
+  skip: False
+  size: 100
+  encrypted: False
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-mongo-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}" # Private subnet
+      - "{{ created_vpc.subnets[3].id }}" # Private subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[1].group_id }}" # Private tier security group
+      - "{{ created_security_groups.results[5].group_id }}" # MongoDB security group
+    listeners:
+      - protocol: tcp
+        load_balancer_port: 27017
+        instance_port: 27017
+  dns_record:
+    name: "{{ vpc_short_name }}-mongo-dns"
+    record: "mongo.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-mongo-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[1].group_id }}" # Private tier security group
+      - "{{ created_security_groups.results[5].group_id }}" # MongoDB security group
+  cluster:
+    vpc_zone_identifier: ["{{ created_vpc.subnets[2].id }}", "{{ created_vpc.subnets[3].id }}"] # Private subnets
+    dns:
+      master: "r0.mongo.{{ dns.base }}"
+      replica1: "r1.mongo.{{ dns.base }}"
+      replica2: "r2.mongo.{{ dns.base }}"
+    master_tags:
+      Name: "{{ vpc_short_name }}-mongo"
+      Environment: "{{ environment_name }}"
+      Description: "MongoDB cluster"
+      InitialMaster: "True"
+    tags:
+      Name: "{{ vpc_short_name }}-mongo"
+      Environment: "{{ environment_name }}"
+      Description: "MongoDB cluster"
+      InitialMaster: "False"
+
+
+# Frontend configuration
+mnoe:
+  skip: false
+  skip_precompile: false
+  skip_migrations: false
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-frontend-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 3 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-frontend-dns"
+    record: "frontend.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-frontend-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+      - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-frontend-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    min_size: 0
+    max_size: 4
+    desired_capacity: 0
+    tags:
+      - Name: "{{ vpc_short_name }}-frontend-app"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "Maestrano Enterprise server"
+
+# RDS database for MNO Hub, MCluster and any required frontend
+rds:
+  name: "{{ environment_name }}-maestrano"
+  skip: false
+  endpoint: "rds.{{ dns.base }}"
+  db_engine: MySQL
+  size: 5
+  instance_type: db.m1.small
+  multi_zone: yes
+  vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+  subnets:
+    - "{{ created_vpc.subnets[2].id }}"
+    - "{{ created_vpc.subnets[3].id }}"
+  username: root
+  password: password
+  tags:
+    Environment: "{{ environment_name }}"
+    Rails_Environment: "{{ rails_environment }}"
+    Application: "{{ application_name }}"
+
+redis_group:
+  name: "{{ environment_name }}-maestrano"
+  description: "Maestrano Redis cache subnet group"
+  vpc_security_groups:
+    - "{{ created_security_groups.results[8].group_id }}"
+  subnets:
+    - "{{ created_vpc.subnets[2].id }}"
+    - "{{ created_vpc.subnets[3].id }}"
+
+# Rundeck configuration
+rundeck:
+  skip: false
+  image_id: "{{ default_base_ami }}"
+  instance_type: "{{ default_instance_type }}"
+  key_name: "{{ keypair }}"
+  security_groups:
+    - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+  subnet_id: "{{ created_vpc.subnets[0].id }}"
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-rundeck-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: tcp
+      ping_port: 80
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-rundeck-dns"
+    record: "rundeck.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+
+# S3 buckets for assets storage and Torquebox clustering
+s3:
+  skip: false
+
+#=======================================================================
+#=======================================================================
+# Application Configuration
+#=======================================================================
+#=======================================================================
+# Torquebox Clustering
+torquebox:
+  s3_cluster:
+    location: "{{ s3_buckets.torquebox }}"
+    access_key: "{{ aws_access_key }}"
+    secret_access_key: "{{ aws_secret_key }}"
+    password: changeme-changeme-changeme
+
+# MongoDB
+mongodb_user_admin_name: siteUserAdmin
+mongodb_user_admin_password: password1
+mongodb_root_admin_name: siteRootAdmin
+mongodb_root_admin_password: password1
+
+# Mongo Replication
+mongodb_conf_replSet: rs0
+mongodb_replication_params:
+  - host_name: "{{ mongo.cluster.dns.master }}"
+    host_port: "{{ mongodb_conf_port }}"
+    host_type: replica
+  - host_name: "{{ mongo.cluster.dns.replica1 }}"
+    host_port: "{{ mongodb_conf_port }}"
+    host_type: replica
+  - host_name: "{{ mongo.cluster.dns.replica2 }}"
+    host_port: "{{ mongodb_conf_port }}"
+    host_type: replica
+
+# Connec Database
+mongodb_user_connec: connec
+mongodb_password_connec: 1b5f75f3g1r5v47dh8z2sdf58df457
+mongodb_database_connec: connec
+
+mongodb_conf_auth: true
+mongodb_users:
+  - {
+    name: "{{ mongodb_user_connec }}",
+    password: "{{ mongodb_password_connec }}",
+    roles: readWrite,
+    database: "{{ mongodb_database_connec }}"
+}
+
+# Nex database credentials
+nex_database_name: mcluster
+nex_database_username: mcluster
+nex_database_password: blaaa465
+nex_database_pool: 15
+nex_database_timeout: 10000
+
+# Maestrano Enterprise database credentials
+mnoe_database_name: mnoe
+mnoe_database_username: mnoe
+mnoe_database_password: blaaa897
+mnoe_database_pool: 15
+mnoe_database_timeout: 10000
+
+# Enterprise Frontend configuration
+frontend_config:
+  public_dns:
+    scheme: http
+    host: "{{ mnoe.dns_record.record }}"
+  private_dns:
+    scheme: http
+    host: "{{ mnoe.dns_record.record }}"
+  mandrill_key: changeme-changeme-changeme
+
+# Impac configuration
+impac_config:
+  public_dns:
+    scheme: http
+    host: "{{ impac.dns_record.record }}"
+  private_dns:
+    scheme: http
+    host: "{{ impac.dns_record.record }}"
+
+# Maestrano configuration
+mnohub_config:
+  skip_migrations: false
+  background_jobs_disabled: false
+  mcluster_autostop_disabled: false
+  sso_idp_delegation: ''
+  redis_url: "redis://{{ mnohub.redis.endpoint }}:6379/0"
+  public_dns:
+    scheme: http
+    host: "{{ maestrano.dns_record.record }}"
+  private_dns:
+    scheme: http
+    host: "{{ maestrano.dns_record.record }}"
+  general:
+    contact_email: contact@example.com
+    support_email: support@example.com
+    feedback_email: feedback@example.com
+    loveus_email: loveus@example.com
+    ceo_email: '"CEO" <ceo@example.com>'
+    account_manager_email: '"Manager" <manager@example.com>'
+    nex_host: "http://{{ nex.dns_record.record }}"
+    http_enabled: true
+    delay_job: true
+    sync_intervall: 10 #seconds
+    private_access_mode: false
+    payment_gateway_mode: test
+    apps_domain: "apps.{{ dns.base }}"
+    virtual_email_domain: "appmail.{{ maestrano.dns_record.record }}"
+    support_rate_pips: 2500
+    cdn_assets: true
+    available_regions:
+      - "{{ aws_region }}"
+    fallback_region: "{{ aws_region }}"
+    mnoe_lockdown_region: "{{ aws_region }}"
+  secrets:
+    encryption_key: "changeme-changeme-changeme"
+    open_exchange_rate_id: a9e8556fb8344519b14e545c4e06541b
+  s3_bucket:
+    region: "ap-southeast-1"
+    public: "{{ s3_buckets.public }}"
+    private: "{{ s3_buckets.private }}"
+    access_key: "changeme-changeme-changeme"
+    secret_access_key: "changeme-changeme-changeme"
+  eway:
+    # eWay Test Crendentials
+    login: '87654321'
+    username: test@eway.com.au
+    password: test123
+  open_exchange_rates:
+    app_id: changeme
+  database:
+    name: maestrano
+    username: maestrano
+    password: changeme
+    pool: 15
+    timeout: 10000
+
+# Nex! Config
+nex_config:
+  connec_api:
+    scheme: "{{ connec_config.public_dns.scheme }}"
+    host: "{{ connec_config.public_dns.host }}"
+
+# Connec! configuration
+connec_config:
+  public_dns:
+    scheme: http
+    host: "{{ connec.dns_record.record }}"
+  private_dns:
+    scheme: http
+    host: "{{ connec.dns_record.record }}"
+  authentication:
+    admin:
+      client_id: "changeme-changeme-changeme"
+      client_key: "changeme-changeme-changeme"
+  oauth:
+    xero:
+      key:
+      secret:
+      endpoint: https://api-partner.network.xero.com/api.xro/2.0
+      private_key: "vendor/xero-certs/{{ rails_environment }}/privatekey.pem"
+      ssl_client_cert: "vendor/xero-certs/{{ rails_environment }}/entrust-cert.pem"
+      ssl_client_key: "vendor/xero-certs/{{ rails_environment }}/entrust-private-nopass.pem"
+      signature_method: RSA-SHA1
+      user_agent: "{{ application_name }} {{ rails_environment }}"
+    quickbooks:
+      api_endpoint: https://sandbox-quickbooks.api.intuit.com
+      login_endpoint: https://oauth.intuit.com
+      request_token_path: /oauth/v1/get_request_token
+      authorize_url: https://appcenter.intuit.com/Connect/Begin
+      access_token_path: /oauth/v1/get_access_token
+      credentials:
+        default:
+          key:
+          secret:
+    myob:
+      key:
+      secret:
+    eventbrite:
+      key:
+      secret:
+  sidekiq:
+    admin:
+      username: admin
+      password: changeme
+
+# RVM platform specific config, see https://rvm.io/rvm/autolibs
+# Only Maestrano Hub uses it at the moment. Will be removed.
+rvm1_autolib_mode: 3 # Use libs, install missing libs
+
+# Rundeck configuration
+rundeck_config:
+  domain: "{{ rundeck.dns_record.record }}"
+  protocol: https
+  database:
+    type: hsqldb
+    host: localhost
+    port: None
+    name: rundeck
+    username: rundeck
+    password: rundeck
+  users:
+    - { name: "admin", password: "changeme", roles: ['user','admin','architect','deploy','build'] }
+  aws_plugin:
+    uat:
+      aws_access_key: changeme
+      aws_secret_key: changeme
+      endpoint: ec2.ap-southeast-1.amazonaws.com
+    production:
+      aws_access_key: changeme
+      aws_secret_key: changeme
+      endpoint: ec2.ap-southeast-1.amazonaws.com
+  ssh_private_keys:
+    uat:
+      name: "{{ environment_name }}-uat"
+      content: --- PRIVATE KEY CONTENT ---
+    production:
+      name: "{{ environment_name }}-production"
+      content: --- PRIVATE KEY CONTENT ---
+  jumphost:
+    uat:
+      username: ec2-user
+      address: changeme  # 52.74.222.93
+      vpc_cidr: changeme # 192.168.*
+    production:
+      username: ec2-user
+      address: changeme  # 52.74.152.129
+      vpc_cidr: changeme # 192.168.*
+  projects:
+    - name: 'MNOHUB_UAT'
+      description: 'UAT - MnoHub'
+      component: mnohub
+      node_name: "{{ vpc_short_name }}-mnohub"
+      ansible_playbook: "{{ mnohub-app-server-ec2.yml }}"
+      environment: uat
+    - name: 'NEX_UAT'
+      description: 'UAT - Nex!'
+      component: nex-app-orchestrator
+      node_name: "{{ vpc_short_name }}-nex-app-orchestrator"
+      ansible_playbook: "{{ nex-app-server-ec2.yml }}"
+      environment: uat
+    - name: 'CONNEC_API_UAT'
+      description: 'UAT - Connec! API'
+      component: connec
+      node_name: "{{ vpc_short_name }}-connec-api"
+      ansible_playbook: "{{ connec-api-server-ec2.yml }}"
+      environment: uat
+    - name: 'CONNEC_JOB_UAT'
+      description: 'UAT - Connec! Jobs'
+      component: connec
+      node_name: "{{ vpc_short_name }}-connec-jobs"
+      ansible_playbook: "{{ connec-jobs-server-ec2.yml }}"
+      environment: uat
+    - name: 'IMPAC_UAT'
+      description: 'UAT - Impac!'
+      component: impac
+      node_name: "{{ vpc_short_name }}-impac"
+      ansible_playbook: "{{ impac-app-server-ec2.yml }}"
+      environment: uat
+    - name: 'MNOE_UAT'
+      description: 'UAT - Mnoe front-end'
+      component: frontend-app
+      node_name: "{{ vpc_short_name }}-frontend-app"
+      ansible_playbook: "{{ mno-enterprise-server-ec2.yml }}"
+      environment: uat
+    - name: 'MNOHUB_PRD'
+      description: 'Production - MnoHub'
+      component: mnohub
+      node_name: "{{ vpc_short_name }}-mnohub"
+      ansible_playbook: "{{ mnohub-app-server-ec2.yml }}"
+      environment: production
+    - name: 'NEX_PRD'
+      description: 'Production - Nex!'
+      component: nex-app-orchestrator
+      node_name: "{{ vpc_short_name }}-nex-app-orchestrator"
+      ansible_playbook: "{{ nex-app-server-ec2.yml }}"
+      environment: production
+    - name: 'CONNEC_API_PRD'
+      description: 'UAT - Connec! API'
+      component: connec
+      node_name: "{{ vpc_short_name }}-connec-api"
+      ansible_playbook: "{{ connec-api-server-ec2.yml }}"
+      environment: production
+    - name: 'CONNEC_JOB_PRD'
+      description: 'UAT - Connec! Jobs'
+      component: connec
+      node_name: "{{ vpc_short_name }}-connec-jobs"
+      ansible_playbook: "{{ connec-jobs-server-ec2.yml }}"
+      environment: production
+    - name: 'IMPAC_PRD'
+      description: 'Production - Impac!'
+      component: impac
+      node_name: "{{ vpc_short_name }}-impac"
+      ansible_playbook: "{{ impac-app-server-ec2.yml }}"
+      environment: production
+    - name: 'MNOE_PRD'
+      description: 'Production - Mnoe front-end'
+      component: frontend-app
+      node_name: "{{ vpc_short_name }}-frontend-app"
+      ansible_playbook: "{{ mno-enterprise-server-ec2.yml }}"
+      environment: production
+rundeck_protocol: "{{ rundeck_config.protocol }}"
+rundeck_domain: "{{ rundeck_config.domain }}"
+rundeck_users: "{{ rundeck_config.users }}"
+rundeck_plugins:
+  - https://github.com/rundeck-plugins/rundeck-ec2-nodes-plugin/releases/download/v1.5.1/rundeck-ec2-nodes-plugin-1.5.1.jar
+rundeck_generate_ssh: False
+rundeck_database_type: "{{ rundeck_config.database.type }}" # Defaults to hsqldb but can be set to postgresql or mysql to use those databases. Users and databases are not automatically created.
+rundeck_database_host: "{{ rundeck_config.database.host }}" # Defaults to localhost and only needs to be set if using an externally hosted database.
+rundeck_database_port: "{{ rundeck_config.database.port }}" # Defaults to None and must be set if using a different database than the default hsqldb.
+rundeck_database_name: "{{ rundeck_config.database.name }}" # Defaults to rundeck but allows you to use a different rundeck database name.
+rundeck_database_user: "{{ rundeck_config.database.username }}" # Defaults to rundeck but allows you to use a different username to accesses the rundeck database.
+rundeck_database_pass: "{{ rundeck_config.database.password }}" # Defaults to rundeck but allows you to use a different password for the user access to the rundeck database.
+
+logrotate:
+  options: ['su deployer deployer', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
+  options_torquebox: ['su torquebox torquebox', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']

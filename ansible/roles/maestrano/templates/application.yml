@@ -1,0 +1,86 @@
+# {{ ansible_managed }}
+
+# Database credentials
+database_hostname: {{ rds.endpoint }}
+database_name: {{ mnohub_config.database.name }}
+database_username: {{ mnohub_config.database.username }}
+database_password: {{ mnohub_config.database.password }}
+
+# Used for encrypting fields in database (e.g: oauth keys)
+encryption_key: {{ mnohub_config.secrets.encryption_key }}
+
+{% if mnohub_config.default_tenant is defined %}
+# Default tenant configuration - Used to seed the database
+default_tenant_name: {{ mnohub_config.default_tenant.name }}
+default_tenant_id: {{ mnohub_config.default_tenant.id }}
+default_tenant_key: {{ mnohub_config.default_tenant.key }}
+{% endif %}
+
+default_tenant_scheme: {{ frontend_config.public_dns.scheme }}
+default_tenant_host: {{ frontend_config.public_dns.host }}
+
+# Connection credentials for Nex!
+{% if nex_config is defined and nex_config.mnohub is defined %}
+mcluster_admin_token: {{ nex_config.mnohub.key }}
+mcluster_admin_password: {{ nex_config.mnohub.secret }}
+{% endif %}
+
+# Connection credentials for Connec!
+connec_authentication_key: {{ connec_config.authentication.admin.client_id }}
+connec_authentication_secret: {{ connec_config.authentication.admin.client_key }}
+
+{% if mnohub_config.secrets.open_exchange_rate_id is defined %}
+# Service used for converting currencies
+open_exchange_rate_id: {{ mnohub_config.secrets.open_exchange_rate_id }}
+{% endif %}
+
+# Mailchimp API - Use to automatically add
+# new users to the mailing list
+# mailchimp_api_key:
+
+# AWS S3 Credentials
+# - Used by carrierwave to manage public and private assets
+aws_s3_access_key_id: {{ mnohub_config.s3_bucket.access_key }}
+aws_s3_secret_access_key: {{ mnohub_config.s3_bucket.secret_access_key }}
+
+# Main email service
+mandrill_username:
+mandrill_key:
+mandrill_webhook_token:
+
+# Secondary email service - Used to relay emails arriving on a <user-uid>.<app-uid>@app.maestrano.io
+# email to the real user email address
+sendgrid_smtp_login:
+sendgrid_smtp_password:
+
+# Support ticket service
+zendesk_username:
+zendesk_token:
+
+{% if mnohub_config.eway is defined %}
+# eWay - Payment gateway
+eway_login: {{ mnohub_config.eway.login }}
+eway_username: {{ mnohub_config.eway.username }}
+eway_password: {{ mnohub_config.eway.password }}
+{% endif %}
+
+# Westcon Login credentials - DEPRECATED
+westcon_api_login:
+westcon_api_pwd:
+
+# Intercom API keys
+intercom_api_secret:
+intercom_api_key:
+
+{% if newrelic_license_key is defined %}
+# Monitoring platform - NewRelic
+newrelic_license_key: {{ newrelic_license_key }}
+{% endif %}
+
+# OAuth Providers keys
+oauth_facebook_key: "NONE"
+oauth_facebook_secret: "NONE"
+oauth_linkedin_key: "NONE"
+oauth_linkedin_secret: "NONE"
+oauth_google_key: "NONE"
+oauth_google_secret: "NONE"

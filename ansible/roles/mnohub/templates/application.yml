@@ -1,0 +1,59 @@
+# {{ ansible_managed }}
+# TODO: Cleanup required
+
+# Rails Secrets
+secret_token: {{ mnohub_config.secrets.secret_token }}
+secret_key_base: {{ mnohub_config.secrets.secret_key_base }}
+
+# Database credentials
+database_hostname: {{ rds.endpoint }}
+database_name: {{ mnohub_config.database.name }}
+database_username: {{ mnohub_config.database.username }}
+database_password: {{ mnohub_config.database.password }}
+
+# Redis URL - Used for caching and background jobs
+redis_url: {{ mnohub_config.redis_url }}
+
+# Used for encrypting fields in database (e.g: oauth keys)
+encryption_key: {{ mnohub_config.secrets.encryption_key }}
+
+# Default tenant configuration - Used to seed the database
+{% if mnohub_config.default_tenant is defined %}
+default_tenant_name: {{ mnohub_config.default_tenant.name }}
+default_tenant_id: {{ mnohub_config.default_tenant.id }}
+default_tenant_key: {{ mnohub_config.default_tenant.key }}
+default_tenant_scheme: {{ frontend_config.public_dns.scheme }}
+default_tenant_host: {{ frontend_config.public_dns.host }}
+{% endif %}
+
+# Connection credentials for Nex!
+{% if nex_config is defined %}
+mcluster_admin_token: {{ nex_config.mnohub.key }}
+mcluster_admin_password: "{{ nex_config.mnohub.secret }}"
+{% endif %}
+
+# Connection credentials for Connec!
+connec_authentication_key: {{ connec_config.authentication.admin.client_id }}
+connec_authentication_secret: {{ connec_config.authentication.admin.client_key }}
+
+# Service used for converting currencies
+OPENEXCHANGERATES_APP_ID: {{ mnohub_config.secrets.open_exchange_rate_id }}
+
+# AWS S3 Credentials
+# - Used by AssetSync to upload application Assets (JS,CSS) to S3
+# - Used by carrierwave to manage public and private assets
+aws_s3_access_key_id: {{ mnohub_config.s3_bucket.access_key }}
+aws_s3_secret_access_key: {{ mnohub_config.s3_bucket.secret_access_key }}
+
+# eWay - Payment gateway
+eway_login: {{ mnohub_config.eway.login }}
+eway_username: {{ mnohub_config.eway.username }}
+eway_password: {{ mnohub_config.eway.password }}
+
+# Braintree - Payment gateway
+braintree_merchant_id: {{ mnohub_config.braintree.merchant_id }}
+braintree_public_key: {{ mnohub_config.braintree.public_key }}
+braintree_private_key: {{ mnohub_config.braintree.private_key }}
+
+# Newrelic api key
+newrelic_license_key: {{ newrelic_license_key }}

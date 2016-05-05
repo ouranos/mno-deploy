@@ -1,0 +1,12 @@
+JAVA=/usr/lib/jvm/jre-1.7.0-openjdk/bin/java
+TORQUEBOX_HOME=/opt/torquebox
+HOME=/opt/torquebox
+JBOSS_HOME=$TORQUEBOX_HOME/jboss
+JRUBY_HOME=$TORQUEBOX_HOME/jruby
+PATH=$JRUBY_HOME/bin:/sbin:/bin:/usr/sbin:/usr/bin:$PATH
+RACK_ENV={{ rails_environment }}
+TORQUEBOX_CLUSTER={{ torquebox.cluster }}
+
+{% if proxy_host is defined and proxy_port is defined %}
+JRUBY_OPTS="-J-Dhttp.proxyHost={{ proxy_host }} -J-Dhttp.proxyPort={{ proxy_port }} -J-Dhttp.nonProxyHosts='{{ proxy_ignore_java }}' -J-Dhttps.proxyHost={{ proxy_host }} -J-Dhttps.proxyPort={{ proxy_port }}"
+{% endif %}

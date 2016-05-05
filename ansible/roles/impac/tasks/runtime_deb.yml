@@ -1,0 +1,11 @@
+---
+
+- name: Impac | Copy puma.rb config
+  template: src=puma-http.rb dest={{deploy_directory}}/shared/config/puma.rb owner=deployer group=deployer mode=0755
+
+- name: Impac | Add /etc/init/puma.conf
+  template: src=puma.conf dest=/etc/init/puma.conf force=yes mode=0755
+
+- name: Impac | Add puma to upstart
+  service: name=puma state=restarted enabled=yes
+

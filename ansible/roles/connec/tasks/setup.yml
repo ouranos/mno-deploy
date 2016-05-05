@@ -1,0 +1,80 @@
+---
+
+- name: Connec | Copy SSL Certification Authorities for Xero
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/share/ca-certificates/{{ item }}"
+  with_items:
+    - entrust_2048_ca.crt
+    - entrust_ec1_ca.crt
+    - entrust_ev_ca.crt
+    - entrust_g2_ca.crt
+    - entrust_ssl_ca.crt
+  when: ansible_os_family == "Debian"
+  tags: [xero]
+
+- name: Connec | Install SSL Certification Authorities
+  shell: 'update-ca-certificates'
+  when: ansible_os_family == "Debian"
+
+- name: Connec | Nginx default site deactivation
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+
+- name: Connec | Nginx site configuration
+  template: src=etc-nginx-connec-http dest=/etc/nginx/sites-available/connec
+  register: nginxconfig
+
+- name: Connec | Nginx certificates directory
+  file: path=/etc/nginx/certificates state=directory
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Connec | Nginx SSL Certificate
+  template: src=etc-nginx-connec-ssl-cert dest=/etc/nginx/certificates/connec.crt
+  register: nginxsslcert
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Connec | Nginx SSL Certificate Key
+  template: src=etc-nginx-connec-ssl-key dest=/etc/nginx/certificates/connec.key
+  register: nginxsslkey
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Connec | Nginx site activation
+  file:
+    src: /etc/nginx/sites-available/connec
+    dest: /etc/nginx/sites-enabled/connec
+    state: link
+    force: yes
+
+- name: Connec | Nginx restart
+  shell: service nginx restart
+  when: nginxconfig.changed or (nginxsslcert is defined and nginxsslcert.changed) or (nginxsslkey is defined and nginxsslkey.changed)
+
+- name: Connec | Create deployment user
+  user: name=deployer comment="Application deployment user"
+
+- name: Connec | Add deployer user to sudoers
+  lineinfile: dest=/etc/sudoers regexp="deployer ALL" line="deployer ALL=(ALL) NOPASSWD:ALL" state=present
+
+- name: Connec | Create deployment directory
+  file: path={{ deploy_directory }} owner=deployer group=deployer state=directory
+
+- name: Connec | Make shared directories
+  file: path={{ deploy_directory }}/shared/{{item}} group=deployer owner=deployer state=directory
+  with_items:
+    - tmp
+    - log
+    - public
+    - bundle
+    - sockets
+    - pids
+    - bin
+    - config
+    - vendor_bundle
+    - cluster_config
+
+- name: Connec | Configure splunk forwarder inputs
+  shell: "/opt/splunkforwarder/bin/splunk add monitor {{ item.monitor }} -index {{ item.index }} -hostname {{ ansible_hostname }} -auth {{ splunk.username }}:{{ splunk.password }}"
+  when: not splunk.skip
+  with_items: "{{ splunk.connec.inputs }}"
+  tags: [splunk-configure]
+  ignore_errors: true

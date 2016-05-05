@@ -1,0 +1,32 @@
+---
+
+- name: Add Yum repository
+  template:
+    src: yum_repo.rhel
+    dest: /etc/yum.repos.d/mongodb.repo
+
+- name: Install MongoDB package
+  yum: name={{item}} state=present
+  with_items:
+    - "{{mongodb_package}}"
+    - numactl
+
+# - name: reload systemd
+#   shell: systemctl daemon-reload
+#   changed_when: false
+#   when: "'systemd' in systemd.stdout"
+
+- name: Install PyMongo package
+  yum: pkg=python-pymongo state=latest
+  when: not mongodb_pymongo_from_pip
+
+- name: Install PIP
+  apt: pkg={{ item }}
+  with_items:
+    - python-dev
+    - python-pip
+  when: mongodb_pymongo_from_pip
+
+- name: Install PyMongo from PIP
+  pip: name=pymongo state=latest
+  when: mongodb_pymongo_from_pip

@@ -1,0 +1,15 @@
+---
+
+- name: Gather facts
+  action: ec2_facts
+
+- name: Attach encrypted volume to instance
+  ec2_vol:
+    instance: "{{ ansible_ec2_instance_id }}"
+    volume_size: "{{ data_volume_size }}"
+    # encrypted: "{{ data_volume_encrypted }}"
+    device_name: /dev/xvdf
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+  when: attach_data_volume

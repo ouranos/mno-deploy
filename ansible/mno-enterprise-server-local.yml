@@ -1,0 +1,20 @@
+---
+
+- name: Configure mno-enterprise instances
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - common
+    - role: ntp
+    - { role: swapfile, swapfile_swappiness: 10 }
+    - { role: newrelic, when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
+    - { role: rvm_io.rvm1-ruby, tags: ruby, rvm1_rubies: ['ruby-2.2.0'] }
+    - { role: jdauphant.nginx, keep_only_specified: true }
+    - role: splunk
+    - role: mno-enterprise
+      when: frontend_project is defined and frontend_project
+    - { role: logrotate, logrotate_scripts: [{name: mnoe, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: newrelic, path: "{{ deploy_directory }}/shared/log/newrelic_agent.log", options: "{{ logrotate.options }}"}] }

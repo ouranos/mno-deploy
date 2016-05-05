@@ -1,0 +1,14 @@
+development:
+  disabled: true
+
+test:
+  disabled: true
+
+sit:
+  disabled: true
+
+uat:
+  disabled: true
+
+production:
+  disabled: true

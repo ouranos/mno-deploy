@@ -1,0 +1,113 @@
+---
+
+# Creates the default VPC. If a VPC already exists with the same cidr_block and resource_tags it will be reused
+- name: Create VPC
+  ec2_vpc:
+    state: present
+    cidr_block: "{{ vpc.cidr_block }}"
+    resource_tags: "{{ vpc_tags }}"
+    subnets: "{{ vpc.subnets }}"
+    internet_gateway: "{{ vpc.internet_gateway|string }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  register: created_vpc
+  tags: [infra_mnoe,infra_maestrano,infra_nex,infra_connec,infra_impac,infra_rundeck]
+
+- name: Create VPC subnets
+  ec2_vpc_subnet:
+    state: present
+    vpc_id: "{{ created_vpc.vpc_id }}"
+    cidr: "{{ item.cidr }}"
+    az: "{{ item.az }}"
+    resource_tags: "{{ item.resource_tags }}"
+  with_items: "{{ vpc.subnets }}"
+
+# Create the Security Groups
+- name: Create Security Groups
+  ec2_group:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    rules: "{{ item.rules }}"
+    rules_egress: "{{ item.rules_egress }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    vpc_id: "{{ created_vpc.vpc_id }}"
+  with_items: "{{ security_groups }}"
+  register: created_security_groups
+  tags: [infra_mnoe,infra_maestrano,infra_nex,infra_connec,infra_impac,infra_rundeck]
+
+# Create the Security Groups
+- name: Create Nex! Security Groups
+  ec2_group:
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    rules: "{{ item.rules }}"
+    rules_egress: "{{ item.rules_egress }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    vpc_id: "{{ created_vpc.vpc_id }}"
+  with_items: "{{ nex_security_groups }}"
+  register: created_nex_security_groups
+  when: not nex.skip
+
+- name: Tag the security groups
+  ec2_tag:
+    resource: "{{ item.group_id }}"
+    region: "{{ aws_region }}"
+    state: present
+    tags: "{{ vpc_tags|safe }}"
+  with_items: "{{ created_security_groups.results }}"
+  when: security_groups_tag
+
+- name: Create Elasticache Subnet Group
+  elasticache_subnet_group:
+    state: present
+    name: "{{ redis_group.name }}"
+    description: "{{ redis_group.description }}"
+    subnets: "{{ redis_group.subnets }}"
+  tags: [redis]
+  register: created_redis_group
+  ignore_errors: true
+
+# Create a NAT instance
+- name: Find NAT AMI
+  ec2_ami_find:
+    owner: amazon
+    name: "{{ vpc_nat.ami_name }}"
+    no_result_action: fail
+  register: ami_nat
+
+- name: Launch NAT instance
+  ec2:
+    keypair: "{{ keypair }}"
+    instance_type: "{{ vpc_nat.instance_type }}"
+    image: "{{ ami_nat.results[0].ami_id }}"
+    group: ["{{ vpc_base_name }}-ssh-inbound", "{{ vpc_base_name }}-nat"]
+    assign_public_ip: yes
+    source_dest_check: no
+    wait: yes
+    vpc_subnet_id: "{{ vpc_nat.subnet_id }}"
+    instance_tags: "{ 'Name': '{{ vpc_base_name }}-nat', 'Environment': '{{ environment_name }}', 'Application': '{{ application_name }}' }"
+    exact_count: 1
+    count_tag: { "Name": "{{ vpc_base_name }}-nat" }
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+  when: not vpc_nat.skip
+  register: vpc_nat_instance
+
+# Update Route Table with NAT instance ENI
+- name: Update VPC routing tables
+  ec2_vpc:
+    state: present
+    cidr_block: "{{ vpc.cidr_block }}"
+    resource_tags: "{{ vpc_tags }}"
+    internet_gateway: "{{ vpc.internet_gateway|string }}"
+    route_tables: "{{ vpc.route_tables }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+  when: not vpc_nat.skip

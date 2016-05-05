@@ -1,0 +1,66 @@
+# Production secrets
+
+# Database credentials
+database_username: {{ nex_database_username }}
+database_password: {{ nex_database_password }}
+database_hostname: {{ rds.endpoint }}
+database_name: {{ nex_database_name }}
+
+# Service used for converting currencies
+open_exchange_rate_id: DEPRECATED
+
+# AWS Credentials - Infrastructure Management
+aws_access_key_id: "{{ nex_config.aws.access_key }}"
+aws_secret_access_key: "{{ nex_config.aws.secret_access_key }}"
+
+# AWS DNS Zone id for (de)registering
+# - the apps DNS
+# - ComputeRack/StorageRack DNS
+app_aws_route53_zone_id: DEPRECATED_AND_NOT_USED
+rack_aws_route53_zone_id: {{ nex_config.route53_rack_zone_id }}
+
+# FOG - AWS Credentials - Used for DNS management
+fog_dns_aws_access_key_id: {{ nex_config.aws.access_key }}
+fog_dns_aws_secret_access_key: {{ nex_config.aws.secret_access_key }}
+
+# Mandrill - Used to configure SMTP Relay on ComputeRacks
+# (emails sent by the applications)
+grid_mandrill_login: {{ nex_config.mandrill.login }}
+grid_mandrill_token: {{ nex_config.mandrill.token }}
+
+# Storage Rsync Key - Used to authenticate ComputeRack on
+# StorageRacks when pushing/pulling cubes
+storage_rsync_key: "{{ nex_config.storage_rsync_key }}"
+
+# SSH Keys
+# Compute - Docker
+ssh_key_compute_docker_apse2: "{{ nex_config.ec2_keypem }}"
+
+# Compute - LXC
+# ssh_key_compute_lxc_apse2: "NOT IN USE"
+
+# Storage - RSYNC
+ssh_key_storage_rsync_apse2: "{{ nex_config.ec2_keypem }}"
+
+# Admin - Bastion
+# ssh_key_admin_bastion_apse2: "NOT IN USE"
+
+# Routing - Nginx
+ssh_key_routing_nginx_apse2: "{{ nex_config.ec2_keypem }}"
+
+# New Relic license key
+# new_relic_license_key: NOT_USED
+
+# SSL Certificate
+# ssl_cert_key_cube_default: "-----BEGIN RSA PRIVATE KEY-----NOT_USED-----END RSA PRIVATE KEY-----\n"
+# ssl_cert_chained_cube_default: "-----BEGIN CERTIFICATE-----NOT_USED-----END CERTIFICATE-----\n"
+
+# Routing Grid credentials used to authenticate to Nex (HTTP Basic)
+# perform IP and Certificate lookups
+routing_grid_key: "{{ nex_config.routing.key }}"
+routing_grid_secret: "{{ nex_config.routing.secret }}"
+
+# Credentials below are only used when seeding the database
+# for the first time
+mno_admin_token: {{ nex_config.mnohub.key }}
+mno_admin_password: "{{ nex_config.mnohub.secret }}"

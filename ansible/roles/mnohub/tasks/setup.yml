@@ -1,0 +1,75 @@
+---
+
+- name: MnoHub | Install packages
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - nodejs
+  when: ansible_os_family == "Debian"
+
+- name: MnoHub | Install packages
+  yum: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - nodejs
+  when: ansible_os_family == "RedHat"
+
+- name: MnoHub | Nginx default site deactivation
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+
+- name: MnoHub | Nginx site configuration
+  template: src=etc-nginx-mnohub-http dest=/etc/nginx/sites-available/mnohub
+  register: nginxconfig
+
+- name: MnoHub | Nginx certificates directory
+  file: path=/etc/nginx/certificates state=directory
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: MnoHub | Nginx SSL Certificate
+  template: src=etc-nginx-mnohub-ssl-cert dest=/etc/nginx/certificates/mnohub.crt
+  register: nginxsslcert
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: MnoHub | Nginx SSL Certificate Key
+  template: src=etc-nginx-mnohub-ssl-key dest=/etc/nginx/certificates/mnohub.key
+  register: nginxsslkey
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: MnoHub | Nginx site activation
+  file:
+    src: /etc/nginx/sites-available/mnohub
+    dest: /etc/nginx/sites-enabled/mnohub
+    state: link
+    force: yes
+
+- name: MnoHub | Nginx restart
+  shell: service nginx restart
+  when: nginxconfig.changed or (nginxsslcert is defined and nginxsslcert.changed) or (nginxsslkey is defined and nginxsslkey.changed)
+
+- name: MnoHub | Create deployment user
+  user: name=deployer comment="Application deployment user"
+
+- name: MnoHub | Add deployer user to sudoers
+  lineinfile: dest=/etc/sudoers regexp="deployer ALL" line="deployer ALL=(ALL) NOPASSWD:ALL" state=present
+
+- name: MnoHub | Create deployment directory
+  file: path={{ deploy_directory }} owner=deployer group=deployer state=directory
+
+- name: MnoHub | Make shared directories
+  file: path={{ deploy_directory }}/shared/{{item}} group=deployer owner=deployer state=directory
+  with_items:
+    - tmp
+    - log
+    - public
+    - bundle
+    - sockets
+    - pids
+    - bin
+    - config
+    - vendor_bundle
+    - cluster_config
+
+- name: MnoHub | Configure splunk forwarder inputs
+  shell: "/opt/splunkforwarder/bin/splunk add monitor {{ item.monitor }} -index {{ item.index }} -hostname {{ ansible_hostname }} -auth {{ splunk.username }}:{{ splunk.password }}"
+  when: not splunk.skip
+  with_items: "{{ splunk.mnohub.inputs }}"
+  tags: [splunk-configure]
+  ignore_errors: true

@@ -1,0 +1,92 @@
+---
+
+# Maestrano Configuration
+
+- set_fact: maestrano_component="mnohub-app-server-local"
+
+- name: Create MnoHub Redis Store
+  elasticache:
+    name: "{{ mnohub.redis.name }}"
+    state: present
+    engine: redis
+    cache_port: 6379
+    node_type: "{{ mnohub.redis.node_type }}"
+    num_nodes: "{{ mnohub.redis.num_nodes }}"
+    cache_subnet_group: "{{ redis_group.name }}"
+    security_group_ids: "{{ redis_group.vpc_security_groups }}"
+    region: "{{ aws_region }}"
+    wait: yes
+  register: created_mnohub_redis
+
+- name: MnoHub | Add Redis Store DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ mnohub.redis.endpoint }}"
+    type: CNAME
+    value: "{{ created_mnohub_redis.elasticache.data.CacheNodes[0].Endpoint.Address }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"
+
+- name: Create MnoHub ELB
+  ec2_elb_lb:
+    name: "{{ mnohub.elastic_load_balancer.name }}"
+    state: present
+    scheme: "{{ mnohub.elastic_load_balancer.scheme | default('internet-facing')}}"
+    connection_draining_timeout: "{{ mnohub.elastic_load_balancer.connection_draining_timeout }}"
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    subnets: "{{ mnohub.elastic_load_balancer.subnets }}"
+    security_group_ids: "{{ mnohub.elastic_load_balancer.security_group_ids }}"
+    listeners: "{{ mnohub.elastic_load_balancer.listeners }}"
+    health_check: "{{ mnohub.elastic_load_balancer.health_check }}"
+  register: mnohub_elastic_load_balancer
+
+- name: Add DNS record for MnoHub ELB
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ mnohub.dns_record.record }}"
+    type: "{{ mnohub.dns_record.type }}"
+    value: "{{ mnohub_elastic_load_balancer.elb.dns_name }}"
+    alias: "{{ mnohub.dns_record.alias }}"
+    ttl: "{{ mnohub.dns_record.ttl }}"
+    private_zone: "{{ route53.zone.private_zone }}"
+    alias_hosted_zone_id: "{{ mnohub.elastic_load_balancer.alias_hosted_zone_id }}"
+    overwrite: "{{ mnohub.dns_record.overwrite }}"
+
+- name: Create MnoHub Launch Configuration
+  ec2_lc:
+    name: "{{ mnohub.launch_configuration.name }}"
+    key_name: "{{ mnohub.launch_configuration.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ mnohub.launch_configuration.image_id }}"
+    instance_type: "{{ mnohub.launch_configuration.instance_type }}"
+    security_groups: "{{ mnohub.launch_configuration.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+
+- name: Create MnoHub Auto Scaling Group
+  ec2_asg:
+    name: "{{ mnohub.auto_scaling_group.name }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    launch_config_name: "{{ mnohub.launch_configuration.name }}"
+    min_size: "{{ mnohub.auto_scaling_group.min_size }}"
+    max_size: "{{ mnohub.auto_scaling_group.max_size }}"
+    desired_capacity: "{{ mnohub.auto_scaling_group.desired_capacity }}"
+    vpc_zone_identifier: "{{ mnohub.auto_scaling_group.vpc_zone_identifier }}"
+    availability_zones: "{{ mnohub.auto_scaling_group.availability_zones }}"
+    load_balancers: "{{ mnohub.elastic_load_balancer.name }}"
+    tags: "{{ mnohub.auto_scaling_group.tags }}"
+  register: maestrano_auto_scaling_group

@@ -1,0 +1,5 @@
+---
+application:
+  root: {{ deploy_directory }}/releases/{{ nex_app_orchestrator_version }}
+environment:
+  RAILS_ENV: {{ rails_environment }}

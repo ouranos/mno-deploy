@@ -1,0 +1,59 @@
+- name: Torquebox | Check Torquebox installation
+  stat:
+    path: "/opt/torquebox-{{ torquebox.version }}"
+  register: torquebox_install_path
+
+- name: Torquebox | Create torquebox group
+  group:
+    name: "{{ torquebox.group }}"
+
+- name: Torquebox | Create torquebox user
+  user:
+    name: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    home: /home/torquebox
+
+- name: Torquebox | Install packages
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - openjdk-7-jdk
+  when: ansible_os_family == "Debian"
+
+- name: Torquebox | Install packages
+  yum: "name={{ item }} state=present"
+  with_items:
+    - java-1.7.0-openjdk
+  when: ansible_os_family == "RedHat"
+
+- name: Torquebox | Download torquebox distribution
+  get_url:
+    url: "http://torquebox.org/release/org/torquebox/torquebox-dist/{{ torquebox.version }}/torquebox-dist-{{ torquebox.version }}-bin.zip"
+    dest: /tmp/torquebox-dist-bin.zip
+    mode: 0755
+  when: torquebox_install_path.stat.exists == False
+
+- name: Torquebox | Extract torquebox archive
+  command: "creates=/opt/torquebox-{{ torquebox.version }} unzip /tmp/torquebox-dist-bin.zip -d /opt/"
+  when: torquebox_install_path.stat.exists == False
+
+- name: Torquebox | Replace previous version
+  file:
+    path: /opt/torquebox
+    state: absent
+  when: torquebox_install_path.stat.exists == False
+
+- name: Torquebox | Symbolic link
+  file:
+    src: "/opt/torquebox-{{ torquebox.version }}"
+    dest: /opt/torquebox
+    owner: "{{ torquebox.owner }}"
+    group: "{{ torquebox.group }}"
+    state: link
+    force: yes
+  when: torquebox_install_path.stat.exists == False
+
+- name: Torquebox | Clean up zip file
+  file:
+    path: tmp/torquebox-dist-bin.zip
+    state: absent
+  when: torquebox_install_path.stat.exists == False

@@ -1,0 +1,174 @@
+---
+
+# Connec! Configuration
+# Creates separate ASGs for API and Background Jobs
+
+- name: Create Connec Redis Subnet Group
+  elasticache_subnet_group:
+    name: "{{ redis_group.name }}"
+    description: "Connec! Redis Subnet Group"
+    subnets: "{{ redis_group.subnets }}"
+    state: present
+
+- name: Create Connec Redis Store
+  elasticache:
+    name: "{{ connec.redis.name }}"
+    state: present
+    engine: redis
+    cache_port: 6379
+    node_type: "{{ connec.redis.node_type }}"
+    num_nodes: "{{ connec.redis.num_nodes }}"
+    cache_subnet_group: "{{ redis_group.name }}"
+    security_group_ids: "{{ redis_group.vpc_security_groups }}"
+    region: "{{ aws_region }}"
+    wait: yes
+  register: created_connec_redis
+
+- name: Add Redis Store DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ connec.redis.endpoint }}"
+    type: CNAME
+    value: "{{ created_connec_redis.elasticache.data.CacheNodes[0].Endpoint.Address }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"
+
+- name: Create Connec! ELB
+  ec2_elb_lb:
+    name: "{{ connec.elastic_load_balancer.name }}"
+    state: present
+    scheme: "{{ connec.elastic_load_balancer.scheme | default('internet-facing')}}"
+    connection_draining_timeout: "{{ connec.elastic_load_balancer.connection_draining_timeout }}"
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    subnets: "{{ connec.elastic_load_balancer.subnets }}"
+    security_group_ids: "{{ connec.elastic_load_balancer.security_group_ids }}"
+    listeners: "{{ connec.elastic_load_balancer.listeners }}"
+    health_check: "{{ connec.elastic_load_balancer.health_check }}"
+  register: connec_elastic_load_balancer
+
+- name: Add DNS record for ELB
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ connec.dns_record.record }}"
+    type: "{{ connec.dns_record.type }}"
+    value: "{{ connec_elastic_load_balancer.elb.dns_name }}"
+    alias: "{{ connec.dns_record.alias }}"
+    ttl: "{{ connec.dns_record.ttl }}"
+    private_zone: "{{ route53.zone.private_zone }}"
+    alias_hosted_zone_id: "{{ connec.elastic_load_balancer.alias_hosted_zone_id }}"
+    overwrite: "{{ connec.dns_record.overwrite }}"
+
+- set_fact: maestrano_component="connec-api-server-local"
+
+- name: Create Connec! Launch Configuration API
+  ec2_lc:
+    name: "{{ connec.launch_configuration.api.name }}"
+    key_name: "{{ connec.launch_configuration.api.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ connec.launch_configuration.api.image_id }}"
+    instance_type: "{{ connec.launch_configuration.api.instance_type }}"
+    security_groups: "{{ connec.launch_configuration.api.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+  when: connec.launch_configuration.api.spot_price is undefined or connec.launch_configuration.api.spot_price is none
+
+- name: Create Connec! Launch Configuration API
+  ec2_lc:
+    name: "{{ connec.launch_configuration.api.name }}"
+    key_name: "{{ connec.launch_configuration.api.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ connec.launch_configuration.api.image_id }}"
+    instance_type: "{{ connec.launch_configuration.api.instance_type }}"
+    spot_price: "{{ connec.launch_configuration.api.spot_price }}"
+    security_groups: "{{ connec.launch_configuration.api.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+  when: connec.launch_configuration.api.spot_price is not none
+
+- name: Create Connec! Auto Scaling Group API
+  ec2_asg:
+    name: "{{ connec.auto_scaling_group.api.name }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    launch_config_name: "{{ connec.launch_configuration.api.name }}"
+    min_size: "{{ connec.auto_scaling_group.api.min_size }}"
+    max_size: "{{ connec.auto_scaling_group.api.max_size }}"
+    desired_capacity: "{{ connec.auto_scaling_group.api.desired_capacity }}"
+    vpc_zone_identifier: "{{ connec.auto_scaling_group.api.vpc_zone_identifier }}"
+    availability_zones: "{{ connec.auto_scaling_group.api.availability_zones }}"
+    load_balancers: "{{ connec.elastic_load_balancer.name }}"
+    tags: "{{ connec.auto_scaling_group.api.tags }}"
+  register: connec_auto_scaling_group
+
+- set_fact: maestrano_component="connec-jobs-server-local"
+
+- name: Create Connec! Launch Configuration Background Jobs
+  ec2_lc:
+    name: "{{ connec.launch_configuration.jobs.name }}"
+    key_name: "{{ connec.launch_configuration.jobs.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ connec.launch_configuration.jobs.image_id }}"
+    instance_type: "{{ connec.launch_configuration.jobs.instance_type }}"
+    security_groups: "{{ connec.launch_configuration.jobs.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+  when: connec.launch_configuration.jobs.spot_price is undefined or connec.launch_configuration.jobs.spot_price is none
+
+- name: Create Connec! Launch Configuration Background Jobs
+  ec2_lc:
+    name: "{{ connec.launch_configuration.jobs.name }}"
+    key_name: "{{ connec.launch_configuration.jobs.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ connec.launch_configuration.jobs.image_id }}"
+    instance_type: "{{ connec.launch_configuration.jobs.instance_type }}"
+    spot_price: "{{ connec.launch_configuration.jobs.spot_price }}"
+    security_groups: "{{ connec.launch_configuration.jobs.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+  when: connec.launch_configuration.jobs.spot_price is not none
+
+- name: Create Connec! Auto Scaling Group Background Jobs
+  ec2_asg:
+    name: "{{ connec.auto_scaling_group.jobs.name }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    launch_config_name: "{{ connec.launch_configuration.jobs.name }}"
+    min_size: "{{ connec.auto_scaling_group.jobs.min_size }}"
+    max_size: "{{ connec.auto_scaling_group.jobs.max_size }}"
+    desired_capacity: "{{ connec.auto_scaling_group.jobs.desired_capacity }}"
+    vpc_zone_identifier: "{{ connec.auto_scaling_group.jobs.vpc_zone_identifier }}"
+    availability_zones: "{{ connec.auto_scaling_group.jobs.availability_zones }}"
+    tags: "{{ connec.auto_scaling_group.jobs.tags }}"
+  register: connec_auto_scaling_group

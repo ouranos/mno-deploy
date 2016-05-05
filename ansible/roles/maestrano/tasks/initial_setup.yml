@@ -1,0 +1,132 @@
+---
+
+- name: Connec | Copy SSL Certification Authorities for Xero
+  copy:
+    src: "{{ item }}"
+    dest: "/usr/local/share/ca-certificates/{{ item }}"
+  with_items:
+    - entrust_2048_ca.crt
+    - entrust_ec1_ca.crt
+    - entrust_ev_ca.crt
+    - entrust_g2_ca.crt
+    - entrust_ssl_ca.crt
+  when: ansible_os_family == "Debian"
+  tags: [xero]
+
+- name: Connec | Install SSL Certification Authorities
+  shell: 'update-ca-certificates'
+  when: ansible_os_family == "Debian"
+
+- name: Maestrano | Install packages
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - curl
+    - libcurl3
+    - libcurl3-gnutls
+    - libcurl4-openssl-dev
+    - libmysqlclient-dev
+    - imagemagick
+  when: ansible_os_family == "Debian"
+
+- name: Maestrano | Create deployment user
+  user: name=deployer comment="Application deployment user"
+
+- name: Maestrano | Add deployer user to sudoers
+  lineinfile: dest=/etc/sudoers regexp="deployer ALL" line="deployer ALL=(ALL) NOPASSWD:ALL" state=present
+
+- name: Maestrano | Create deployment directory
+  file: path={{deploy_directory}} owner=deployer group=deployer state=directory
+
+- name: Maestrano | Make shared directories
+  file: path={{deploy_directory}}/shared/{{item}} group=deployer owner=deployer state=directory
+  with_items:
+    - tmp
+    - log
+    - public
+    - bundle
+    - bin
+    - config
+    - pids
+    - sockets
+    - vendor_bundle
+    - downloads
+    - geocoder
+    - solr
+
+- name: Maestrano | Download GeoLoc database
+  get_url: url=http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz dest={{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb.gz
+
+- name: Maestrano | Decompress GeoLoc database
+  shell: "gzip -d {{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb.gz"
+  args:
+    creates: "{{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb"
+
+- name: Maestrano | Create symlink
+  file:
+    src: "{{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb"
+    dest: "{{ deploy_directory }}/shared/geocoder/geodb.mmdb"
+    state: link
+    force: yes
+
+- name: Maestrano | Set GeoLoc database permissions
+  file:
+    path: "{{ deploy_directory }}/shared/geocoder"
+    mode: 0755
+    owner: deployer
+    group: deployer
+    state: directory
+    recurse: yes
+
+- name: Maestrano | Install bundler
+  command: gem install bundler
+
+- name: Maestrano | Install puma
+  command: gem install puma
+
+- include: puma_deb.yml
+  when: ansible_os_family == "Debian"
+
+- include: puma_rhel.yml
+  when: ansible_os_family == "RedHat"
+
+- name: Maestrano | Copy puma.rb config
+  template: src=puma.rb dest={{deploy_directory}}/shared/config/puma.rb owner=deployer group=deployer mode=0755
+
+- name: Maestrano | Nginx default site deactivation
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+
+- name: Maestrano | Nginx site configuration
+  template: src=etc-nginx-mnohub dest=/etc/nginx/sites-available/maestrano
+  register: nginxconfig
+
+- name: Maestrano | Nginx certificates directory
+  file: path=/etc/nginx/certificates state=directory
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Maestrano | Nginx SSL Certificate
+  template: src=etc-nginx-mnohub-ssl-cert dest=/etc/nginx/certificates/mnohub.crt
+  register: nginxsslcert
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Maestrano | Nginx SSL Certificate Key
+  template: src=etc-nginx-mnohub-ssl-key dest=/etc/nginx/certificates/mnohub.key
+  register: nginxsslkey
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Maestrano | Nginx site activation
+  file:
+    src: /etc/nginx/sites-available/maestrano
+    dest: /etc/nginx/sites-enabled/maestrano
+    state: link
+    force: yes
+
+- name: Maestrano | Nginx restart
+  shell: service nginx restart
+  when: nginxconfig.changed or (nginxsslcert is defined and nginxsslcert.changed) or (nginxsslkey is defined and nginxsslkey.changed)
+
+- name: Maestrano | Configure splunk forwarder inputs
+  shell: "/opt/splunkforwarder/bin/splunk add monitor {{ item.monitor }} -index {{ item.index }} -hostname {{ ansible_hostname }} -auth {{ splunk.username }}:{{ splunk.password }}"
+  when: not splunk.skip
+  with_items: "{{ splunk.maestrano.inputs }}"
+  tags: [splunk-configure]
+  ignore_errors: true

@@ -1,0 +1,17 @@
+impac:
+  # Must be a URL accessible by end users
+  protocol: {{ impac_config.public_dns.scheme }}
+  host: {{ impac_config.public_dns.host }}
+  paths:
+    root: /api/v1
+    get_widget: /api/v1/get_widget
+mno:
+  protocol: {{ mnohub_config.public_dns.scheme }}
+  host: {{ mnohub_config.public_dns.host }}
+  private_protocol: {{ mnohub_config.private_dns.scheme }}
+  private_host: {{ mnohub_config.private_dns.host }}
+  paths:
+    root: "/api/mnoe/v1"
+tenant:
+  id: {{ mnohub_config.default_tenant.id }}
+  key: {{ mnohub_config.default_tenant.key }}

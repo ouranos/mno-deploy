@@ -1,0 +1,63 @@
+upstream mnohub {
+  server unix:{{ deploy_directory }}/shared/sockets/puma.sock fail_timeout=0;
+}
+
+server {
+  listen 80 default_server;
+  server_name _;
+
+  {% if ssl_internal_cert is defined and ssl_internal_key is defined %}
+  # HTTPS Listener
+  listen 443 ssl default_server;
+  ssl_certificate     /etc/nginx/certificates/mnohub.crt;
+  ssl_certificate_key /etc/nginx/certificates/mnohub.key;
+  {% endif %}
+
+  location ~* ^/(webhook|auth|assets|app_logout) {
+    root      {{ deploy_directory }}/current/public;
+
+    try_files $uri/index.html $uri @mnohub;
+  }
+
+  location ~* ^/(api|ping|health_check|active_admin) {
+    root      {{ deploy_directory }}/current/public;
+
+    try_files $uri/index.html $uri @mnohub-api;
+  }
+
+  location / { deny all; }
+
+  location @mnohub {
+    proxy_pass http://mnohub;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_redirect off;
+
+  {% if mnohub_config.error_page_uri is defined %}
+    proxy_intercept_errors on;
+  {% endif %}
+  }
+
+  # No custom error pages (as custom error page returns a 302)
+  location @mnohub-api {
+    proxy_pass http://mnohub;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_redirect off;
+  }
+
+{% if mnohub_config.error_page_uri is defined %}
+  error_page 500 502 503 504 {{ mnohub_config.error_page_uri }};
+{% else %}
+  error_page 500 502 503 504 /500.html;
+{% endif %}
+{% if mnohub_config.not_found_page_uri is defined %}
+  error_page 404 {{ mnohub_config.not_found_page_uri }};
+{% endif %}
+  client_max_body_size 4G;
+  keepalive_timeout 10;
+}

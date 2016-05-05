@@ -1,0 +1,8 @@
+---
+
+- include: install.yml
+  tags: [splunk-install]
+  when: not splunk.skip
+- include: configure.yml
+  tags: [splunk-configure]
+  when: not splunk.skip

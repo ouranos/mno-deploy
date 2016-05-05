@@ -1,0 +1,9 @@
+{{ rails_environment }}:
+  adapter: jdbcmysql
+  encoding: utf8
+  host: {{ rds.endpoint }}
+  database: {{ nex_database_name }}
+  pool: {{ nex_database_pool }}
+  timeout: {{ nex_database_timeout }}
+  username: {{ nex_database_username }}
+  password: {{ nex_database_password }}

@@ -1,0 +1,8 @@
+---
+
+rds_db_engine: MySQL
+rds_size: 5
+rds_instance_type: db.t1.micro
+rds_multi_zone: yes
+rds_username: root
+rds_password: password

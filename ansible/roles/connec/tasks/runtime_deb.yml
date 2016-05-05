@@ -1,0 +1,21 @@
+---
+
+- name: Connec | Copy puma.rb config
+  template: src=puma-http.rb dest={{deploy_directory}}/shared/config/puma.rb owner=deployer group=deployer mode=0755
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add /etc/init/puma.conf
+  template: src=puma.conf dest=/etc/init/puma.conf force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add puma to upstart
+  service: name=puma state=restarted enabled=yes
+  when: connec_config.component is defined and connec_config.component == 'api'
+
+- name: Connec | Add /etc/init/sidekiq.conf
+  template: src=sidekiq.conf dest=/etc/init/sidekiq.conf force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'jobs'
+
+- name: Connec | Add sidekiq to upstart
+  service: name=sidekiq state=restarted enabled=yes
+  when: connec_config.component is defined and connec_config.component == 'jobs'

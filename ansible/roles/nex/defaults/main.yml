@@ -1,0 +1,7 @@
+---
+
+deploy_directory: /apps/nex
+nex_app_orchestrator_version: 7614014
+default_environment:
+  RAILS_ENV: "{{ rails_environment }}"
+  PATH: /opt/torquebox/jruby/bin:/sbin:/bin:/usr/sbin:/usr/bin

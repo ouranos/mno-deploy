@@ -1,0 +1,36 @@
+---
+
+- name: Nex | Install packages
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - python-mysqldb
+  when: ansible_os_family == "Debian"
+
+- name: Nex | Install packages
+  yum: "name={{ item }} state=present"
+  with_items:
+    - MySQL-python
+  when: ansible_os_family == "RedHat"
+
+- name: Nex | Create RDS database
+  mysql_db:
+    login_host: "{{ rds.endpoint }}"
+    login_user: "{{ rds.username }}"
+    login_password: "{{ rds.password }}"
+    login_port: 3306
+    collation: utf8_general_ci
+    encoding: utf8
+    name: "{{ nex_database_name }}"
+    state: present
+
+- name: Nex | Create RDS database user
+  mysql_user:
+    login_host: "{{ rds.endpoint }}"
+    login_user: "{{ rds.username }}"
+    login_password: "{{ rds.password }}"
+    login_port: 3306
+    name: "{{ nex_database_username }}"
+    host: '%'
+    password: "{{ nex_database_password }}"
+    priv: "{{ nex_database_name }}.*:ALL,GRANT"
+    state: present

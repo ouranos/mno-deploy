@@ -1,0 +1,7 @@
+- name: Create hosted zone
+  route53_zone:
+    vpc_id: "{{ created_vpc.vpc.id }}"
+    vpc_region: "{{ created_vpc.vpc.region }}"
+    zone: "{{ route53.zone.name }}"
+    state: present
+  register: created_hosted_zone

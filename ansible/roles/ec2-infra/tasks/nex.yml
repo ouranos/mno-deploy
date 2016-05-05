@@ -1,0 +1,82 @@
+---
+
+# Nex Configuration
+
+- set_fact: maestrano_component="nex-app-server-local"
+
+- name: Nex! | Create Nex ELB
+  ec2_elb_lb:
+    name: "{{ nex.elastic_load_balancer.name }}"
+    state: present
+    scheme: "{{ nex.elastic_load_balancer.scheme | default('internet-facing')}}"
+    connection_draining_timeout: "{{ nex.elastic_load_balancer.connection_draining_timeout }}"
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    subnets: "{{ nex.elastic_load_balancer.subnets }}"
+    security_group_ids: "{{ nex.elastic_load_balancer.security_group_ids }}"
+    listeners: "{{ nex.elastic_load_balancer.listeners }}"
+  register: nex_elastic_load_balancer
+
+- name: Nex! | Create Apps Routing ELB
+  ec2_elb_lb:
+    name: "{{ nex.apps_elastic_load_balancer.name }}"
+    state: present
+    scheme: "{{ nex.apps_elastic_load_balancer.scheme | default('internet-facing')}}"
+    connection_draining_timeout: "{{ nex.apps_elastic_load_balancer.connection_draining_timeout }}"
+    cross_az_load_balancing: "yes"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    subnets: "{{ nex.apps_elastic_load_balancer.subnets }}"
+    security_group_ids: "{{ nex.apps_elastic_load_balancer.security_group_ids }}"
+    listeners: "{{ nex.apps_elastic_load_balancer.listeners }}"
+    health_check: "{{ nex.elastic_load_balancer.health_check }}"
+  register: nex_apps_elastic_load_balancer
+
+- name: Add DNS record for ELB
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ nex.dns_record.record }}"
+    type: "{{ nex.dns_record.type }}"
+    value: "{{ nex_elastic_load_balancer.elb.dns_name }}"
+    alias: "{{ nex.dns_record.alias }}"
+    ttl: "{{ nex.dns_record.ttl }}"
+    private_zone: "{{ route53.zone.private_zone }}"
+    alias_hosted_zone_id: "{{ nex.elastic_load_balancer.alias_hosted_zone_id }}"
+    overwrite: "{{ nex.dns_record.overwrite }}"
+
+- name: Create Nex! Launch Configuration
+  ec2_lc:
+    name: "{{ nex.launch_configuration.name }}"
+    key_name: "{{ nex.launch_configuration.key_name }}"
+    region: "{{ aws_region }}"
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ nex.launch_configuration.image_id }}"
+    instance_type: "{{ nex.launch_configuration.instance_type }}"
+    security_groups: "{{ nex.launch_configuration.security_groups }}"
+    user_data: "{{ lookup('template', '../templates/user_data.sh') }}"
+    volumes:
+      - device_name: /dev/sda1
+        volume_size: 50
+        device_type: gp2 # SSD
+        delete_on_termination: true
+
+- name: Create Nex! Auto Scaling Group
+  ec2_asg:
+    name: "{{ nex.auto_scaling_group.name }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    launch_config_name: "{{ nex.launch_configuration.name }}"
+    min_size: "{{ nex.auto_scaling_group.min_size }}"
+    max_size: "{{ nex.auto_scaling_group.max_size }}"
+    desired_capacity: "{{ nex.auto_scaling_group.desired_capacity }}"
+    vpc_zone_identifier: "{{ nex.auto_scaling_group.vpc_zone_identifier }}"
+    availability_zones: "{{ nex.auto_scaling_group.availability_zones }}"
+    load_balancers: "{{ nex.elastic_load_balancer.name }}"
+    tags: "{{ nex.auto_scaling_group.tags }}"
+  register: nex_auto_scaling_group

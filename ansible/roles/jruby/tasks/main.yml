@@ -1,0 +1,68 @@
+- name: JRuby | Install Java (Debian)
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - openjdk-7-jdk
+  when: ansible_os_family == "Debian"
+
+- name: JRuby | Install Java (RHEL)
+  yum: "name={{ item }} state=present"
+  with_items:
+    - java-1.7.0-openjdk
+  when: ansible_os_family == "RedHat"
+
+- name: JRuby | Check jruby installation
+  stat:
+    path: "/opt/jruby/jruby-{{ jruby.version }}"
+  register: jruby_install_path
+
+- name: JRuby | Create jruby install folder
+  file:
+    path: /opt/jruby
+    state: directory
+    mode: 0755
+
+# Use curl as Ansible#get_url has problems with SNI
+- name: JRuby | Download
+  command: "curl -s -o /tmp/jruby-bin.tar.gz https://s3.amazonaws.com/jruby.org/downloads/{{ jruby.version }}/jruby-bin-{{ jruby.version }}.tar.gz"
+  when: jruby_install_path.stat.exists == False
+
+- name: JRuby | Extract
+  command: "creates=/opt/jruby/jruby-{{ jruby.version }} tar -xzf /tmp/jruby-bin.tar.gz -C /opt/jruby/"
+  when: jruby_install_path.stat.exists == False
+
+- name: JRuby | Replace previous version
+  file:
+    path: /opt/jruby/current
+    state: absent
+  when: jruby_install_path.stat.exists == False
+
+- name: JRuby | Symbolic link
+  file:
+    src: "/opt/jruby/jruby-{{ jruby.version }}"
+    dest: /opt/jruby/current
+    state: link
+    force: yes
+  when: jruby_install_path.stat.exists == False
+
+- name: JRuby | Clean up tar file
+  file:
+    path: /tmp/jruby-bin.tar.gz
+    state: absent
+  when: jruby_install_path.stat.exists == False
+
+- name: JRuby | Create Profile jruby.sh
+  template:
+    src: profile-debian
+    dest: /etc/profile.d/jruby.sh
+    mode: 0755
+  when: ansible_os_family == "Debian"
+
+- name: JRuby | Create Profile jruby.sh
+  template:
+    src: profile-rhel
+    dest: /etc/profile.d/jruby.sh
+    mode: 0755
+  when: ansible_os_family == "RedHat"
+
+- name: JRuby | Install Bundler
+  command: "/opt/jruby/current/bin/jruby -S gem install bundler"

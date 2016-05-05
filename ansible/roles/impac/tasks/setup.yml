@@ -1,0 +1,63 @@
+---
+
+- name: Impac | Nginx default site deactivation
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+
+- name: Impac | Nginx site configuration
+  template: src=etc-nginx-impac-http dest=/etc/nginx/sites-available/impac
+  register: nginxconfig
+
+- name: Impac | Nginx certificates directory
+  file: path=/etc/nginx/certificates state=directory
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Impac | Nginx SSL Certificate
+  template: src=etc-nginx-impac-ssl-cert dest=/etc/nginx/certificates/impac.crt
+  register: nginxsslcert
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Impac | Nginx SSL Certificate Key
+  template: src=etc-nginx-impac-ssl-key dest=/etc/nginx/certificates/impac.key
+  register: nginxsslkey
+  when: ssl_internal_cert is defined and ssl_internal_key is defined
+
+- name: Impac | Nginx site activation
+  file:
+    src: /etc/nginx/sites-available/impac
+    dest: /etc/nginx/sites-enabled/impac
+    state: link
+    force: yes
+
+- name: Impac | Nginx restart
+  shell: service nginx restart
+  when: nginxconfig.changed or (nginxsslcert is defined and nginxsslcert.changed) or (nginxsslkey is defined and nginxsslkey.changed)
+
+- name: Impac | Create deployment user
+  user: name=deployer comment="Application deployment user"
+
+- name: Impac | Add deployer user to sudoers
+  lineinfile: dest=/etc/sudoers regexp="deployer ALL" line="deployer ALL=(ALL) NOPASSWD:ALL" state=present
+
+- name: Impac | Create deployment directory
+  file: path={{ deploy_directory }} owner=deployer group=deployer state=directory
+
+- name: Impac | Make shared directories
+  file: path={{ deploy_directory }}/shared/{{item}} group=deployer owner=deployer state=directory
+  with_items:
+    - tmp
+    - log
+    - public
+    - bundle
+    - sockets
+    - pids
+    - bin
+    - config
+    - vendor_bundle
+    - cluster_config
+
+- name: Impac | Configure splunk forwarder inputs
+  shell: "/opt/splunkforwarder/bin/splunk add monitor {{ item.monitor }} -index {{ item.index }} -hostname {{ ansible_hostname }} -auth {{ splunk.username }}:{{ splunk.password }}"
+  when: not splunk.skip
+  with_items: "{{ splunk.impac.inputs }}"
+  tags: [splunk-configure]
+  ignore_errors: true

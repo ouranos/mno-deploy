@@ -1,0 +1,23 @@
+---
+
+# Requires Ansible 2.0
+
+- name: Create IAM role for Launch Configurations
+  iam:
+    iam_type: role
+    name: "{{ environment_name }}-{{ application_name }}-instances"
+    state: present
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+  register: ec2_iam_instances
+
+- name: Attach policies to roles
+  iam_policy:
+    iam_type: role
+    iam_name: "{{ environment_name }}-{{ application_name }}-instances"
+    policy_name: EC2 and S3 access
+    state: present
+    policy_document: ../policies/instance-iam.json
+    ec2_access_key: "{{ aws_access_key }}"
+    ec2_secret_key: "{{ aws_secret_key }}"
+  register: ec2_iam_policies_instances

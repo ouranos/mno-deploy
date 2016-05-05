@@ -1,0 +1,14 @@
+[Unit]
+Description=Torquebox
+After=network.target
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/torquebox
+WorkingDirectory=/opt/torquebox
+ExecStart=/opt/torquebox/torquebox_init.rb run
+TimeoutStartSec=20
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

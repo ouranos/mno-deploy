@@ -1,0 +1,20 @@
+---
+
+deploy_directory: /apps/impac
+default_environment:
+  RAILS_ENV: "{{ rails_environment }}"
+  JAVA: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+  PATH: "/opt/jruby/current/bin:{{ ansible_env.PATH }}"
+  HTTP_PROXY: "{% if proxy_host is defined %}http://{{ proxy_host }}:{{ proxy_port }}{% endif %}"
+  HTTPS_PROXY: "{% if proxy_host is defined %}http://{{ proxy_host }}:{{ proxy_port }}{% endif %}"
+  NO_PROXY: "{% if proxy_ignore is defined %}{{ proxy_ignore }}{% else %}localhost,169.254.169.254{% endif %}"
+
+impac_config:
+  puma:
+    java_opts:
+      xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 70% of server memory for Puma
+      max_perm_size: 256m
+  newrelic:
+    common:
+      app_name: Impac

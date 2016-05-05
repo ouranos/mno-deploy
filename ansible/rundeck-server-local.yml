@@ -1,0 +1,24 @@
+---
+
+- name: Configure RunDeck instance
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - common
+    - role: ntp
+    - role: jdauphant.nginx
+      keep_only_specified: true
+      nginx_sites:
+        default:
+          - listen 80
+          - server_name _
+          - location / {
+              proxy_pass http://localhost:4440;
+              proxy_set_header        Host            $host;
+              proxy_set_header        X-Real-IP       $remote_addr;
+              proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+    - role: rundeck

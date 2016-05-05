@@ -1,0 +1,6 @@
+---
+
+# Data Volume
+attach_data_volume: true
+data_volume_size: 8
+data_volume_encrypted: false

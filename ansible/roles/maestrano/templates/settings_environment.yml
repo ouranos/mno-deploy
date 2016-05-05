@@ -1,0 +1,66 @@
+# {{ ansible_managed }}
+
+encryption:
+  key: <%= ENV['encryption_key'] %>
+connec:
+  protocol: {{ connec_config.private_dns.scheme }}
+  host: {{ connec_config.private_dns.host }}
+  port: {{ 443 if connec_config.private_dns.scheme == 'https' else 80 }}
+  authentication:
+    key: <%= ENV['connec_authentication_key'] %>
+    secret: <%= ENV['connec_authentication_secret'] %>
+  paths:
+    sync: /v1/:instance_uid/sync
+    all_accounts: /api/reports/:org_uid/account_balances
+    balance_sheet: /api/reports/:channel/balance_sheet
+    accounts_summary: /api/reports/:channel/accounts_summary
+    customers_invoices: /api/reports/:channel/customers_invoices
+    suppliers_invoices: /api/reports/:channel/suppliers_invoices
+  upload:
+    protocol: {{ connec_config.private_dns.scheme }}
+    company: {{ connec_config.private_dns.host }}/v1/:channel_id/company
+    organizations: {{ connec_config.private_dns.host }}/v1/admin/uploads/organizations
+    people: {{ connec_config.private_dns.host }}/v1/admin/uploads/people
+    items: {{ connec_config.private_dns.host }}/v1/admin/uploads/items
+impac:
+  protocol: {{ impac_config.private_dns.scheme }}
+  host: {{ impac_config.private_dns.host }}
+  paths:
+    get_widget: /api/v1/get_widget
+  colors:
+    positive: "#3FC4FF"
+    negative: "#1DE9B6"
+    array: ["#1de9b6","#7c4dff","#ffc928","#3fc4ff","#ff8e01","#c6ff00","#d500fa","#ff6e41","#ffeb3c","#ff1844"]
+oauth:
+  {{ connec_config.oauth | to_json }}
+westcon:
+  reseller_code: US-WESTCON-GROUP-1214
+  api_login: <%= ENV['westcon_api_login'] %>
+  api_pwd: <%= ENV['westcon_api_pwd'] %>
+aws_s3:
+  region: {{ mnohub_config.s3_bucket.region }}
+  access_key_id: <%= ENV['aws_s3_access_key_id'] %>
+  secret_access_key: <%= ENV['aws_s3_secret_access_key'] %>
+  public_bucket: {{ mnohub_config.s3_bucket.public }}
+  private_bucket: {{ mnohub_config.s3_bucket.private }}
+  {% if mnohub_config.asset_host is defined and mnohub_config.public_asset_host is defined %}
+  asset_host: {{ mnohub_config.asset_host }}
+  public_asset_host: {{ mnohub_config.public_asset_host }}
+  public_asset_path: {{ mnohub_config.public_asset_path }}
+  {% endif %}
+star:
+  url: not-available
+  show_logs: false
+microsoft:
+  partner_id: 000000
+geocoder:
+  lookup: 'google'
+  ip_lookup: 'geoip2'
+  geoip2:
+    file: <%= File.join(Rails.root,'geocoder','geodb.mmdb') %>
+shareasale:
+  url: NOT-AVAILABLE
+intercom:
+  app_id: <%= ENV["INTERCOM_APP_ID"] %>
+  api_secret: <%= ENV['intercom_api_secret'] %>
+  api_key: <%= ENV['intercom_api_key'] %>

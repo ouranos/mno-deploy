@@ -1,0 +1,26 @@
+---
+
+deploy_directory: /apps/connec
+default_environment:
+  RAILS_ENV: "{{ rails_environment }}"
+  JAVA: /usr/lib/jvm/java-7-openjdk-amd64/jre/bin/java
+  PATH: "/opt/jruby/current/bin:{{ ansible_env.PATH }}"
+  HTTP_PROXY: "{% if proxy_host is defined %}http://{{ proxy_host }}:{{ proxy_port }}{% endif %}"
+  HTTPS_PROXY: "{% if proxy_host is defined %}http://{{ proxy_host }}:{{ proxy_port }}{% endif %}"
+  NO_PROXY: "{% if proxy_ignore is defined %}{{ proxy_ignore }}{% else %}localhost,169.254.169.254{% endif %}"
+
+connec_config:
+  puma:
+    java_opts:
+      xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 80% of server memory for Puma
+      max_perm_size: 256m
+  sidekiq:
+    worker_threads: 25
+    java_opts:
+      xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 75% of server memory for Sidekiq
+      max_perm_size: 512m
+  newrelic:
+    common:
+      app_name: Connec

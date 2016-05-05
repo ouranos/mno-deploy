@@ -1,0 +1,129 @@
+---
+
+### Maestrano configuration
+
+# Extra packages required
+- name: Rundeck | Install packages
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - libmysqlclient-dev
+  when: ansible_os_family == "Debian"
+
+# Set server URL
+- name: Rundeck | Ensure server url is configured (rundeck-config.properties)
+  lineinfile: >
+    dest=/etc/rundeck/rundeck-config.properties
+    regexp="^grails\.serverURL\="
+    line="grails.serverURL={{ rundeck_protocol }}://{{ rundeck_domain }}"
+  notify:
+    - restart rundeck
+  tags:
+    - rundeck
+    - configuration
+
+- name: Rundeck | Ensure server url is configured (framework.properties)
+  lineinfile: >
+    dest=/etc/rundeck/framework.properties
+    regexp="^framework\.server\.url\s*\=s*"
+    line="framework.server.url = {{ rundeck_protocol }}://{{ rundeck_domain }}"
+  notify:
+    - restart rundeck
+  tags:
+    - rundeck
+    - configuration
+
+# Fix SSL property for CLI
+- name: Rundeck | Comment out SSL option for CLI (/etc/rundeck/profile)
+  lineinfile: >
+    dest=/etc/rundeck/profile
+    regexp="^export RDECK_SSL_OPTS=(.*)$"
+    line="# export RDECK_SSL_OPTS=\1"
+    backrefs=yes
+  tags:
+    - rundeck
+    - configuration
+
+# Configure projects
+- name: Rundeck | Configure SSH keys paths
+  file: path={{ item }} owner=rundeck group=rundeck state=directory
+  with_items:
+    - /var/lib/rundeck/var/storage/content/keys
+    - /var/lib/rundeck/var/storage/meta/keys
+
+- name: Rundeck | Set SSH private keys
+  copy: 
+    content: "{{ item.value.content }}"
+    dest: "/var/lib/rundeck/var/storage/content/keys/{{ item.value.name }}.pem"
+    owner: rundeck
+    group: jetty
+    mode: 0600
+  with_dict: "{{ rundeck_config.ssh_private_keys }}"
+
+- name: Rundeck | Set SSH private keys metadata
+  copy: 
+    content: "{'Rundeck-content-size':'{{ item.value.content | length }}','Rundeck-key-type':'private','Rundeck-content-mask':'content','Rundeck-content-creation-time':'{{ ansible_date_time.iso8601 }}','Rundeck-auth-created-username':'admin','Rundeck-auth-modified-username':'admin','Rundeck-content-modify-time':'{{ ansible_date_time.iso8601 }}','Rundeck-content-type':'application/octet-stream'}"
+    dest: "/var/lib/rundeck/var/storage/meta/keys/{{ item.value.name }}.pem"
+    owner: rundeck
+    group: jetty
+    mode: 0600
+  with_dict: "{{ rundeck_config.ssh_private_keys }}"
+
+- name: Rundeck | Configure projects paths
+  file: path=/var/rundeck/projects/{{ item.name }}/etc owner=rundeck group=rundeck state=directory
+  with_items: "{{ rundeck_config.projects }}"
+
+- name: Rundeck | Configure projects
+  template:
+    src: project.properties
+    dest: "/var/rundeck/projects/{{ item.name }}/etc/project.properties"
+    owner: rundeck
+    group: rundeck
+  with_items: "{{ rundeck_config.projects }}"
+
+- name: Rundeck | Configure server configuration jobs templates
+  template:
+    src: deployment-job.yml
+    dest: "/var/rundeck/deployment-job-{{ item.name }}.yml"
+    owner: rundeck
+    group: rundeck
+  with_items: "{{ rundeck_config.projects }}"
+
+- name: Rundeck | Configure components deployment jobs templates
+  template:
+    src: deploy-version-job.yml
+    dest: "/var/rundeck/deployment-version-job-{{ item.name }}.yml"
+    owner: rundeck
+    group: rundeck
+  with_items: "{{ rundeck_config.projects }}"
+
+- name: Rundeck | Ensure Rundeck is running
+  shell: "service rundeckd start"
+  ignore_errors: true
+
+- name: Rundeck | Wait for Rundeck to be up
+  wait_for: port=4440 delay=10
+
+- name: Rundeck | Configure jobs
+  shell: "rd-jobs load --file /var/rundeck/deployment-job-{{ item.name }}.yml -F yaml -p {{ item.name }}"
+  environment:
+    RUNDECK_URL: http://localhost
+    RUNDECK_USER: "{{ rundeck_config.username }}"
+    RUNDECK_PASS: "{{ rundeck_config.password }}"
+  with_items: "{{ rundeck_config.projects }}"
+  ignore_errors: true
+
+- name: Rundeck | Configure jobs
+  shell: "rd-jobs load --file /var/rundeck/deployment-version-job-{{ item.name }}.yml -F yaml -p {{ item.name }}"
+  environment:
+    RUNDECK_URL: http://localhost
+    RUNDECK_USER: "{{ rundeck_config.username }}"
+    RUNDECK_PASS: "{{ rundeck_config.password }}"
+  with_items: "{{ rundeck_config.projects }}"
+  ignore_errors: true
+
+- name: Rundeck | Backup script
+  template:
+    src: backup_restore.sh
+    dest: "/var/lib/rundeck/backup_restore.sh"
+    owner: rundeck
+    group: rundeck

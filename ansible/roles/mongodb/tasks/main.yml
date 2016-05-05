@@ -1,0 +1,42 @@
+---
+
+- name: Gather EC2 facts
+  action: ec2_facts
+  tags: [mongodb]
+
+- name: MongoDB | Add bind_ip/DNS to hosts file on EC2
+  template: src=etc_hosts_ec2 dest=/etc/hosts
+  when: ansible_ec2_local_ipv4 is defined
+  tags: [mongodb]
+
+- include: install.deb.yml
+  when: ansible_os_family == 'Debian'
+  tags: [mongodb]
+
+- include: install.rhel.yml
+  when: ansible_os_family == 'RedHat'
+  tags: [mongodb]
+
+- include: configure.yml
+  tags: [mongodb]
+
+- include: replication_init_auth.yml
+  when: ( mongodb_conf_replSet is defined and mongodb_conf_auth
+        and mongodb_master is defined and mongodb_master )
+  tags: [mongodb]
+
+# NOTE: it may seems strange to run the replication process on nodes
+# other than mongodb_master (slave).
+# Reasons is the mongodb_master may change over time which is why
+# the replication.yml is run on all nodes
+- include: replication.yml
+  when: mongodb_conf_replSet is defined
+  tags: [mongodb]
+
+- include: auth_initialization.yml
+  when: mongodb_conf_auth and not mongodb_conf_replSet
+  tags: [mongodb]
+
+- include: mms-agent.yml
+  when: mongodb_mms_api_key != ""
+  tags: [mongodb]

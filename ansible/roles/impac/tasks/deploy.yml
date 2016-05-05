@@ -1,0 +1,132 @@
+---
+
+- name: Impac | Release folder
+  set_fact: release_folder="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: Impac | Download application from S3 (impac-XXX.tar.gz)
+  s3:
+    bucket: "{{ mno_pkgs_bucket }}"
+    object: "impac/{{ impac_folder }}/{{ impac_version }}.tar.gz"
+    dest: "{{ deploy_directory }}/{{ impac_version }}.tar.gz"
+    mode: get
+    region: "{{ mno_pkgs_s3_aws_region }}"
+    aws_access_key: "{{ mno_pkgs_s3_aws_access_key }}"
+    aws_secret_key: "{{ mno_pkgs_s3_aws_secret_key }}"
+
+- name: Impac | Replace version
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    state: absent
+
+- name: Impac | Create version directory (/apps/impac/releases/XXX)
+  file: path={{ deploy_directory }}/releases/{{ release_folder }} owner=deployer group=deployer state=directory
+
+- name: Impac | Extract current version
+  command: "tar -xzf {{ deploy_directory }}/{{ impac_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
+
+- name: Impac | Clean up tar file
+  file:
+    path: "{{ deploy_directory }}/{{ impac_version }}.tar.gz"
+    state: absent
+
+- name: Impac | Clean up gems
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/bundle"
+    state: absent
+
+- name: Impac | Clean up gems
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor"
+    state: directory
+
+- name: Impac | NewRelic file newrelic.yml
+  template:
+    src: newrelic.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/newrelic.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: Impac | Configuration file config/application.yml
+  template:
+    src: application.yml
+    dest: "{{ deploy_directory }}/shared/config/application.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: Impac | Replace config/application.yml
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/config/application.yml"
+    state: absent
+
+- name: Impac | Symbolic link to config/application.yml
+  file:
+    src: "{{ deploy_directory }}/shared/config/application.yml"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/application.yml"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: Impac | Symbolic link to log directory
+  file:
+    src: "{{ deploy_directory }}/shared/log"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/log"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: Impac | Set log directory permissions
+  file:
+    path: "{{ deploy_directory }}/shared/log"
+    mode: 0755
+    owner: deployer
+    group: deployer
+    state: directory
+    recurse: yes
+
+- name: Impac | Set directory permissions
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    mode: 0755
+    owner: deployer
+    group: deployer
+    state: directory
+    recurse: yes
+
+- name: Impac | Symbolic link to gems
+  file:
+    src: "{{ deploy_directory }}/shared/vendor_bundle"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/bundle"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: Impac | Configure settings file
+  template:
+    src: settings_environment.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/settings/{{ rails_environment }}.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: Impac | Run bundle install
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} /opt/jruby/current/bin/jruby -S bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
+  sudo_user: deployer
+
+- name: Impac | Replace previous version
+  file:
+    path: "{{ deploy_directory }}/current"
+    state: absent
+
+- name: Impac | Symbolic link to current version
+  file:
+    src: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    dest: "{{ deploy_directory }}/current"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes

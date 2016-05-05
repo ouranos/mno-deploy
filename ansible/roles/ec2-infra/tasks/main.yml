@@ -1,0 +1,41 @@
+---
+
+- include: vpc.yml
+  when: not vpc.skip
+  tags: [infra_vpc]
+- include: route53.yml
+  when: not route53.skip
+  tags: [infra_route53]
+# IAM roles definition requires Ansible 2.0
+# - include: iam.yml
+#   when: not iam.skip
+- include: rds.yml
+  when: not rds.skip
+  tags: [infra_rds]
+- include: s3.yml
+  when: not s3.skip
+  tags: [infra_s3]
+- include: mongo.yml
+  when: not mongo.skip
+  tags: [infra_mongo]
+- include: nex.yml
+  when: not nex.skip
+  tags: [infra_nex]
+- include: connec.yml
+  when: not connec.skip
+  tags: [infra_connec]
+- include: mnohub.yml
+  when: not mnohub.skip
+  tags: [infra_mnohub]
+- include: maestrano.yml
+  when: not maestrano.skip
+  tags: [infra_maestrano]
+- include: impac.yml
+  when: not impac.skip
+  tags: [infra_impac]
+- include: mno-enterprise.yml
+  when: not mnoe.skip
+  tags: [infra_mnoe]
+- include: rundeck.yml
+  when: not rundeck.skip
+  tags: [infra_rundeck]

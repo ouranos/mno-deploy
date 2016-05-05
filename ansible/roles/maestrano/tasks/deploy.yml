@@ -1,0 +1,217 @@
+---
+
+- name: MNO Hub | Release folder
+  set_fact: release_folder="{{lookup('pipe','date +%Y%m%d%H%M%S')}}"
+
+- name: MNO Hub | Download application from S3 (maestrano-XXX.tar.gz)
+  s3:
+    bucket: "{{ mno_pkgs_bucket }}"
+    object: "mno-hub/{{ mnohub_folder }}/{{ mnohub_version }}.tar.gz"
+    dest: "{{ deploy_directory }}/maestrano-{{ mnohub_version }}.tar.gz"
+    mode: get
+    region: "{{ mno_pkgs_s3_aws_region }}"
+    aws_access_key: "{{ mno_pkgs_s3_aws_access_key }}"
+    aws_secret_key: "{{ mno_pkgs_s3_aws_secret_key }}"
+
+- name: MNO Hub | Replace version
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    state: absent
+
+- name: MNO Hub | Create version directory (/apps/maestrano/releases/XXX)
+  file: path={{ deploy_directory }}/releases/{{ release_folder }} owner=deployer group=deployer state=directory
+
+- name: MNO Hub | Extract current version
+  command: "tar -xzf {{ deploy_directory }}/maestrano-{{ mnohub_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
+
+- name: MNO Hub | Clean up tar file
+  file:
+    path: "{{ deploy_directory }}/maestrano-{{ mnohub_version }}.tar.gz"
+    state: absent
+
+- name: MNO Hub | Clean up gems
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/bundle"
+    state: absent
+
+- name: MNO Hub | Clean up gems
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor"
+    state: directory
+
+- name: MNO Hub | Database file database.yml
+  template:
+    src: database.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/database.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNO Hub | Configuration file app_config.yml
+  template:
+    src: app_config.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/app_config.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNO Hub | Configuration file config/application.yml
+  template:
+    src: application.yml
+    dest: "{{ deploy_directory }}/shared/config/application.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNO Hub | Replace config/application.yml
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/config/application.yml"
+    state: absent
+
+- name: MNO Hub | Symbolic link to config/application.yml
+  file:
+    src: "{{ deploy_directory }}/shared/config/application.yml"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/application.yml"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: MNO Hub | Configure settings file
+  template:
+    src: settings_environment.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/settings/{{ rails_environment }}.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNO Hub | Clean directory for Xero API certificates
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/xero-certs"
+    state: absent
+    owner: deployer
+    group: deployer
+    mode: 0755
+  tags: [xero]
+
+- name: MNO Hub | Clean directory for Xero API certificates
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/xero-certs/{{ rails_environment }}"
+    state: directory
+    owner: deployer
+    group: deployer
+    mode: 0755
+  tags: [xero]
+
+- name: MNO Hub | Deploy Xero API certificates
+  copy:
+    content: "{{ lookup('file', 'files/xero_certs/' + environment_name + '/' + rails_environment + '/' + item) }}"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/xero-certs/{{ rails_environment }}/{{ item }}"
+    owner: deployer
+    group: deployer
+    mode: 0755
+  with_items:
+    - privatekey.pem
+    - entrust-cert.pem
+    - entrust-private-nopass.pem
+  tags: [xero]
+
+- name: MNO Hub | Disable Sunspot::Solr
+  template:
+    src: sunspot.yml
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/sunspot.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
+- name: MNO Hub | Set directory permissions
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    mode: 0755
+    owner: deployer
+    group: deployer
+    state: directory
+    recurse: yes
+
+- name: MNO Hub | Symbolic link to gems
+  file:
+    src: "{{ deploy_directory }}/shared/vendor_bundle"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor/bundle"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: MNO Hub | Run bundle install
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
+  sudo_user: deployer
+  environment: "{{ default_environment }}"
+
+- name: MNO Hub | Migrate the database
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
+  environment: "{{ default_environment }}"
+  sudo_user: deployer
+
+- name: MNO Hub | Assets precompile
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} /usr/local/bin/bundle exec rake assets:precompile"
+  sudo_user: deployer
+  environment: "{{ default_environment }}"
+
+- name: MNO Hub | Replace previous version
+  file:
+    path: "{{ deploy_directory }}/current"
+    state: absent
+
+- name: MNO Hub | Symbolic link to current version
+  file:
+    src: "{{ deploy_directory }}/releases/{{ release_folder }}"
+    dest: "{{ deploy_directory }}/current"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+
+- name: MNO Hub | Clean directories
+  file:
+    path: "{{ deploy_directory }}/releases/{{ release_folder }}/{{ item }}"
+    state: absent
+  with_items:
+    - log
+    - tmp
+    - solr
+    - geocoder
+    - downloads
+
+- name: MNO Hub | Symbolic links to shared directories
+  file:
+    src: "{{ deploy_directory }}/shared/{{ item }}"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/{{ item }}"
+    owner: deployer
+    group: deployer
+    state: link
+    force: yes
+  with_items:
+    - log
+    - tmp
+    - solr
+    - geocoder
+    - downloads
+
+- name: MNO Hub | Restart puma service
+  service: name=puma state=restarted
+
+- name: MNO Hub | Restart delayed_job service
+  service: name=delayed-job state=restarted
+  when: ansible_os_family == "Debian"
+
+- name: MNO Hub | Restart delayed_job service
+  service: name=delayed_job state=restarted
+  when: ansible_os_family == "RedHat"
+
+- name: MNO Hub | Add cron job to restart delayed jobs daily
+  cron: name="maestrano delayed jobs" minute="5" hour="0" job="service delayed-job restart > /dev/null"
+  when: ansible_os_family == "Debian"
+
+- name: MNO Hub | Add cron job to restart delayed jobs daily
+  cron: name="maestrano delayed jobs" minute="5" hour="0" job="service delayed_job restart > /dev/null"
+  when: ansible_os_family == "RedHat"
