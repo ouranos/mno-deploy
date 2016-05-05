@@ -49,9 +49,6 @@ tenant_dropbox_s3_aws_access_key: "changeme-with-s3-tenant-key"
 tenant_dropbox_s3_aws_secret_key: "changeme-with-s3-tenant-secret"
 tenant_dropbox_s3_aws_region: "ap-southeast-2"
 
-# Dropbox paths
-dropbox_mno_infrastructure_builds_path: '/mno-infrastructure/develop'
-
 #=======================================================================
 #=======================================================================
 # General Environment configuration
