@@ -14,5 +14,5 @@
     - role: splunk
     - role: jruby
     - { role: jdauphant.nginx, keep_only_specified: true }
-    - { role: dev_platform }
+    - { role: dev-platform }
     - { role: logrotate, logrotate_scripts: [{name: connec, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
