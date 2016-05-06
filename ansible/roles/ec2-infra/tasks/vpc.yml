@@ -12,7 +12,7 @@
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
   register: created_vpc
-  tags: [infra_mnoe,infra_maestrano,infra_nex,infra_connec,infra_impac,infra_rundeck]
+  tags: [infra_mnoe,infra_maestrano,infra_nex,infra_connec,infra_impac,infra_rundeck,infra_dev_platform]
 
 - name: Create VPC subnets
   ec2_vpc_subnet:
@@ -36,7 +36,7 @@
     vpc_id: "{{ created_vpc.vpc_id }}"
   with_items: "{{ security_groups }}"
   register: created_security_groups
-  tags: [infra_mnoe,infra_maestrano,infra_nex,infra_connec,infra_impac,infra_rundeck]
+  tags: [infra_mnoe,infra_maestrano,infra_nex,infra_connec,infra_impac,infra_rundeck,infra_dev_platform]
 
 # Create the Security Groups
 - name: Create Nex! Security Groups

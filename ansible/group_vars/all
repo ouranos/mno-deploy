@@ -16,6 +16,8 @@ nex_app_orchestrator_folder: develop
 frontend_project: changeme
 frontend_version: changeme
 frontend_folder: develop
+dev_platform_folder: develop
+dev_platform_version: changeme
 
 #=======================================================================
 #=======================================================================
@@ -121,6 +123,12 @@ splunk:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
       - {index: "main", monitor: "/var/log/torquebox/torquebox.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+  dev_platform:
+    inputs:
+      - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
 
 # Private Route53 Zone
@@ -834,6 +842,61 @@ mnoe:
         Rails_Environment: "{{ rails_environment }}"
         Description: "Maestrano Enterprise server"
 
+# Developer platform configuration
+dev_platform:
+  skip: true
+  skip_precompile: false
+  skip_migrations: false
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-devp-elb"
+    connection_draining_timeout: 60
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets[4].id }}" # ELB subnet
+      - "{{ created_vpc.subnets[5].id }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      ping_path: "/ping"
+      response_timeout: 3 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-devp-dns"
+    record: "dev-platform.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-devp-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+      - "{{ created_security_groups.results[4].group_id }}" # RDS security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-devp-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    min_size: 0
+    max_size: 4
+    desired_capacity: 0
+    tags:
+      - Name: "{{ vpc_short_name }}-devp-app"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "Developer Platform server"
+
 # RDS database for MNO Hub, MCluster and any required frontend
 rds:
   name: "{{ environment_name }}-maestrano"
@@ -1090,9 +1153,22 @@ connec_config:
       username: admin
       password: changeme
 
-# RVM platform specific config, see https://rvm.io/rvm/autolibs
-# Only Maestrano Hub uses it at the moment. Will be removed.
-rvm1_autolib_mode: 3 # Use libs, install missing libs
+# Developer Platform configuration
+dev_platform_config:
+  public_dns:
+    scheme: https
+    host: "{{ dev_platform.dns_record.record }}"
+  private_dns:
+    scheme: http
+    host: "{{ dev_platform.dns_record.record }}"
+  database:
+    database: dev_platform
+    username: dev_platform
+    password:  changeme
+    host: "{{ dev_platform_config.private_dns.scheme }}://{{ dev_platform_config.private_dns.host }}"
+    pool: 10
+    timeout: 10000
+  rails_secret_key: changeme
 
 # Rundeck configuration
 rundeck_config:
@@ -1221,3 +1297,7 @@ rundeck_database_pass: "{{ rundeck_config.database.password }}" # Defaults to ru
 logrotate:
   options: ['su deployer deployer', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
   options_torquebox: ['su torquebox torquebox', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
+
+# RVM platform specific config, see https://rvm.io/rvm/autolibs
+# Only Maestrano Hub uses it at the moment. Will be removed.
+rvm1_autolib_mode: 3 # Use libs, install missing libs
