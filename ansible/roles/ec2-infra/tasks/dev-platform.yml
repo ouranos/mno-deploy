@@ -4,6 +4,38 @@
 
 - set_fact: maestrano_component="dev-platform-server-local"
 
+- name: Create Developer Platform Redis Subnet Group
+  elasticache_subnet_group:
+    name: "{{ redis_group.name }}"
+    description: "Developer Platform Redis Subnet Group"
+    subnets: "{{ redis_group.subnets }}"
+    state: present
+
+- name: Create Developer Platform Redis Store
+  elasticache:
+    name: "{{ dev_platform.redis.name }}"
+    state: present
+    engine: redis
+    cache_port: 6379
+    node_type: "{{ dev_platform.redis.node_type }}"
+    num_nodes: "{{ dev_platform.redis.num_nodes }}"
+    cache_subnet_group: "{{ redis_group.name }}"
+    security_group_ids: "{{ redis_group.vpc_security_groups }}"
+    region: "{{ aws_region }}"
+    wait: yes
+  register: created_dev_platform_redis
+
+- name: Add Redis Store DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ dev_platform.redis.endpoint }}"
+    type: CNAME
+    value: "{{ created_dev_platform_redis.elasticache.data.CacheNodes[0].Endpoint.Address }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"
+
 - name: Create Developer Platform ELB
   ec2_elb_lb:
     name: "{{ dev_platform.elastic_load_balancer.name }}"
