@@ -1051,6 +1051,7 @@ impac_config:
   private_dns:
     scheme: http
     host: "{{ impac.dns_record.record }}"
+  sparkpost_api_key: changeme
 
 # Maestrano configuration
 mnohub_config:
