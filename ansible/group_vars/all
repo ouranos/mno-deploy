@@ -897,10 +897,10 @@ dev_platform:
         Rails_Environment: "{{ rails_environment }}"
         Description: "Developer Platform server"
   redis:
-    name: "{{ environment_name }}-dev_platform-redis"
+    name: "{{ environment_name }}-devp-redis"
     node_type: cache.t2.micro
     num_nodes: 1
-    endpoint: "{{ environment_name }}-dev_platform-redis.{{ dns.base }}"
+    endpoint: "{{ environment_name }}-devp-redis.{{ dns.base }}"
 
 # RDS database for MNO Hub, MCluster and any required frontend
 rds:
