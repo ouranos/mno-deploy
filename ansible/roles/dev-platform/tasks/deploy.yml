@@ -131,7 +131,7 @@
   environment: "{{ default_environment }}"
 
 - name: Dev Platform | Migrate the database
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate"
   environment: "{{ default_environment }}"
   sudo_user: deployer
   when: not dev_platform.skip_migrations
