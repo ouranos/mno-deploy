@@ -6,7 +6,7 @@
 - name: Dev Platform | Download application from S3
   s3:
     bucket: "{{ mno_pkgs_bucket }}"
-    object: "dev_platform/{{ dev_platform_folder }}/{{ dev_platform_version }}.tar.gz"
+    object: "dev-platform/{{ dev_platform_folder }}/{{ dev_platform_version }}.tar.gz"
     dest: "{{ deploy_directory }}/{{ dev_platform_version }}.tar.gz"
     mode: get
     region: "{{ mno_pkgs_s3_aws_region }}"
@@ -18,7 +18,7 @@
     path: "{{ deploy_directory }}/releases/{{ release_folder }}"
     state: absent
 
-- name: Dev Platform | Create version directory (/apps/dev_platform/releases/XXX)
+- name: Dev Platform | Create version directory (/apps/dev-platform/releases/XXX)
   file: path={{ deploy_directory }}/releases/{{ release_folder }} owner=deployer group=deployer state=directory
 
 - name: Dev Platform | Extract current version

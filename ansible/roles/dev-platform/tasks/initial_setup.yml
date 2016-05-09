@@ -10,6 +10,7 @@
     - libmysqlclient-dev
     - libsqlite3-dev
     - nodejs
+    - ruby-dev
   when: ansible_os_family == "Debian"
 
 - name: Developer Platform | Install packages
