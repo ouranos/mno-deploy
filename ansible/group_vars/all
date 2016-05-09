@@ -1165,7 +1165,6 @@ dev_platform_config:
     database: dev_platform
     username: dev_platform
     password:  changeme
-    host: "{{ dev_platform_config.private_dns.scheme }}://{{ dev_platform_config.private_dns.host }}"
     pool: 10
     timeout: 10000
   rails_secret_key: changeme

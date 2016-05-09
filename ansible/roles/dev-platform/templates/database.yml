@@ -3,7 +3,7 @@
 {{ rails_environment }}:
   adapter: mysql2
   encoding: utf8
-  host: {{ dev_platform_config.database.host }}
+  host: {{ dev_platform_config.private_dns.scheme }}://{{ dev_platform_config.private_dns.host }}
   database: {{ dev_platform_config.database.database }}
   pool: {{ dev_platform_config.database.pool }}
   timeout: {{ dev_platform_config.database.timeout }}
