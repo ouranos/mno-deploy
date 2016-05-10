@@ -136,12 +136,6 @@
   sudo_user: deployer
   when: not dev_platform.skip_migrations
 
-- name: Dev Platform | Assets precompile
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake assets:precompile"
-  sudo_user: deployer
-  environment: "{{ default_environment }}"
-  when: not dev_platform.skip_precompile
-
 - name: Dev Platform | Replace previous version
   file:
     path: "{{ deploy_directory }}/current"

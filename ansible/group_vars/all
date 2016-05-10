@@ -845,7 +845,6 @@ mnoe:
 # Developer platform configuration
 dev_platform:
   skip: true
-  skip_precompile: false
   skip_migrations: false
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-devp-elb"
