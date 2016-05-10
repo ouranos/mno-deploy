@@ -1249,6 +1249,12 @@ rundeck_config:
       node_name: "{{ vpc_short_name }}-frontend-app"
       ansible_playbook: "{{ mno-enterprise-server-ec2.yml }}"
       environment: uat
+    - name: 'DEV_PLATFORM_UAT'
+      description: 'UAT - Dev Platform'
+      component: dev-platform
+      node_name: "{{ vpc_short_name }}-devp-app"
+      ansible_playbook: "{{ mno-enterprise-server-ec2.yml }}"
+      environment: uat
     - name: 'MNOHUB_PRD'
       description: 'Production - MnoHub'
       component: mnohub
@@ -1262,13 +1268,13 @@ rundeck_config:
       ansible_playbook: "{{ nex-app-server-ec2.yml }}"
       environment: production
     - name: 'CONNEC_API_PRD'
-      description: 'UAT - Connec! API'
+      description: 'Production - Connec! API'
       component: connec
       node_name: "{{ vpc_short_name }}-connec-api"
       ansible_playbook: "{{ connec-api-server-ec2.yml }}"
       environment: production
     - name: 'CONNEC_JOB_PRD'
-      description: 'UAT - Connec! Jobs'
+      description: 'Production - Connec! Jobs'
       component: connec
       node_name: "{{ vpc_short_name }}-connec-jobs"
       ansible_playbook: "{{ connec-jobs-server-ec2.yml }}"
@@ -1283,6 +1289,12 @@ rundeck_config:
       description: 'Production - Mnoe front-end'
       component: frontend-app
       node_name: "{{ vpc_short_name }}-frontend-app"
+      ansible_playbook: "{{ mno-enterprise-server-ec2.yml }}"
+      environment: production
+    - name: 'DEV_PLATFORM_PRD'
+      description: 'Production - Dev Platform'
+      component: dev-platform
+      node_name: "{{ vpc_short_name }}-devp-app"
       ansible_playbook: "{{ mno-enterprise-server-ec2.yml }}"
       environment: production
 rundeck_protocol: "{{ rundeck_config.protocol }}"
