@@ -1104,7 +1104,7 @@ mnohub_config:
     app_id: changeme
   database:
     host: "{{ rds.endpoint }}"
-    name: maestrano
+    database: maestrano
     username: maestrano
     password: changeme
     pool: 15
