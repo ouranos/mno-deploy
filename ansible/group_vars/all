@@ -470,7 +470,7 @@ maestrano:
 mnohub:
   skip: true # new mnohub is not yet part of the default implementation
   redis:
-    name: "{{ environment_name }}-mnohub-redis"
+    name: mnohub-redis
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-mnohub-redis.{{ dns.base }}"
@@ -597,7 +597,7 @@ nex:
 connec:
   skip: false
   redis:
-    name: "{{ environment_name }}-connec-redis"
+    name: connec-redis
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-connec-redis.{{ dns.base }}"
@@ -681,7 +681,7 @@ connec:
 impac:
   skip: false
   redis:
-    name: "{{ environment_name }}-impac-redis"
+    name: impac-redis
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-impac-redis.{{ dns.base }}"
@@ -896,7 +896,7 @@ dev_platform:
         Rails_Environment: "{{ rails_environment }}"
         Description: "Developer Platform server"
   redis:
-    name: "{{ environment_name }}-devp-redis"
+    name: devp-redis
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-devp-redis.{{ dns.base }}"

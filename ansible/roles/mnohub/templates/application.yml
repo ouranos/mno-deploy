@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
-# TODO: Cleanup required
+# TODO: Cleanup required - move from settings.yml into this file
 
 # Rails Secrets
 secret_token: {{ mnohub_config.secrets.secret_token }}
