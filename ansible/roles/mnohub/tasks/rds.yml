@@ -20,7 +20,7 @@
     login_port: 3306
     collation: utf8_general_ci
     encoding: utf8
-    name: "{{ mnohub_config.database.name }}"
+    name: "{{ mnohub_config.database.database }}"
     state: present
 
 - name: MnoHub | Create RDS database user
