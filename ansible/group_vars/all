@@ -508,6 +508,7 @@ mnohub:
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
     instance_type: "{{ default_instance_type }}"
+    spot_price: None
     security_groups:
       - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
       - "{{ created_security_groups.results[4].group_id }}" # RDS security group
