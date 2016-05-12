@@ -1103,6 +1103,7 @@ mnohub_config:
   open_exchange_rates:
     app_id: changeme
   database:
+    host: "{{ rds.endpoint }}"
     name: maestrano
     username: maestrano
     password: changeme
