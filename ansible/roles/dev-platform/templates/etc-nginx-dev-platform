@@ -15,7 +15,13 @@ server {
 
   root      {{ deploy_directory }}/current/public;
 
-  try_files $uri/index.html $uri @dev_platform;
+  # Location to route to the rails backend
+  location ~* ^/(api|ping) {
+    try_files $uri/index.html $uri @dev_platform;
+  }
+
+  # Everything else to the index page
+  try_files $uri $uri/ /index.html;
 
   location @dev_platform {
     proxy_pass http://dev_platform;
