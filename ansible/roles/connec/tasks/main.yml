@@ -13,9 +13,9 @@
 
 - name: Connec | Instance De-register
   ec2_elb:
-    aws_access_key: "{{ infra_ec2_aws_access_key }}"
-    aws_access_secret: "{{ infra_ec2_aws_access_secret }}"
-    region: "{{ infra_ec2_aws_region }}"
+    ec2_access_key: "{{ infra_ec2_aws_access_key }}"
+    ec2_secret_key: "{{ infra_ec2_aws_access_secret }}"
+    ec2_region: "{{ infra_ec2_aws_region }}"
     instance_id: "{{ ansible_ec2_instance_id }}"
     state: absent
   when: infra_ec2_aws_access_key is defined
@@ -33,9 +33,9 @@
 
 - name: Connec | Instance Register
   ec2_elb:
-    aws_access_key: "{{ infra_ec2_aws_access_key }}"
-    aws_access_secret: "{{ infra_ec2_aws_access_secret }}"
-    region: "{{ infra_ec2_aws_region }}"
+    ec2_access_key: "{{ infra_ec2_aws_access_key }}"
+    ec2_secret_key: "{{ infra_ec2_aws_access_secret }}"
+    ec2_region: "{{ infra_ec2_aws_region }}"
     instance_id: "{{ ansible_ec2_instance_id }}"
     ec2_elbs: "{{ item }}"
     state: present
