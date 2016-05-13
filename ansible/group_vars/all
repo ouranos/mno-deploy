@@ -72,7 +72,7 @@ default_base_ami_os: ubuntu
 # default_base_ami_os: rhel
 # default_base_ami: ami-d3daace9 # Red Hat Enterprise Linux 7.1
 # default_base_ami_os: rhel
-default_instance_type: m1.medium
+default_instance_type: t2.medium
 
 # Used to restrict SSH access to the jumpbox/NAT
 inbound_ip_range: 103.237.93.231/32
