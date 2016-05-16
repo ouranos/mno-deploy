@@ -3,13 +3,6 @@
 # Connec! Configuration
 # Creates separate ASGs for API and Background Jobs
 
-- name: Create Connec Redis Subnet Group
-  elasticache_subnet_group:
-    name: "{{ redis_group.name }}"
-    description: "Connec! Redis Subnet Group"
-    subnets: "{{ redis_group.subnets }}"
-    state: present
-
 - name: Create Connec Redis Store
   elasticache:
     name: "{{ connec.redis.name }}"

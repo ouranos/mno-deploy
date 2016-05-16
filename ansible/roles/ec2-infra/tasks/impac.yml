@@ -4,13 +4,6 @@
 
 - set_fact: maestrano_component="impac-app-server-local"
 
-- name: Create Impac Redis Subnet Group
-  elasticache_subnet_group:
-    name: "{{ redis_group.name }}"
-    description: "Impac! Redis Subnet Group"
-    subnets: "{{ redis_group.subnets }}"
-    state: present
-
 - name: Create Impac Redis Store
   elasticache:
     name: "{{ impac.redis.name }}"

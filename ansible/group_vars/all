@@ -75,7 +75,7 @@ default_base_ami_os: ubuntu
 default_instance_type: t2.medium
 
 # Used to restrict SSH access to the jumpbox/NAT
-inbound_ip_range: 103.237.93.231/32
+nat_inbound_ip_range: "{{ vpc.cidr_block }}"
 
 # New Relic
 newrelic_license_key:
@@ -404,10 +404,7 @@ vpc_nat:
   skip: false
   ami_name: amzn-ami-vpc-nat-hvm-2016.03.0.x86_64-ebs
   instance_type: t2.micro
-  spot_price: None
   subnet_id: "{{ created_vpc.subnets[4].id }}"
-
-nat_inbound_ip_range: None
 
 # IAM roles
 iam:
@@ -510,7 +507,6 @@ mnohub:
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
     instance_type: "{{ default_instance_type }}"
-    spot_price: None
     security_groups:
       - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
       - "{{ created_security_groups.results[4].group_id }}" # RDS security group
@@ -639,7 +635,6 @@ connec:
       image_id: "{{ default_base_ami }}"
       key_name: "{{ keypair }}"
       instance_type: "{{ default_instance_type }}"
-      spot_price: None
       security_groups:
         - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
         - "{{ created_security_groups.results[4].group_id }}" # RDS security group
@@ -649,7 +644,6 @@ connec:
       image_id: "{{ default_base_ami }}"
       key_name: "{{ keypair }}"
       instance_type: "{{ default_instance_type }}"
-      spot_price: None
       security_groups:
         - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
         - "{{ created_security_groups.results[4].group_id }}" # RDS security group
@@ -722,7 +716,6 @@ impac:
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
     instance_type: "{{ default_instance_type }}"
-    spot_price: None
     security_groups:
       - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
   auto_scaling_group:

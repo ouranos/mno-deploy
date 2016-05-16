@@ -4,13 +4,6 @@
 
 - set_fact: maestrano_component="dev-platform-server-local"
 
-- name: Create Developer Platform Redis Subnet Group
-  elasticache_subnet_group:
-    name: "{{ redis_group.name }}"
-    description: "Developer Platform Redis Subnet Group"
-    subnets: "{{ redis_group.subnets }}"
-    state: present
-
 - name: Create Developer Platform Redis Store
   elasticache:
     name: "{{ dev_platform.redis.name }}"
