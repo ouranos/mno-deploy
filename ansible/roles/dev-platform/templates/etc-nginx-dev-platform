@@ -16,7 +16,7 @@ server {
   root      {{ deploy_directory }}/current/public;
 
   # Location to route to the rails backend
-  location ~* ^/(api|ping) {
+  location ~* ^/(api|ping|locales) {
     try_files $uri/index.html $uri @dev_platform;
   }
 
