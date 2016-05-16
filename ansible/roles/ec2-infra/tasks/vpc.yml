@@ -4,9 +4,10 @@
 - name: Create VPC
   ec2_vpc:
     state: present
+    vpc_id: "{{ vpc.vpc_id }}"
     cidr_block: "{{ vpc.cidr_block }}"
-    resource_tags: "{{ vpc_tags }}"
-    subnets: "{{ vpc.subnets }}"
+    resource_tags: "{{ vpc_tags|safe }}"
+    # subnets: "{{ vpc.subnets }}"
     internet_gateway: "{{ vpc.internet_gateway|string }}"
     region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
@@ -22,6 +23,7 @@
     az: "{{ item.az }}"
     resource_tags: "{{ item.resource_tags }}"
   with_items: "{{ vpc.subnets }}"
+  when: vpc.vpc_id is undefined or vpc.vpc_id is none
 
 # Create the Security Groups
 - name: Create Security Groups
@@ -104,7 +106,7 @@
   ec2_vpc:
     state: present
     cidr_block: "{{ vpc.cidr_block }}"
-    resource_tags: "{{ vpc_tags }}"
+    resource_tags: "{{ vpc_tags|safe }}"
     internet_gateway: "{{ vpc.internet_gateway|string }}"
     route_tables: "{{ vpc.route_tables }}"
     region: "{{ aws_region }}"

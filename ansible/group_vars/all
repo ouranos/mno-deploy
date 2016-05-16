@@ -156,7 +156,6 @@ s3_buckets:
   private: generic-private-assets
   torquebox: generic-torquebox-cluster
 
-
 # VPC naming
 vpc_base_name: "{{ application_name }}-{{ environment_name }}-{{ rails_environment }}"
 vpc_short_name: "{{ application_name }}-{{ environment_name }}"
@@ -181,6 +180,7 @@ asg_tags:
 # If you override this, you should keep the same hierarchy (public | private | elb)
 vpc:
   skip: false
+  vpc_id: None
   name: "{{ vpc_base_name }}-vpc"
   cidr_block: 192.168.14.0/23
   subnets:
@@ -406,6 +406,8 @@ vpc_nat:
   instance_type: t2.micro
   spot_price: None
   subnet_id: "{{ created_vpc.subnets[4].id }}"
+
+nat_inbound_ip_range: None
 
 # IAM roles
 iam:
