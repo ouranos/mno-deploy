@@ -32,5 +32,5 @@
     host: '%'
     name: "{{ mnohub_config.database.username }}"
     password: "{{ mnohub_config.database.password }}"
-    priv: "{{ mnohub_config.database.name }}.*:ALL,GRANT"
+    priv: "{{ mnohub_config.database.database }}.*:ALL,GRANT"
     state: present

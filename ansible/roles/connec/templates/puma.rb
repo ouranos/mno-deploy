@@ -1,4 +1,4 @@
-#{{ ansible_managed }}
+# {{ ansible_managed }}
 
 # Min and Max threads per worker
 threads 6, 512
