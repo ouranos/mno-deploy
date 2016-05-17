@@ -4,16 +4,30 @@
 - name: Create VPC
   ec2_vpc:
     state: present
-    vpc_id: "{{ vpc.vpc_id }}"
     cidr_block: "{{ vpc.cidr_block }}"
     resource_tags: "{{ vpc_tags|safe }}"
-    # subnets: "{{ vpc.subnets }}"
+    subnets: "{{ vpc.subnets }}"
     internet_gateway: "{{ vpc.internet_gateway|string }}"
     region: "{{ aws_region }}"
     aws_access_key: "{{ aws_access_key }}"
     aws_secret_key: "{{ aws_secret_key }}"
   register: created_vpc
   tags: [infra_rds,infra_mnoe,infra_maestrano,infra_mnohub,infra_nex,infra_connec,infra_impac,infra_rundeck,infra_dev_platform]
+  when: vpc.vpc_id is undefined or vpc.vpc_id is none
+
+- name: Retrieve VPC detail
+  ec2_vpc:
+    state: present
+    vpc_id: "{{ vpc.vpc_id }}"
+    cidr_block: "{{ vpc.cidr_block }}"
+    resource_tags: "{{ vpc_tags|safe }}"
+    internet_gateway: "{{ vpc.internet_gateway|string }}"
+    region: "{{ aws_region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  register: created_vpc
+  tags: [infra_rds,infra_mnoe,infra_maestrano,infra_mnohub,infra_nex,infra_connec,infra_impac,infra_rundeck,infra_dev_platform]
+  when: vpc.vpc_id is defined and vpc.vpc_id is not none
 
 - name: Create VPC subnets
   ec2_vpc_subnet:
