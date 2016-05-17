@@ -1,0 +1,19 @@
+---
+
+- name: Configure Developer Platform instances
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - role: common
+    - role: ntp
+    - { role: swapfile, swapfile_swappiness: 10 }
+    - { role: newrelic, when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
+    - role: splunk
+    # - role: jruby # Switch to JRuby when rails 5 is stable
+    - { role: rvm_io.rvm1-ruby, tags: ruby, rvm1_rubies: ['ruby-2.3.1'] }
+    - { role: jdauphant.nginx, keep_only_specified: true }
+    - { role: dev-platform }
+    - { role: logrotate, logrotate_scripts: [{name: connec, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
