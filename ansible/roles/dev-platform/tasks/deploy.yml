@@ -136,6 +136,12 @@
   sudo_user: deployer
   when: not dev_platform.skip_migrations
 
+- name: Dev Platform | Seed the database
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:seed:locales"
+  environment: "{{ default_environment }}"
+  sudo_user: deployer
+  when: not dev_platform.skip_migrations
+
 - name: Dev Platform | Replace previous version
   file:
     path: "{{ deploy_directory }}/current"
