@@ -48,13 +48,6 @@ keypair: global
 # Open to the world - for testing only
 inbound_ip_range: 0.0.0.0/0
 
-# Route53
-route53:
-  zone:
-    id: 11111111
-    name: local
-    private_zone: true
-
 # Base DNS name
 dns:
   base: "{{ rails_environment }}.{{ environment_name }}.{{ route53.zone.name }}"
@@ -111,12 +104,6 @@ splunk:
 # List of user SSH keys
 ssh_users:
   - { name: "ubuntu", file: "files/public_keys/arnaud.lachaume@maestrano.com" }
-  - { name: "ubuntu", file: "files/public_keys/bruno@bruno-P34" }
-  - { name: "ubuntu", file: "files/public_keys/camille@ubuntu-Aspire-E5-521" }
-  - { name: "ubuntu", file: "files/public_keys/cesar.tonnoir@maestrano.com" }
-  - { name: "ubuntu", file: "files/public_keys/git@xade.eu" }
-  - { name: "ubuntu", file: "files/public_keys/obrisse@zen" }
-  - { name: "ubuntu", file: "files/public_keys/xaunlopez@gmail.com" }
 
 #=======================================================================
 #=======================================================================
@@ -129,10 +116,23 @@ s3_buckets:
   private: mnohub-vpc-ci-private-assets
   torquebox: "{{ environment_name }}-{{ rails_environment }}-torquebox-cluster"
 
+# VPC Configuration
+vpc:
+  vpc_id: vpc-294c734c
+
+# Route53
+route53:
+  zone:
+    id: !!null
+
 # VPC NAT
 vpc_nat:
   skip: false
   instance_type: t2.micro
+
+# Rundeck configuration
+rundeck:
+  skip: true
 
 # Maestrano configuration
 # Note: Maestrano website - should not be used as "MnoHub" anymore
@@ -148,6 +148,8 @@ maestrano:
 # MnoHub Infrastructure Configuration
 mnohub:
   skip: false # keep until all.yml gets changed
+  redis:
+    name: "{{ environment_name }}-mnohub"
   auto_scaling_group:
     min_size: 1
     max_size: 2
@@ -162,11 +164,16 @@ mnohub:
         instance_protocol: http
         instance_port: 80
         ssl_certificate_id: "arn:aws:iam::647381683421:server-certificate/maestrano.io.wilcard-2016"
+  launch_configuration:
+    instance_type: c3.large
+    spot_price: 0.0235
 
 nex:
   skip: true
 
 connec:
+  redis:
+    name: "{{ environment_name }}-connec"
   auto_scaling_group:
     api:
       min_size: 1
@@ -188,13 +195,15 @@ connec:
         ssl_certificate_id: "arn:aws:iam::647381683421:server-certificate/maestrano.io.wilcard-2016"
   launch_configuration:
     api:
-      instance_type: t2.micro
+      instance_type: c3.large
       spot_price: 0.0235
     jobs:
-      instance_type: t2.micro
+      instance_type: c3.large
       spot_price: 0.0235
 
 impac:
+  redis:
+    name: "{{ environment_name }}-impac"
   auto_scaling_group:
     min_size: 1
     max_size: 2
@@ -210,7 +219,8 @@ impac:
         instance_port: 80
         ssl_certificate_id: "arn:aws:iam::647381683421:server-certificate/maestrano.io.wilcard-2016"
   launch_configuration:
-    instance_type: t2.micro
+    instance_type: c3.large
+    spot_price: 0.0235
 
 mongo:
   size: 100
@@ -225,8 +235,8 @@ mnoe:
     desired_capacity: 0
 
 rds:
-  name: "ci-maestrano"
-  size: 50
+  multi_zone: no
+  instance_type: db.t2.micro
 
 #=======================================================================
 #=======================================================================

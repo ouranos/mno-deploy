@@ -1,38 +1,19 @@
 #!/bin/bash
 
 #==============================================================
-# AWS Infrastructure setup
-# Launch the ansible scripts with local configuration
-# and execute AWS infrastructure setup script
+# Cleanup the AWS account
+# This script assumes that 'setup_infrastructure.sh' has been
+# run previously
 #==============================================================
 
 #====================================================
-# 1 - Prepare deployment package
+# 1 - Prepare environment variables
 #====================================================
-# Setup temporary ansible directory
-mkdir tmpdeploy
-rm -rf tmpdeploy/aws-ubuntu-ci
-mkdir tmpdeploy/aws-ubuntu-ci
-
-# Copy core deployment scripts
-cp -R ../ansible tmpdeploy/aws-ubuntu-ci/
-cp -R ../scripts tmpdeploy/aws-ubuntu-ci/
-
-# Apply environment specific configuration
-cp -R ci_environments/aws_ubuntu/ansible/* tmpdeploy/aws-ubuntu-ci/ansible/
-cp -R ci_environments/aws_ubuntu/scripts/* tmpdeploy/aws-ubuntu-ci/scripts/
-
-# Navigate to directory
-cd tmpdeploy/aws-ubuntu-ci
+# Navigate to ansible folder
+cd tmpdeploy/aws-ubuntu-ci/ansible
 
 #====================================================
-# 2 - Download vault key
-#====================================================
-bucket_location="mno-deploy-ci/aws-ubuntu-config"
-aws s3 cp s3://$bucket_location/key.txt ./ansible/key.txt > /dev/null
-
-#====================================================
-# 3 - Prepare environment variables
+# 2 - Prepare environment variables
 #====================================================
 # Set ansible vars to use in run.sh script
 export ENVIRONMENT_CONFIGURATION="aws_ubuntu_ci"
@@ -46,24 +27,21 @@ export AWS_ACCESS_KEY_ID=$TST_AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$TST_AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$TST_AWS_DEFAULT_REGION
 
-#====================================================
-# 4 - Execute infrastructure setup script
-#====================================================
-sh scripts/run.sh
+ansible-playbook -vvvv -i hosts cleanup.yml --extra-vars="{\"env_config\": \"${ENVIRONMENT_CONFIGURATION}\"}" --vault-password-file ${ANSIBLE_VAULT_PASSWORD_FILE}
 retval=$?
 
 #====================================================
-# 5 - Cleanup
+# 4 - Cleanup
 #====================================================
-# Clean up
-cd ..
-
 # Re-instate variables
 export AWS_ACCESS_KEY_ID=$ORIG_AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$ORIG_AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$ORIG_AWS_DEFAULT_REGION
 unset ENVIRONMENT_CONFIGURATION
 unset ANSIBLE_VAULT_PASSWORD_FILE
+
+# Cleanup
+cd ../..
 
 # Exit with ansible return code
 exit $retval
