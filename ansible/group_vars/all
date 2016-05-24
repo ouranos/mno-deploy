@@ -455,7 +455,9 @@ maestrano:
   auto_scaling_group:
     name: "{{ vpc_short_name }}-mnohub-asg"
     availability_zones: "{{ aws_availability_zones }}"
-    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 4
     desired_capacity: 0
@@ -514,7 +516,9 @@ mnohub:
   auto_scaling_group:
     name: "{{ vpc_short_name }}-mnohub-asg"
     availability_zones: "{{ aws_availability_zones }}"
-    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 4
     desired_capacity: 0
@@ -582,7 +586,9 @@ nex:
   auto_scaling_group:
     name: "{{ vpc_short_name }}-nex-asg"
     availability_zones: "{{ aws_availability_zones }}"
-    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 4
     desired_capacity: 0
@@ -652,7 +658,9 @@ connec:
     api:
       name: "{{ vpc_short_name }}-connec-api-asg"
       availability_zones: "{{ aws_availability_zones }}"
-      vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+      vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
       min_size: 0
       max_size: 4
       desired_capacity: 0
@@ -664,7 +672,9 @@ connec:
     jobs:
       name: "{{ vpc_short_name }}-connec-jobs-asg"
       availability_zones: "{{ aws_availability_zones }}"
-      vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+      vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
       min_size: 0
       max_size: 4
       desired_capacity: 0
@@ -721,7 +731,9 @@ impac:
   auto_scaling_group:
     name: "{{ vpc_short_name }}-impac-asg"
     availability_zones: "{{ aws_availability_zones }}"
-    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 4
     desired_capacity: 0
@@ -829,7 +841,9 @@ mnoe:
   auto_scaling_group:
     name: "{{ vpc_short_name }}-frontend-asg"
     availability_zones: "{{ aws_availability_zones }}"
-    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 4
     desired_capacity: 0
@@ -883,7 +897,9 @@ dev_platform:
   auto_scaling_group:
     name: "{{ vpc_short_name }}-devp-asg"
     availability_zones: "{{ aws_availability_zones }}"
-    vpc_zone_identifier: ["{{ created_vpc.subnets[0].id }}", "{{ created_vpc.subnets[1].id }}"] # Public subnets
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 4
     desired_capacity: 0
