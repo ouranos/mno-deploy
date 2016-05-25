@@ -23,6 +23,7 @@
     name: "{{ mnoe_database_name }}"
     state: present
   when: not rds.skip
+
 - name: Maestrano Enterprise | Create RDS database user
   mysql_user:
     login_host: "{{ rds.endpoint }}"
