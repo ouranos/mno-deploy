@@ -1,6 +1,17 @@
 # Rails secret key
 SECRET_KEY_BASE: {{ frontend_config.rails_secret_key }}
 
+# Tenant API keys
+{% if frontend_config.tenant is defined and frontend_config.tenant.id is defined %}
+tenant_id: {{ frontend_config.tenant.id }}
+tenant_key: {{ frontend_config.tenant.key }}
+{% endif %}
+
+# Newrelic api key
+{% if newrelic_license_key is defined %}
+newrelic_license_key: {{ newrelic_license_key }}
+{% endif %}
+
 # Database
 database_hostname: {{ rds.endpoint }}
 database_name: {{ mnoe_database_name }}
@@ -8,8 +19,18 @@ database_username: {{ mnoe_database_username }}
 database_password: {{ mnoe_database_password }}
 
 # Emailing platform - Mandrill
+{% if frontend_config.mandrill_key is defined %}
 mandrill_key: {{ frontend_config.mandrill_key }}
 mailer_default_host: {{ frontend_config.public_dns.host }}
+{% endif %}
+
+# Mail relay
+{% if frontend_config.sparkpost_api_key is defined %}
+SPARKPOST_API_KEY: {{ frontend_config.sparkpost_api_key }}
+{% endif %}
+{% if frontend_config.mandrill_api_key is defined %}
+MANDRILL_API_KEY: {{ frontend_config.mandrill_api_key }}
+{% endif %}
 
 {% if frontend_config.intercom is defined %}
 # Intercom configuration
@@ -18,9 +39,6 @@ intercom_app_id: {{ frontend_config.intercom.app_id }}
 intercom_api_secret: {{ frontend_config.intercom.api_secret }}
 {% endif %}
 {% endif %}
-
-# Newrelic api key
-newrelic_license_key: {{ newrelic_license_key }}
 
 {% if frontend_config.google_tag_container is defined %}
 # Google Tag Manager
