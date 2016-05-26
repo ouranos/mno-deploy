@@ -3,6 +3,11 @@
 # Rails secret key
 SECRET_KEY_BASE: {{ dev_platform_config.rails_secret_key }}
 
+# Mnohub shared secret
+{% if dev_platform_config.shared_secret is defined %}
+DEV_PLATFORM_SHARED_SECRET: {{ dev_platform_config.shared_secret }}
+{% endif %}
+
 # Newrelic api key
 NEWRELIC_LICENSE_KEY: {{ newrelic_license_key }}
 
