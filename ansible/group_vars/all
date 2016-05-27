@@ -1125,6 +1125,9 @@ mnohub_config:
 
 # Nex! Config
 nex_config:
+  public_dns:
+    scheme: http
+    host: "{{ nex.dns_record.record }}"
   connec_api:
     scheme: "{{ connec_config.public_dns.scheme }}"
     host: "{{ connec_config.public_dns.host }}"
