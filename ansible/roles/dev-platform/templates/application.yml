@@ -3,6 +3,9 @@
 # Rails secret key
 SECRET_KEY_BASE: {{ dev_platform_config.rails_secret_key }}
 
+# Redis cluster
+REDIS_URL: redis://{{ dev_platform_config.redis.endpoint }}:6379/0
+
 # Mnohub shared secret
 {% if dev_platform_config.shared_secret is defined %}
 DEV_PLATFORM_SHARED_SECRET: {{ dev_platform_config.shared_secret }}
