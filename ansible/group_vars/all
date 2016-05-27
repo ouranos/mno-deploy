@@ -857,11 +857,6 @@ mnoe:
 dev_platform:
   skip: true
   skip_migrations: false
-  redis:
-    name: devp-redis
-    node_type: cache.t2.micro
-    num_nodes: 1
-    endpoint: "{{ environment_name }}-devp-redis.{{ dns.base }}"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-devp-elb"
     connection_draining_timeout: 60
