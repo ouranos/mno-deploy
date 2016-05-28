@@ -136,7 +136,19 @@
     #=======================================
     # RDS
     #=======================================
-    - name: Maestrano RDS | Create RDS instance
+    - name: Destroy RDS instance
       rds:
         command: delete
         instance_name: "{{ rds.name }}"
+
+    #=======================================
+    # NAT/Jumpbox
+    #=======================================
+    - name: Destroy NAT/Jumpbox
+      ec2:
+        region: "{{ aws_region }}"
+        image: "ami-1234"
+        count_tag:
+          - Name: "{{ vpc_base_name }}-nat"
+          - Environment: "{{ environment_name }}"
+        exact_count: 0
