@@ -13,6 +13,10 @@ frontend_project: maestrano-enterprise
 frontend_version: latest
 dev_platform_version: latest
 
+# S3 Location of the Ansible configuration for this environment
+mno_deploy_configuration_bucket: mno-deploy-ci
+mno_deploy_configuration_path: /aws-ubuntu-config
+
 #=======================================================================
 #=======================================================================
 # AWS Keys
