@@ -1,8 +1,10 @@
 {
   "jumpbox": {
+    "user": "ec2-user",
     "host": "{{ ec2_nat.instances[0].public_dns_name }}"
   },
   "connec_api": {
+    "user": "ubuntu",
     "hosts": [
 {% for instance in ec2_connec_api.instances %}
       "{{ instance.private_ip_address }}"{% if not loop.last %},{% endif %}
@@ -11,6 +13,7 @@
     ]
   },
   "connec_jobs": {
+    "user": "ubuntu",
     "hosts": [
 {% for instance in ec2_connec_jobs.instances %}
       "{{ instance.private_ip_address }}"{% if not loop.last %},{% endif %}
@@ -19,6 +22,7 @@
     ]
   },
   "impac_api": {
+    "user": "ubuntu",
     "hosts": [
 {% for instance in ec2_impac_api.instances %}
       "{{ instance.private_ip_address }}"{% if not loop.last %},{% endif %}
@@ -27,6 +31,7 @@
     ]
   },
   "mnohub_api": {
+    "user": "ubuntu",
     "hosts": [
 {% for instance in ec2_mnohub_api.instances %}
       "{{ instance.private_ip_address }}"{% if not loop.last %},{% endif %}
@@ -35,6 +40,7 @@
     ]
   },
   "mongodb": {
+    "user": "ubuntu",
     "hosts": [
 {% for instance in ec2_mongodb.instances %}
       "{{ instance.private_ip_address }}"{% if not loop.last %},{% endif %}
