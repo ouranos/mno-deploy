@@ -88,4 +88,4 @@
     - name: Generate Inventory File
       template:
         src: templates/inventory.json
-        dest: ../inventory.json
+        dest: ../inventory/inventory.json

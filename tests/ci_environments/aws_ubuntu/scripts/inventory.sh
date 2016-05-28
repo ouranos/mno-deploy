@@ -21,8 +21,8 @@ mkdir -p inventory
 cd ./inventory
 
 bucket_location="mno-deploy-ci/aws-ubuntu-config"
-aws s3 cp s3://$bucket_location/ssh-key.pem ../inventory/ssh-key.pem > /dev/null
-chmod 600 ../inventory/ssh-key.pem
+aws s3 cp s3://$bucket_location/key-ssh.pem ../inventory/key-ssh.pem > /dev/null
+chmod 600 ../inventory/key-ssh.pem
 
 cd ..
 
