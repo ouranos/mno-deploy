@@ -9,11 +9,25 @@
 #====================================================
 # 1 - Prepare environment variables
 #====================================================
-# Navigate to ansible folder
-cd tmpdeploy/aws-ubuntu-ci/ansible
+# Navigate to CI folder
+cd tmpdeploy/aws-ubuntu-ci
+
+# Create inventory folder (inventory and access keys)
+mkdir -p inventory
 
 #====================================================
-# 2 - Prepare environment variables
+# 2 - Download Infra ssh key
+#====================================================
+cd ./inventory
+
+bucket_location="mno-deploy-ci/aws-ubuntu-config"
+aws s3 cp s3://$bucket_location/ssh-key.pem ../inventory/ssh-key.pem > /dev/null
+chmod 600 ../inventory/ssh-key.pem
+
+cd ..
+
+#====================================================
+# 3 - Prepare environment variables
 #====================================================
 # Set ansible vars to use in run.sh script
 export ENVIRONMENT_CONFIGURATION="aws_ubuntu_ci"
@@ -27,11 +41,16 @@ export AWS_ACCESS_KEY_ID=$TST_AWS_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$TST_AWS_SECRET_ACCESS_KEY
 export AWS_DEFAULT_REGION=$TST_AWS_DEFAULT_REGION
 
+#====================================================
+# 4 - Collect inventory
+#====================================================
+cd ./ansible
+
 ansible-playbook -vvvv -i hosts inventory.yml --extra-vars="{\"env_config\": \"${ENVIRONMENT_CONFIGURATION}\"}" --vault-password-file ${ANSIBLE_VAULT_PASSWORD_FILE}
 retval=$?
 
 #====================================================
-# 4 - Cleanup
+# 5 - Cleanup
 #====================================================
 # Re-instate variables
 export AWS_ACCESS_KEY_ID=$ORIG_AWS_ACCESS_KEY_ID
