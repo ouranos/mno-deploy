@@ -1,0 +1,40 @@
+{
+  "jumpbox": {
+    "host": "{{ ec2_nat.instances[0].public_dns_name }}"
+  },
+  "connec_api": {
+    "hosts": [
+{% for instance in ec2_connec_api.instances %}
+      "{{ instance.private_ip_address }}"
+{% endfor %}
+    ]
+  },
+  "connec_jobs": {
+    "hosts": [
+{% for instance in ec2_connec_jobs.instances %}
+      "{{ instance.private_ip_address }}"
+{% endfor %}
+    ]
+  },
+  "impac_api": {
+    "hosts": [
+{% for instance in ec2_impac_api.instances %}
+      "{{ instance.private_ip_address }}"
+{% endfor %}
+    ]
+  },
+  "mnohub_api": {
+    "hosts": [
+{% for instance in ec2_mnohub_api.instances %}
+      "{{ instance.private_ip_address }}"
+{% endfor %}
+    ]
+  },
+  "mongodb": {
+    "hosts": [
+{% for instance in ec2_mongodb.instances %}
+      "{{ instance.private_ip_address }}"
+{% endfor %}
+    ]
+  }
+}

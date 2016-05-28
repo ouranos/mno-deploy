@@ -41,7 +41,7 @@ fi
 #--------------------------------------------------------
 # 3. Publish test environment configuration to a CI bucket
 #--------------------------------------------------------
-echo "[RUN] Publishing core deployment scripts onto staging..."
+echo "[RUN] Publishing CI deployment configuration onto staging..."
 sh 3-publish-ci-config.sh
 
 if [ $? -eq 0 ]; then
@@ -65,23 +65,36 @@ else
 fi
 
 #--------------------------------------------------------
-# 5. Run test suite
+# 5. Generate inventory
+#--------------------------------------------------------
+inventory_retval=0
+
+if [ $infra_setup_retval -eq 0 ]; then
+  echo "[RUN] Generating infrastructure inventory..."
+  sh 5-generate-inventory.sh
+  inventory_retval=$?
+else
+  echo "[SKIP] Skipping inventory as there were issues deploying infrastructure components"
+fi
+
+#--------------------------------------------------------
+# 6. Run test suite
 #--------------------------------------------------------
 test_suite_retval=0
 
-if [ $infra_setup_retval -eq 0 ]; then
-  echo "[RUN] Running Ansible end-to-end test suite..."
-  sh 5-run-test-suite.sh
+if [ $infra_setup_retval -eq 0 ] && [ $inventory_retval -eq 0 ]; then
+  echo "[RUN] Running end-to-end test suite..."
+  sh 6-run-test-suite.sh
   test_suite_retval=$?
 else
   echo "[SKIP] Skipping test suite there were issues deploying infrastructure components"
 fi
 
 #--------------------------------------------------------
-# 6. Cleanup test resources
+# 7. Cleanup test resources
 #--------------------------------------------------------
 echo "[RUN] Cleaning up all test infrastructure resources..."
-sh 6-cleanup.sh
+sh 7-cleanup.sh
 infra_cleanup_retval=$?
 
 if [ $infra_cleanup_retval -eq 0 ]; then
@@ -101,9 +114,10 @@ echo "Summary:"
 echo "----------"
 echo "Syntax check:  $syntax_check_retval"
 echo "Infra setup:   $infra_setup_retval"
+echo "Inventory:   $infra_setup_retval"
 echo "E2E Tests:     $test_suite_retval"
 echo "Infra cleanup: $infra_setup_retval"
 
 # Final return code
-let "retval = $infra_setup_retval + $test_suite_retval + $infra_cleanup_retval"
+let "retval = $infra_setup_retval + $inventory_retval + $test_suite_retval + $infra_cleanup_retval"
 exit $retval
