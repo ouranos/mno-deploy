@@ -1,0 +1,30 @@
+require 'rake'
+require 'yaml'
+require 'json'
+require 'rspec/core/rake_task'
+
+inventory = JSON.load(File.read(ENV['SRVSPEC_INVENTORY_FILE']))
+
+# Default task
+task :default => [:spec]
+
+desc "Run serverspec to all hosts"
+task :spec => 'serverspec:all'
+
+namespace :serverspec do
+  task :all => inventory.keys.map { |group| inventory[group.to_s]['hosts'].map { |host| "serverspec:#{group}:#{host}" } }.flatten
+
+  # Create a task for each host of each inventory group
+  inventory.keys.each do |group|
+    next unless inventory[group.to_s]['hosts']
+    next unless File.directory?("spec/#{group}")
+
+    inventory[group.to_s]['hosts'].each do |host|
+      RSpec::Core::RakeTask.new("#{group}:#{host}") do |t|
+        ENV['TARGET_HOST'] = host
+        ENV['TARGET_HOST_USER'] = inventory[group.to_s]['user']
+        t.pattern = "spec/{#{group}}/*_spec.rb"
+      end
+    end
+  end
+end
