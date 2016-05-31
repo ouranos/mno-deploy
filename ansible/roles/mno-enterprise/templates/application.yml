@@ -13,7 +13,7 @@ tenant_key: {{ frontend_config.tenant.key }}
 {% endif %}
 
 # Impac! configuration
-{% if impac_config is defined and impac_config.public_dns is defined %}
+{% if impac_config is defined and impac_config.public_dns is defined and impac_config.public_dns.scheme is defined %}
 impac_protocol: {{ impac_config.public_dns.scheme }}
 impac_host: {{ impac_config.public_dns.host }}
 {% endif %}
@@ -27,6 +27,6 @@ mno_private_host: {{ mnohub_config.private_dns.host }}
 # Extra variables
 {% if frontend_config.extra_variables is defined %}
 {% for key in frontend_config.extra_variables %}
-{{ key }}: {{ frontend_config.extra_variables[key] }}
+{{ key }}: {{ (frontend_config.extra_variables[key] | to_json) if frontend_config.extra_variables[key] is mapping else frontend_config.extra_variables[key] }}
 {% endfor %}
 {% endif %}
