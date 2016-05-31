@@ -93,29 +93,51 @@ splunk:
   maestrano:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   mno_enterprise:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   mnohub:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
-      - {index: "main", monitor: "/var/log/torquebox/torquebox.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
+      - {index: "main", monitor: "{{ deploy_directory }}/shared/log/sidekiq.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   connec:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   impac:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
@@ -127,6 +149,10 @@ splunk:
   dev_platform:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
