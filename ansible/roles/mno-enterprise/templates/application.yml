@@ -1,8 +1,5 @@
 # {{ ansible_managed }}
 
-# Rails secret key
-SECRET_KEY_BASE: {{ frontend_config.rails_secret_key }}
-
 # Database
 database_hostname: {{ rds.endpoint }}
 database_name: {{ mnoe_database_name }}
