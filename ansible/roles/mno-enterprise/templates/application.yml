@@ -13,8 +13,10 @@ tenant_key: {{ frontend_config.tenant.key }}
 {% endif %}
 
 # Impac! configuration
+{% if impac_config is defined and impac_config.public_dns is defined %}
 impac_protocol: {{ impac_config.public_dns.scheme }}
 impac_host: {{ impac_config.public_dns.host }}
+{% endif %}
 
 # Mnohub configuration
 mno_protocol: {{ mnohub_config.public_dns.scheme }}
