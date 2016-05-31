@@ -159,6 +159,7 @@ splunk:
 
 # Sumologic
 sumologic:
+  skip: true
   maestrano:
     log_path:
       - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
