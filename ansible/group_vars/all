@@ -157,6 +157,69 @@ splunk:
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
 
+# Sumologic
+sumologic:
+  maestrano:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+  mno_enterprise:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+  mnohub:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+  connec:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+  impac:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+  nex:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+  dev_platform:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+
 # Private Route53 Zone
 route53:
   skip: false
