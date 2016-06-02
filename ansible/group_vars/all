@@ -93,29 +93,51 @@ splunk:
   maestrano:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   mno_enterprise:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   mnohub:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
-      - {index: "main", monitor: "/var/log/torquebox/torquebox.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
+      - {index: "main", monitor: "{{ deploy_directory }}/shared/log/sidekiq.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   connec:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   impac:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
@@ -127,9 +149,77 @@ splunk:
   dev_platform:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
+
+# Sumologic
+sumologic:
+  skip: true
+  maestrano:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+  mno_enterprise:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+  mnohub:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+  connec:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+  impac:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+  nex:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
+  dev_platform:
+    log_path:
+      - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
+      - {name: "NGINX ACCES LOG", path: "/var/log/nginx/access.log", use_multiline: false, category: "NGINX"}
+      - {name: "NGINX ERROR LOG", path: "/var/log/nginx/error.log", use_multiline: false, category: "NGINX"}
+      - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
+      - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
+      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
 
 # Private Route53 Zone
 route53:
@@ -1125,6 +1215,9 @@ mnohub_config:
 
 # Nex! Config
 nex_config:
+  public_dns:
+    scheme: http
+    host: "{{ nex.dns_record.record }}"
   connec_api:
     scheme: "{{ connec_config.public_dns.scheme }}"
     host: "{{ connec_config.public_dns.host }}"
@@ -1239,17 +1332,11 @@ rundeck_config:
       node_name: "{{ vpc_short_name }}-nex-app-orchestrator"
       ansible_playbook: "{{ nex-app-server-ec2.yml }}"
       environment: uat
-    - name: 'CONNEC_API_UAT'
+    - name: 'CONNEC_UAT'
       description: 'UAT - Connec! API'
       component: connec
       node_name: "{{ vpc_short_name }}-connec-api"
       ansible_playbook: "{{ connec-api-server-ec2.yml }}"
-      environment: uat
-    - name: 'CONNEC_JOB_UAT'
-      description: 'UAT - Connec! Jobs'
-      component: connec
-      node_name: "{{ vpc_short_name }}-connec-jobs"
-      ansible_playbook: "{{ connec-jobs-server-ec2.yml }}"
       environment: uat
     - name: 'IMPAC_UAT'
       description: 'UAT - Impac!'
@@ -1281,17 +1368,11 @@ rundeck_config:
       node_name: "{{ vpc_short_name }}-nex-app-orchestrator"
       ansible_playbook: "{{ nex-app-server-ec2.yml }}"
       environment: production
-    - name: 'CONNEC_API_PRD'
+    - name: 'CONNEC_PRD'
       description: 'Production - Connec! API'
       component: connec
       node_name: "{{ vpc_short_name }}-connec-api"
       ansible_playbook: "{{ connec-api-server-ec2.yml }}"
-      environment: production
-    - name: 'CONNEC_JOB_PRD'
-      description: 'Production - Connec! Jobs'
-      component: connec
-      node_name: "{{ vpc_short_name }}-connec-jobs"
-      ansible_playbook: "{{ connec-jobs-server-ec2.yml }}"
       environment: production
     - name: 'IMPAC_PRD'
       description: 'Production - Impac!'
@@ -1315,7 +1396,7 @@ rundeck_protocol: "{{ rundeck_config.protocol }}"
 rundeck_domain: "{{ rundeck_config.domain }}"
 rundeck_users: "{{ rundeck_config.users }}"
 rundeck_plugins:
-  - https://github.com/rundeck-plugins/rundeck-ec2-nodes-plugin/releases/download/v1.5.1/rundeck-ec2-nodes-plugin-1.5.1.jar
+  - https://github.com/rundeck-plugins/rundeck-ec2-nodes-plugin/releases/download/v1.5.2/rundeck-ec2-nodes-plugin-1.5.2.jar
 rundeck_generate_ssh: False
 rundeck_database_type: "{{ rundeck_config.database.type }}" # Defaults to hsqldb but can be set to postgresql or mysql to use those databases. Users and databases are not automatically created.
 rundeck_database_host: "{{ rundeck_config.database.host }}" # Defaults to localhost and only needs to be set if using an externally hosted database.
