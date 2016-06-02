@@ -16,6 +16,7 @@ sumologic_collector_accesskey: ""
 #   https://service.sumologic.com/help/Default.htm#Using_Clobber.htm
 sumologic_collector_clobber: ""
 
+sumologic_host_name: "{{ ansible_hostname }}"
 sumologic_installer_file: ""
 sumologic_collector_source_template: "collector.json.j2"
 sumologic_collector_timezone: "UTC"
