@@ -21,7 +21,7 @@ fi
 # Stop here if end-to-end testing is not enabled or if not on the
 # tested branch (should be master)
 if [ "$TST_ENABLED" != "true" ] || [ "$CI_BRANCH" != "$TST_BRANCH" ];  then
-  echo "[SKIP] Skipping end-to-end tests (env var TST_ENABLED absent or set to false)"
+  echo "[SKIP] Skipping end-to-end tests (env var TST_ENABLED set to false or we are not currently on the TST_BRANCH)"
   exit 0
 fi
 

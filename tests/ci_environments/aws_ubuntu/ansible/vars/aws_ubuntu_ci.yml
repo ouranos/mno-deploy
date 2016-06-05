@@ -50,7 +50,7 @@ default_instance_type: t2.medium
 keypair: mno-deploy-ci
 
 # Open to the world - for testing only
-inbound_ip_range: 0.0.0.0/0
+nat_inbound_ip_range: 0.0.0.0/0
 
 # Base DNS name
 dns:
