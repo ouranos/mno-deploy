@@ -47,5 +47,16 @@
 
 {% endfor %}
     ]
+  },
+  "vars": {
+    "mongodb_admin": {
+      "login": "{{ mongodb_root_admin_name }}",
+      "password": "{{ mongodb_root_admin_password }}"
+    },
+    "mongodb_connec": {
+      "db": "{{ mongodb_database_connec }}",
+      "login": "{{ mongodb_user_connec }}",
+      "password": "{{ mongodb_password_connec }}"
+    }
   }
 }

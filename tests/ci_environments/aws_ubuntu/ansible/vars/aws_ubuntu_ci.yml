@@ -142,12 +142,6 @@ rundeck:
 # Note: Maestrano website - should not be used as "MnoHub" anymore
 maestrano:
   skip: true
-  dns_record:
-    dns: example.com
-  auto_scaling_group:
-    min_size: 0
-    max_size: 2
-    desired_capacity: 0
 
 # MnoHub Infrastructure Configuration
 mnohub:
