@@ -1,6 +1,6 @@
 ---
 
-- name: Replication configuration
+- name: Replication configuration (pre-auth init)
   mongodb_replication:
     login_host: "{{ mongodb_login_host|default('localhost') }}"
     login_port: "{{ mongodb_conf_port|default(27017) }}"
@@ -18,7 +18,11 @@
 - include: auth_initialization.yml
   when: mongodb_replica_init|failed
 
-- name: Replication configuration
+- name: Initialize the replica set
+  shell: "mongo -u {{mongodb_root_admin_name}} -p {{mongodb_root_admin_password}} --eval 'rs.initiate();printjson(rs.status())' admin"
+  when: mongodb_replica_init|failed
+
+- name: Replication configuration (post-auth init)
   mongodb_replication:
     login_host: "{{ mongodb_login_host|default('localhost') }}"
     login_port: "{{ mongodb_conf_port|default(27017) }}"
