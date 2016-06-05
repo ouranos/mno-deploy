@@ -3,4 +3,10 @@
 #==============================================================
 # This script runs the test suite on the infrastructure(s)
 #==============================================================
-echo "No test suite implemented yet"
+cd serverspecs
+
+# Install dependencies
+bundle install
+
+# Run the test suite
+rake spec
