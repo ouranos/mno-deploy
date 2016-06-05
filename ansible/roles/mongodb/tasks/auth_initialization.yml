@@ -13,6 +13,9 @@
   retries: 60
   delay: 5
 
+- name: Ensure authorization schema is upgraded
+  shell: "mongo --eval 'db.getSiblingDB(\"admin\").runCommand({authSchemaUpgrade: 1 })'"
+
 - name: create administrative user siteUserAdmin
   mongodb_user:
     database: admin
