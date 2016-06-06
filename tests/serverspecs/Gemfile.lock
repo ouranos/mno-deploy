@@ -1,4 +1,5 @@
 GEM
+  remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
     multi_json (1.11.3)
@@ -42,3 +43,6 @@ PLATFORMS
 DEPENDENCIES
   net-ssh-gateway (~> 1.0)
   serverspec
+
+BUNDLED WITH
+   1.12.5

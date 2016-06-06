@@ -1,7 +1,11 @@
 # Maestrano Infrastructure
 
+[ ![Codeship Status for maestrano/mno-deploy](https://codeship.com/projects/f6587590-e990-0133-f67a-4afac8d396b8/status?branch=master)](https://codeship.com/projects/147638)
+
 The complete Maestrano infrastructure can be deployed on demand on AWS using these scripts
 The `ansible` directory contains the Ansible playbooks to create a new environment and setup the components
+
+Tested with Ansible 2.0.2.0
 
 ## Infrastructure configuration and setup
 The Maestrano infrastructure is setup on AWS inside a VPC
@@ -24,7 +28,7 @@ Create a directory structure as follows. Copy the scripts files `setup_infrastru
 |       +-- vault_pass.sh
 ```
 
-### Ansible variable and secrets
+### Ansible variables and secrets
 The infrastructure needs to be configured
 - Create a yaml configuration file under `ansible/vars` (eg: `ansible/vars/myenv.yml`) and customise values from `ansible/group_vars/all` as needed
 - Create a yaml secret file file under `ansible/vars` (eg: `ansible/vars/myenv_secret.yml`) containing passwords and secrets

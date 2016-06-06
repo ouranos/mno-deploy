@@ -1,6 +1,9 @@
 #!/bin/bash
 APP_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 
+# Install Ansible
+pip install -Iv ansible==2.0.2.0
+
 # Move to test directory
 cd $APP_ROOT/tests
 
@@ -8,7 +11,7 @@ cd $APP_ROOT/tests
 # 1. Check syntax of ansible scripts
 #--------------------------------------------------------
 echo "[RUN] Checking Ansible syntax..."
-sh 1-check-syntax.sh
+bash 1-check-syntax.sh
 syntax_check_retval=$?
 
 if [ $syntax_check_retval -eq 0 ]; then
@@ -29,7 +32,7 @@ fi
 # 2. Publish Core deployment scripts to a CI bucket
 #--------------------------------------------------------
 echo "[RUN] Publishing core deployment scripts onto staging..."
-sh 2-publish-ci-pkg.sh
+bash 2-publish-ci-pkg.sh
 
 if [ $? -eq 0 ]; then
   echo "[SUCCESS] Core deployment scripts have been published to CI bucket"
@@ -42,7 +45,7 @@ fi
 # 3. Publish test environment configuration to a CI bucket
 #--------------------------------------------------------
 echo "[RUN] Publishing CI deployment configuration onto staging..."
-sh 3-publish-ci-config.sh
+bash 3-publish-ci-config.sh
 
 if [ $? -eq 0 ]; then
   echo "[SUCCESS] Configuration scripts have been published to CI bucket"
@@ -55,7 +58,7 @@ fi
 # 4. Setup test environments
 #--------------------------------------------------------
 echo "[RUN] Setting up test environments..."
-sh 4-setup-ci-infra.sh
+bash 4-setup-ci-infra.sh
 infra_setup_retval=$?
 
 if [ $infra_setup_retval -eq 0 ]; then
@@ -71,7 +74,7 @@ inventory_retval=0
 
 if [ $infra_setup_retval -eq 0 ]; then
   echo "[RUN] Generating infrastructure inventory..."
-  sh 5-generate-inventory.sh
+  bash 5-generate-inventory.sh
   inventory_retval=$?
 else
   echo "[SKIP] Skipping inventory as there were issues deploying infrastructure components"
@@ -84,7 +87,7 @@ test_suite_retval=0
 
 if [ $infra_setup_retval -eq 0 ] && [ $inventory_retval -eq 0 ]; then
   echo "[RUN] Running end-to-end test suite..."
-  sh 6-run-test-suite.sh
+  bash 6-run-test-suite.sh
   test_suite_retval=$?
 else
   echo "[SKIP] Skipping test suite there were issues deploying infrastructure components"
@@ -94,7 +97,7 @@ fi
 # 7. Cleanup test resources
 #--------------------------------------------------------
 echo "[RUN] Cleaning up all test infrastructure resources..."
-sh 7-cleanup.sh
+bash 7-cleanup.sh
 infra_cleanup_retval=$?
 
 if [ $infra_cleanup_retval -eq 0 ]; then
