@@ -9,4 +9,4 @@ cd serverspecs
 bundle install
 
 # Run the test suite
-rake spec
+bundle exec rake spec
