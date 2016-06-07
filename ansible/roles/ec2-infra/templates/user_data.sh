@@ -58,8 +58,12 @@ export AWS_SECRET_ACCESS_KEY={{ tenant_dropbox_s3_aws_secret_key }}
 export AWS_DEFAULT_REGION={{ tenant_dropbox_s3_aws_region }}
 
 # MongoDB specific configuration
-{% if mongodb_master is defined %}export MONGODB_MASTER={{ mongodb_master }}{% endif %}
-{% if mongodb_bind_ip is defined %}export MONGODB_BIND_IP={{ mongodb_bind_ip }}{% endif %}
+{% if mongodb_master is defined %}
+export MONGODB_MASTER={{ mongodb_master }}
+{% endif %}
+{% if mongodb_bind_ip is defined %}
+export MONGODB_BIND_IP={{ mongodb_bind_ip }}
+{% endif %}
 
 # S3 bucket of the deployment configuration scripts
 export MNO_DEPLOY_BUCKET={{ mno_deploy_configuration_bucket }}
