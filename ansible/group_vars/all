@@ -1274,6 +1274,7 @@ dev_platform_config:
     scheme: http
     host: "{{ dev_platform.dns_record.record }}"
   database:
+    hostname: "{{ rds.endpoint }}"
     database: dev_platform
     username: dev_platform
     password:  changeme
