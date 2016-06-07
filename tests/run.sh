@@ -3,6 +3,7 @@ APP_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 
 # Install Ansible
 pip install -Iv ansible==2.0.2.0
+pip install boto pycrypto
 
 # Move to test directory
 cd $APP_ROOT/tests
