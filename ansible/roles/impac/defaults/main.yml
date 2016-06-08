@@ -19,7 +19,7 @@ impac_config:
   jobs:
     java_opts:
       xms: "{{ (0.30 * ansible_memtotal_mb)|int }}m"
-      xmx: "{{ (0.30 * ansible_memtotal_mb)|int }}m" # Allocate 30% of server memory for Puma
+      xmx: "{{ (0.30 * ansible_memtotal_mb)|int }}m" # Allocate 30% of server memory for Sidekiq
       max_perm_size: 256m
   newrelic:
     common:
