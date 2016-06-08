@@ -13,13 +13,13 @@ impac_config:
   sidekiq_worker_threads: 5
   puma:
     java_opts:
-      xms: "{{ (0.40 * ansible_memtotal_mb)|int }}m"
-      xmx: "{{ (0.40 * ansible_memtotal_mb)|int }}m" # Allocate 40% of server memory for Puma
+      xms: "{{ (0.50 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.50 * ansible_memtotal_mb)|int }}m" # Allocate 50% of server memory for Puma
       max_perm_size: 256m
   jobs:
     java_opts:
-      xms: "{{ (0.30 * ansible_memtotal_mb)|int }}m"
-      xmx: "{{ (0.30 * ansible_memtotal_mb)|int }}m" # Allocate 30% of server memory for Sidekiq
+      xms: "{{ (0.20 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.20 * ansible_memtotal_mb)|int }}m" # Allocate 20% of server memory for Sidekiq
       max_perm_size: 256m
   newrelic:
     common:
