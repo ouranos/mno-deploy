@@ -10,10 +10,16 @@ default_environment:
   NO_PROXY: "{% if proxy_ignore is defined %}{{ proxy_ignore }}{% else %}localhost,169.254.169.254{% endif %}"
 
 impac_config:
+  sidekiq_worker_threads: 5
   puma:
     java_opts:
-      xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
-      xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 70% of server memory for Puma
+      xms: "{{ (0.50 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.50 * ansible_memtotal_mb)|int }}m" # Allocate 50% of server memory for Puma
+      max_perm_size: 256m
+  jobs:
+    java_opts:
+      xms: "{{ (0.20 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.20 * ansible_memtotal_mb)|int }}m" # Allocate 20% of server memory for Sidekiq
       max_perm_size: 256m
   newrelic:
     common:

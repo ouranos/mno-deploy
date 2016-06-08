@@ -6,8 +6,14 @@
 - name: Impac | Add /etc/systemd/system/puma.service
   template: src=puma.service dest=/etc/systemd/system/puma.service force=yes mode=0755
 
+- name: Impac | Add /etc/systemd/system/sidekiq.service
+  template: src=sidekiq.service dest=/etc/systemd/system/sidekiq.service force=yes mode=0755
+
 - name: Impac | Add /etc/systemd/system/puma-env.conf
   template: src=puma-env.conf dest=/etc/systemd/system/puma-env.conf force=yes mode=0755
 
 - name: Impac | Add puma to systemd
   service: name=puma state=restarted enabled=yes
+
+- name: Impac | Add sidekiq to systemd
+  service: name=sidekiq state=restarted enabled=yes
