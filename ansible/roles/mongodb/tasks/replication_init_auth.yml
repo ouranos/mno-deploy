@@ -35,3 +35,7 @@
   with_items:
     - "{{ mongodb_replication_params }}"
   when: mongodb_replica_init|failed
+  register: result
+  until: result|success
+  retries: 5
+  delay: 5
