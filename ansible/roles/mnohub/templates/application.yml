@@ -59,7 +59,7 @@ braintree_private_key: {{ mnohub_config.braintree.private_key }}
 newrelic_license_key: {{ newrelic_license_key }}
 
 # DevPlatform
-DEV_PLATFORM_ENDPOINT: http://{{ dev_platform_config.dns_record.record }}
+DEV_PLATFORM_ENDPOINT: {{ dev_platform_config.public_dns.scheme }}://{{ dev_platform_config.public_dns.host }}
 {% if dev_platform_config.shared_secret is defined %}
 DEV_PLATFORM_SHARED_SECRET: {{ dev_platform_config.shared_secret }}
 {% endif %}
