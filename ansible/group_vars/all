@@ -699,7 +699,7 @@ connec:
     endpoint: "{{ environment_name }}-connec-redis.{{ dns.base }}"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-connec-elb"
-    connection_draining_timeout: 60
+    connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
     alias_hosted_zone_id: "{{ route53.zone.id }}"
     subnets:
@@ -785,7 +785,7 @@ impac:
     endpoint: "{{ environment_name }}-impac-redis.{{ dns.base }}"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-impac-elb"
-    connection_draining_timeout: 60
+    connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
     alias_hosted_zone_id: "{{ route53.zone.id }}"
     subnets:
