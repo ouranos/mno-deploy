@@ -10,9 +10,12 @@
 #==============================================================
 # Destroy the AWS Ubuntu Test environment
 sh ci_environments/aws_ubuntu/scripts/cleanup.sh
+retval=$?
 
 #==============================================================
 # Final cleanup
 #==============================================================
 # Remove the tmpdeploy folder
 rm -rf tmpdeploy
+
+exit $retval
