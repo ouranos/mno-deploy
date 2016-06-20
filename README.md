@@ -15,7 +15,7 @@ The default cloud provider used to deploy the Maestrano platform is Amazon Web S
 ### Setup a new environment
 This set of scripts is generic and needs to be configured on a per environment basis. The recommended approach is to create a new project to pull down the deployment scripts and merge them with your local configuration.
 
-Create a directory structure as follows and copy the scripts files setup_infrastructure.sh, setup_instance.sh and vault_pass.sh under the directory myproject/scripts.
+Create a directory structure as follows and copy the scripts files `setup_infrastructure.sh`, `setup_instance.sh` and `vault_pass.sh` under the directory `myproject/scripts`.
 ```
 +-- _myproject
 |   +-- _ansible
@@ -30,14 +30,14 @@ Create a directory structure as follows and copy the scripts files setup_infrast
 ```
 
 ### Ansible configuration
-Basic configuration
-#### Copy the default configuration file from mno-deploy/ansible/vars/example.yml to ansible/vars/myenv.yml and set the values. A complete list of configuration properties is defined in the file ansible/group_vars/all.
+#### Basic configuration
+Copy the default configuration file from `mno-deploy/ansible/vars/example.yml` to `ansible/vars/myenv.yml` and set the values. A complete list of configuration properties is defined in the file `ansible/group_vars/all`.
 
-An example of configuration file is available under mno-deploy/tests/ci_environments/aws_ubuntu/ansible/vars/aws_ubuntu_ci.yml
+An example of configuration file is available under `mno-deploy/tests/ci_environments/aws_ubuntu/ansible/vars/aws_ubuntu_ci.yml`
 
 #### Passwords and secrets
-Copy the default secrets file from mno-deploy/ansible/vars/example_secrets.yml to ansible/vars/myenv_secret.yml and update with your passwords and secrets. This file will be encrypted using ansible vault commands:
-ansible-vault encrypt ansible/vars/myenv_secret.yml
+Copy the default secrets file from `mno-deploy/ansible/vars/example_secrets.yml` to `ansible/vars/myenv_secrets.yml` and update with your passwords and secrets. This file will be encrypted using ansible vault commands:
+ansible-vault encrypt `ansible/vars/myenv_secrets.yml`
 Store the ansible vault password in a text file that will be reused as part of the deployment scripts to decrypt this file at runtime.
 
 ### Infrastructure setup
@@ -69,7 +69,7 @@ Follow the Ansible setup steps on screen and verify the AWS infrastructure has b
 ## Components configuration
 ### Common configuration
 #### User ssh keys
-To add SSH keys to the instances, you need to add the keys to the folder ansible/files/public_keys and them to the Ansible configuration:
+To add SSH keys to the instances, you need to add the keys to the folder `ansible/files/public_keys` and them to the Ansible configuration:
 
 ```
 # List of user SSH keys
@@ -79,7 +79,7 @@ ssh_users:
 
 ### Mnohub configuration
 #### Xero certificates
-Xero certificate files must be added to ansible/files/xero_certs/RAILS_ENVIRONMENT/
+Xero certificate files must be added to `ansible/files/xero_certs/RAILS_ENVIRONMENT/`
 - privatekey.pem
 - entrust-cert.pem
 - entrust-private-nopass.pem
