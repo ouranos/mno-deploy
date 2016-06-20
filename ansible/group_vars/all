@@ -1022,7 +1022,7 @@ redis_group:
 
 # Rundeck configuration
 rundeck:
-  skip: false
+  skip: true
   image_id: "{{ default_base_ami }}"
   instance_type: "{{ default_instance_type }}"
   key_name: "{{ keypair }}"
