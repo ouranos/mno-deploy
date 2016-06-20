@@ -8,8 +8,9 @@ The `ansible` directory contains the Ansible playbooks to create a new environme
 Tested with Ansible 2.0.2.0
 
 ## Infrastructure configuration and setup
-The Maestrano infrastructure is setup on AWS inside a VPC
-It contains an ASG for every component of the platform (frontend, mnohub, nex!, connec!, impac!)
+The default cloud provider used to deploy the Maestrano platform is Amazon Web Services running inside a VPC.
+The different components of the platform are deployed independantly (frontend, mnohub, nex!, connec!, impac!)
+[ ![Architecture diagram](https://raw.githubusercontent.com/maestrano/mno-deploy/develop/architecture_diagram.png)]
 
 ### Setup a new environment
 Create a directory structure as follows. Copy the scripts files `setup_infrastructure.sh`, `setup_instance.sh` and `vault_pass.sh` under the directory `myproject/scripts`.
@@ -33,7 +34,7 @@ The infrastructure needs to be configured
 - Create a yaml configuration file under `ansible/vars` (eg: `ansible/vars/myenv.yml`) and customise values from `ansible/group_vars/all` as needed
 - Create a yaml secret file file under `ansible/vars` (eg: `ansible/vars/myenv_secret.yml`) containing passwords and secrets
 - Encrypt the secret file with ansible vault: `ansible-vault encrypt ansible/vars/myenv_secret.yml`
-- Store the ansible vault password in a text file
+- Store the ansible vault password in a text file that will be reused as part of the deployment scripts
 
 ### Infrastructure setup
 - Run the following script
