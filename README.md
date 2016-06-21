@@ -10,7 +10,7 @@ Automatic setup of new servers launched by the ASGs
 
 ## Infrastructure configuration and setup
 The default cloud provider used to deploy the Maestrano platform is Amazon Web Services running inside a VPC. The different components of the platform are deployed independently (frontend, mnohub, nex!, connec!, impac!)
-[Architecture diagram](https://raw.githubusercontent.com/maestrano/mno-deploy/develop/architecture_diagram.png)
+![Architecture diagram](https://raw.githubusercontent.com/maestrano/mno-deploy/develop/architecture_diagram.png)
 
 ### Setup a new environment
 This set of scripts is generic and needs to be configured on a per environment basis. The recommended approach is to create a new project to pull down the deployment scripts and merge them with your local configuration.
