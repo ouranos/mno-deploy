@@ -4,18 +4,17 @@
 #=======================================================================
 #=======================================================================
 mnohub_version: latest
+mnohub_folder: releases
 connec_version: latest
 connec_folder: releases
 impac_version: latest
 impac_folder: releases
 nex_app_orchestrator_version: latest
-frontend_project: maestrano-enterprise
-frontend_version: latest
-dev_platform_version: latest
+nex_app_orchestrator_folder: releases
 
 # S3 Location of the Ansible configuration for this environment
-mno_deploy_configuration_bucket: mno-deploy-ci
-mno_deploy_configuration_path: /aws-ubuntu-config
+mno_deploy_configuration_bucket: mno-deploy-example
+mno_deploy_configuration_path: /my-environment
 
 #=======================================================================
 #=======================================================================
@@ -34,7 +33,7 @@ aws_region: "{{ lookup('env', 'AWS_REGION') }}"
 # General Environment configuration
 #=======================================================================
 #=======================================================================
-environment_name: ubuntu-ci
+environment_name: my-environment
 rails_environment: uat
 
 timezone: Australia/Sydney
@@ -47,7 +46,7 @@ aws_availability_zones: ["{{ aws_availability_zone1 }}", "{{ aws_availability_zo
 # default_base_ami: ami-d3daace9 # Red Hat Enterprise Linux 7.1 - APSE2
 default_base_ami: ami-25c00c46
 default_instance_type: t2.medium
-keypair: mno-deploy-ci
+keypair: my-environment
 
 # Open to the world - for testing only
 nat_inbound_ip_range: 0.0.0.0/0
@@ -58,7 +57,7 @@ dns:
 
 # List of user SSH keys
 ssh_users:
-  - { name: "ubuntu", file: "files/public_keys/arnaud.lachaume@maestrano.com" }
+  - { name: "ubuntu", file: "files/public_keys/my-ssh-key" } # Add this key to folder mno-deploy-ansible/files/public_keys/
 
 #=======================================================================
 #=======================================================================
@@ -67,8 +66,8 @@ ssh_users:
 #=======================================================================
 # S3 Buckets
 s3_buckets:
-  public: mnohub-vpc-ci-public-assets
-  private: mnohub-vpc-ci-private-assets
+  public: mnohub-my-environment-public-assets
+  private: mnohub-my-environment-private-assets
   torquebox: "{{ environment_name }}-{{ rails_environment }}-torquebox-cluster"
 
 # VPC Configuration
@@ -85,8 +84,7 @@ vpc_nat:
   skip: false
   instance_type: t2.micro
 
-# Maestrano configuration
-# Note: Maestrano website - should not be used as "MnoHub" anymore
+# Skip Maestrano configuration
 maestrano:
   skip: true
 
@@ -104,14 +102,8 @@ mnohub:
       - protocol: http
         load_balancer_port: 80
         instance_port: 80
-      - protocol: https
-        load_balancer_port: 443
-        instance_protocol: http
-        instance_port: 80
-        ssl_certificate_id: "arn:aws:iam::647381683421:server-certificate/maestrano.io.wilcard-2016"
   launch_configuration:
-    instance_type: c3.large
-    spot_price: 0.0235
+    instance_type: t2.small
 
 nex:
   skip: true
@@ -134,18 +126,11 @@ connec:
       - protocol: http
         load_balancer_port: 80
         instance_port: 80
-      - protocol: https
-        load_balancer_port: 443
-        instance_protocol: http
-        instance_port: 80
-        ssl_certificate_id: "arn:aws:iam::647381683421:server-certificate/maestrano.io.wilcard-2016"
   launch_configuration:
     api:
-      instance_type: c3.large
-      spot_price: 0.0235
+      instance_type: m3.medium
     jobs:
-      instance_type: c3.large
-      spot_price: 0.0235
+      instance_type: m3.medium
 
 impac:
   skip: false
@@ -160,14 +145,8 @@ impac:
       - protocol: http
         load_balancer_port: 80
         instance_port: 80
-      - protocol: https
-        load_balancer_port: 443
-        instance_protocol: http
-        instance_port: 80
-        ssl_certificate_id: "arn:aws:iam::647381683421:server-certificate/maestrano.io.wilcard-2016"
   launch_configuration:
-    instance_type: c3.large
-    spot_price: 0.0235
+    instance_type: m3.medium
 
 mongo:
   size: 10
@@ -180,43 +159,6 @@ mnoe:
 rds:
   multi_zone: no
   instance_type: db.t2.micro
-
-#=======================================================================
-#=======================================================================
-# Application Configuration
-#=======================================================================
-#=======================================================================
-# Maestrano configuration
-mnohub_config:
-  carrierwave:
-    public_bucket: cdn-ci-maestrano
-    private_bucket: private-assets-apse1-ci-maestrano
-    asset_host: dbu1g4tv4k5kk.cloudfront.net
-  general:
-    nex_host: !!null
-    http_enabled: true
-    delay_job: true
-    sync_intervall: 10 #seconds
-    payment_gateway_mode: test
-    apps_domain: "apps.uat.maestrano.io"
-    virtual_email_domain: "appmail.{{ maestrano.dns_record.record }}"
-    support_rate_pips: 2500
-    cdn_assets: true
-  private_dns:
-    scheme: https
-    host: uat.maestrano.io # TODO: Change when switching to VPC
-  open_exchange_rates:
-    app_id: d8091e280ec44002ae37ede2a63167d2
-
-# Connec! Configuration
-connec_config:
-  maestrano_database:
-    pool: 10
-  sidekiq:
-    worker_threads: 10
-    admin:
-      username: admin
-      password: 93938dkdjjf84j
 
 # Swapfile configuration
 swapfile_use_dd: True
