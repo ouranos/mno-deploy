@@ -2,8 +2,6 @@
 
 - name: MnoHub | Download GeoLoc database
   get_url: url=http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz dest={{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb.gz
-  args:
-    creates: "{{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb.gz"
 
 - name: MnoHub | Unarchive GeoLoc database
   shell: "gzip -d {{ deploy_directory }}/shared/geocoder/GeoLite2-City.mmdb.gz"
