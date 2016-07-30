@@ -10,7 +10,7 @@
     - role: common
     - role: ntp
     - { role: swapfile, swapfile_swappiness: 10 }
-    - { role: jdauphant.nginx, keep_only_specified: true }
+    - { role: jdauphant.nginx, keep_only_specified: true, nginx_official_repo: True }
     - { role: spark }
     - { role: spark-jobserver }
     - { role: spark-zeppelin }

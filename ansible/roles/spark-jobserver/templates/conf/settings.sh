@@ -20,7 +20,7 @@ JOBSERVER_MEMORY={{ spark_jobserver_memory }}
 SPARK_VERSION={{ spark_version }}
 MAX_DIRECT_MEMORY={{ spark_jobserver_direct_memory }}
 SPARK_HOME={{ spark_lib_dir }}
-SPARK_CONF_DIR={{ spark_conf_dir }}/conf
+SPARK_CONF_DIR={{ spark_conf_dir }}
 
 # Only needed for Mesos deploys
 SPARK_EXECUTOR_URI=/home/spark/spark-1.6.0.tar.gz
