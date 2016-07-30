@@ -1059,10 +1059,10 @@ rundeck:
     overwrite: yes
 
 # Spark Prototype configuration
-spark-proto:
+spark_proto:
   skip: true
   elastic_load_balancer:
-    name: "{{ vpc_short_name }}-spark-proto-elb"
+    name: "{{ vpc_short_name }}-sparkpto-elb"
     connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
     alias_hosted_zone_id: "{{ route53.zone.id }}"
@@ -1078,7 +1078,7 @@ spark-proto:
     health_check:
       ping_protocol: http
       ping_port: 80
-      #ping_path: "/ping"
+      ping_path: "/ping"
       response_timeout: 5 # seconds
       interval: 30 # seconds
       unhealthy_threshold: 2
@@ -1105,7 +1105,7 @@ spark-proto:
       - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
     min_size: 0
     max_size: 1
-    desired_capacity: 1
+    desired_capacity: 0
     tags:
       - Name: "{{ vpc_short_name }}-spark-proto"
         Environment: "{{ environment_name }}"
