@@ -9,3 +9,7 @@ spark_zeppelin_run_dir: "/run/zeppelin"
 spark_zeppelin_conf_dir: "/etc/zeppelin"
 
 spark_user: "spark"
+
+# List of users with access to Zeppelin
+spark_zeppelin_users:
+  root: changeme

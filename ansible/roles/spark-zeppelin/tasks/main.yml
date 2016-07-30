@@ -33,6 +33,17 @@
   tags: ["symlinks"]
 
 - name: Configure Spark Zeppelin environment
-  template: src=conf-zeppelin-env.sh
-            dest="{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all/conf/zeppelin-env.sh"
+  template: src={{ item }}
+            dest="{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all/conf/{{ item }}"
+            mode=0755
+  with_items:
+    - zeppelin-env.sh
+    - zeppelin-site.xml
+    - shiro.ini
   tags: ["config"]
+
+- name: Add Spark Zeppelin service script
+  template: src=upstart.conf
+            dest=/etc/init/zeppelin.conf
+            mode=0755
+  tags: ["service"]
