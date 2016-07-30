@@ -50,3 +50,28 @@
 - name: Spark Jobserver | Start service
   service: name=spark-jobserver state=started enabled=yes
   tags: ["service"]
+
+- stat: path=/etc/nginx/sites-enabled
+  register: nginxsitedir
+
+- name: Spark Jobserver | Nginx default site deactivation
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+  when: nginxsitedir.stat.exists
+
+- name: Spark Jobserver | Nginx site configuration
+  template: src=nginx/spark-jobserver
+            dest="/etc/nginx/sites-available/spark-jobserver"
+  register: nginxconfig
+  when: nginxsitedir.stat.exists
+
+- name: Spark Jobserver | Nginx site activation
+  file:
+    src: /etc/nginx/sites-available/spark-jobserver
+    dest: /etc/nginx/sites-enabled/spark-jobserver
+    state: link
+    force: yes
+  when: nginxsitedir.stat.exists
+
+- name: Spark Jobserver | Nginx reload
+  shell: service nginx reload
+  when: nginxsitedir.stat.exists and nginxconfig.changed

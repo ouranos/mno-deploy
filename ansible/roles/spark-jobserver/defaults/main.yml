@@ -8,6 +8,7 @@ spark_jobserver_src_dir: "/usr/local/src"
 spark_jobserver_lib_dir: "/var/lib/spark-jobserver"
 spark_jobserver_log_dir: "/var/log/spark-jobserver"
 spark_jobserver_run_dir: "/run/spark-jobserver"
+spark_jobserver_port: 8090
 
 spark_user: "spark"
 spark_version: "1.6.2"
