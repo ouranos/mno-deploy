@@ -4,7 +4,7 @@ upstream spark-jobserver {
 
 server {
   listen 80;
-  server_name api-spark*;
+  server_name ~^api-spark.*;
 
   location @spark-jobserver {
     access_log off;
