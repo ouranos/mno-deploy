@@ -1,0 +1,12 @@
+# http://apache.uberglobalmirror.com/zeppelin/zeppelin-0.6.0/zeppelin-0.6.0-bin-all.tgz
+spark_zeppelin_version: "0.6.0"
+spark_zeppelin_mirror: "http://apache.uberglobalmirror.com/zeppelin"
+
+spark_zeppelin_usr_parent_dir: "/usr/lib"  #this is the folder where the archives will be extracted
+spark_zeppelin_src_dir: "/usr/local/src"
+spark_zeppelin_lib_dir: "/var/lib/zeppelin"
+spark_zeppelin_log_dir: "/var/log/zeppelin"
+spark_zeppelin_run_dir: "/run/zeppelin"
+spark_zeppelin_conf_dir: "/etc/zeppelin"
+
+spark_user: "spark"

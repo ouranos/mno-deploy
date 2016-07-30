@@ -1058,6 +1058,60 @@ rundeck:
     ttl: 60
     overwrite: yes
 
+# Spark Prototype configuration
+spark-proto:
+  skip: true
+  elastic_load_balancer:
+    name: "{{ vpc_short_name }}-spark-proto-elb"
+    connection_draining_timeout: 600
+    zones: "{{ aws_availability_zones }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    subnets:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[4].resource_tags.Name) | map(attribute='id')| join('') }}" # ELB subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[5].resource_tags.Name) | map(attribute='id')| join('') }}" # ELB subnet
+    security_group_ids:
+      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
+    listeners:
+      - protocol: http
+        load_balancer_port: 80
+        instance_port: 80
+    health_check:
+      ping_protocol: http
+      ping_port: 80
+      #ping_path: "/ping"
+      response_timeout: 5 # seconds
+      interval: 30 # seconds
+      unhealthy_threshold: 2
+      healthy_threshold: 4
+  dns_record:
+    name: "{{ vpc_short_name }}-spark-proto-dns"
+    record: "api-spark-proto.{{ dns.base }}"
+    type: CNAME
+    alias: False
+    ttl: 60
+    overwrite: yes
+  launch_configuration:
+    name: "{{ vpc_short_name }}-spark-proto-lc"
+    image_id: "{{ default_base_ami }}"
+    key_name: "{{ keypair }}"
+    instance_type: "{{ default_instance_type }}"
+    security_groups:
+      - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
+  auto_scaling_group:
+    name: "{{ vpc_short_name }}-spark-proto-asg"
+    availability_zones: "{{ aws_availability_zones }}"
+    vpc_zone_identifier:
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[0].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[1].resource_tags.Name) | map(attribute='id')| join('') }}" # Public subnet
+    min_size: 0
+    max_size: 1
+    desired_capacity: 1
+    tags:
+      - Name: "{{ vpc_short_name }}-spark-proto"
+        Environment: "{{ environment_name }}"
+        Rails_Environment: "{{ rails_environment }}"
+        Description: "Spark-Proto server"
+
 # S3 buckets for assets storage and Torquebox clustering
 s3:
   skip: false

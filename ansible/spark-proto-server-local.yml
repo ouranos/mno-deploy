@@ -1,0 +1,30 @@
+---
+
+- name: Configure Spark-Proto
+  hosts: localhost
+  connection: local
+  vars_files:
+  - [ "vars/{{ env_config }}.yml" ]
+  - [ "vars/{{ env_config }}_secrets.yml" ]
+  roles:
+    - role: common
+    - role: ntp
+    - { role: swapfile, swapfile_swappiness: 10 }
+    - { role: jdauphant.nginx, keep_only_specified: true }
+    - { role: spark }
+    - { role: spark-jobserver }
+    - { role: spark-zeppelin }
+    - role: logrotate
+      logrotate_scripts:
+        -
+          name: spark
+          path: "/var/log/spark/*.log"
+          options: "{{ logrotate.options }}"
+        -
+          name: spark-jobserver
+          path: "/var/log/spark-job-server/*.log"
+          options: "{{ logrotate.options }}"
+        -
+          name: spark-zeppelin
+          path: "/var/log/spark-zeppelin/*.log"
+          options: "{{ logrotate.options }}"
