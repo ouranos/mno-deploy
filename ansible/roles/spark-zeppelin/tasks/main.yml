@@ -1,9 +1,9 @@
 ---
-- name: Create service account for Spark Zeppelin
+- name: Spark Zeppelin | Create user account
   user: name={{ spark_user }}
   tags: ["spark-jobserver-user"]
 
-- name: Ensure Spark Zeppelin log and run directories exist
+- name: Spark Zeppelin | Ensure service directories exist
   file: path="{{ item }}"
         owner={{ spark_user }}
         group={{ spark_user }}
@@ -13,17 +13,17 @@
     - "{{ spark_zeppelin_log_dir }}"
     - "{{ spark_zeppelin_run_dir }}"
 
-- name: Download Spark Zeppelin distribution
+- name: Spark Zeppelin | Download distribution
   get_url: url="{{ spark_zeppelin_mirror }}/zeppelin-{{ spark_zeppelin_version }}/zeppelin-{{ spark_zeppelin_version }}-bin-all.tgz"
            dest="{{ spark_zeppelin_src_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all.tgz"
 
-- name: Extract Spark Zeppelin distribution
+- name: Spark Zeppelin | Extract distribution
   unarchive: src="{{ spark_zeppelin_src_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all.tgz"
              dest="{{ spark_zeppelin_usr_parent_dir }}"
              copy=no
              creates="{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all"
 
-- name: Setup Spark Zeppelin distribution symlinks
+- name: Spark Zeppelin | Setup distribution symlinks
   file: src="{{ item.src }}"
         dest="{{ item.dest }}"
         state=link
@@ -32,8 +32,8 @@
     - { src: "{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all/conf", dest: "{{ spark_zeppelin_conf_dir }}" }
   tags: ["symlinks"]
 
-- name: Configure Spark Zeppelin environment
-  template: src={{ item }}
+- name: Spark Zeppelin | Setup configuration files
+  template: src=conf/{{ item }}
             dest="{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all/conf/{{ item }}"
             mode=0755
   with_items:
@@ -42,8 +42,12 @@
     - shiro.ini
   tags: ["config"]
 
-- name: Add Spark Zeppelin service script
-  template: src=upstart.conf
+- name: Spark Zeppelin | Add service script
+  template: src=upstart/zeppelin.conf
             dest=/etc/init/zeppelin.conf
             mode=0755
+  tags: ["service"]
+
+- name: Spark Zeppelin | Start service
+  service: name=zeppelin state=started enabled=yes
   tags: ["service"]

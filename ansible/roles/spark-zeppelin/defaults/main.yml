@@ -7,6 +7,7 @@ spark_zeppelin_lib_dir: "/var/lib/zeppelin"
 spark_zeppelin_log_dir: "/var/log/zeppelin"
 spark_zeppelin_run_dir: "/run/zeppelin"
 spark_zeppelin_conf_dir: "/etc/zeppelin"
+spark_zeppelin_port: 9010
 
 spark_user: "spark"
 
