@@ -1072,7 +1072,7 @@ spark_proto:
     security_group_ids:
       - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
     listeners:
-      - protocol: http
+      - protocol: tcp
         load_balancer_port: 80
         instance_port: 80
     health_check:

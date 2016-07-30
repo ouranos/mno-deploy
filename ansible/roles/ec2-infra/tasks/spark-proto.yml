@@ -1,6 +1,13 @@
 ---
 
 # Spark-Proto Configuration
+#
+# IMPORTANT (TODO: Add to ansible commands)
+# The following commands are also required after running ansible to enable
+# the proxy protocol on the ELB
+# aws elb create-load-balancer-policy --load-balancer-name maestrano-maestrano-sparkpto-elb --policy-name my-ProxyProtocol-policy --policy-type-name ProxyProtocolPolicyType --policy-attributes AttributeName=ProxyProtocol,AttributeValue=true
+# aws elb set-load-balancer-policies-for-backend-server --load-balancer-name maestrano-maestrano-sparkpto-elb --instance-port 80 --policy-names my-ProxyProtocol-policy
+# aws elb set-load-balancer-policies-for-backend-server --load-balancer-name maestrano-maestrano-sparkpto-elb --instance-port 443 --policy-names my-ProxyProtocol-policy
 
 - set_fact: maestrano_component="spark-proto-server-local"
 
