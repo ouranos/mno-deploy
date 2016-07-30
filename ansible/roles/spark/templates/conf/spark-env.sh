@@ -59,6 +59,8 @@ export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/etc/hadoop/conf}
 export SPARK_LOG_DIR=${SPARK_LOG_DIR:-{{ spark_log_dir }}}
 export SPARK_PID_DIR=${SPARK_PID_DIR:-{{ spark_run_dir }}}
 
+export SPARK_MASTER_IP=${SPARK_MASTER_IP:-{{ spark_master_bind_ip }}}
+
 {% for key, value in spark_env_extras.items() | sort %}
 export {{ key }}="{{ value }}"
 {% endfor %}
