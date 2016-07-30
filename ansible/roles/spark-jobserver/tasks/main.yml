@@ -1,9 +1,9 @@
 ---
-- name: Create service account for Spark Jobserver
+- name: Spark Jobserver | Create user account
   user: name={{ spark_user }}
   tags: ["spark-jobserver-user"]
 
-- name: Ensure Spark Jobserver log and run directories exist
+- name: Spark Jobserver | Ensure service directories exist
   file: path="{{ item }}"
         owner={{ spark_user }}
         group={{ spark_user }}
@@ -14,17 +14,17 @@
     - "{{ spark_jobserver_run_dir }}"
     - "{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}"
 
-- name: Download Spark Jobserver distribution
+- name: Spark Jobserver | Download distribution
   get_url: url="{{ spark_jobserver_mirror }}/spark-jobserver-{{ spark_jobserver_version }}.tar.gz"
            dest="{{ spark_jobserver_src_dir }}/spark-jobserver-{{ spark_jobserver_version }}.tar.gz"
 
-- name: Extract Spark Jobserver distribution
+- name: Spark Jobserver | Extract distribution
   unarchive: src="{{ spark_jobserver_src_dir }}/spark-jobserver-{{ spark_jobserver_version }}.tar.gz"
              dest="{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}"
              copy=no
-             creates="{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}"
+             creates="{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}/spark-job-server.jar"
 
-- name: Setup Spark Jobserver distribution symlinks
+- name: Spark Jobserver | Setup distribution symlinks
   file: src="{{ item.src }}"
         dest="{{ item.dest }}"
         state=link
@@ -32,8 +32,8 @@
     - { src: "{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}", dest: "{{ spark_jobserver_lib_dir }}" }
   tags: ["symlinks"]
 
-- name: Configure Spark Jobserver environment
-  template: src={{ item }}
+- name: Spark Jobserver | Setup configuration files
+  template: src=conf/{{ item }}
             dest="{{ spark_jobserver_lib_dir }}/{{ item }}"
             mode=0755
   with_items:
@@ -41,3 +41,12 @@
     - settings.sh
     - shiro.ini
   tags: ["config"]
+
+- name: Spark Jobserver | Add service scripts
+  template: src="upstart/spark-jobserver.conf"
+            dest="/etc/init/spark-jobserver.conf"
+  tags: ["service"]
+
+- name: Spark Jobserver | Start service
+  service: name=spark-jobserver state=started enabled=yes
+  tags: ["service"]
