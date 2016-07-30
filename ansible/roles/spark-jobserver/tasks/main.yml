@@ -12,14 +12,15 @@
   with_items:
     - "{{ spark_jobserver_log_dir }}"
     - "{{ spark_jobserver_run_dir }}"
+    - "{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}"
 
 - name: Download Spark Jobserver distribution
   get_url: url="{{ spark_jobserver_mirror }}/spark-jobserver-{{ spark_jobserver_version }}.tar.gz"
-           dest="{{ spark_jobserver_src_dir }}/spark-jobserver-{{ spark_jobserver_version }}.tgz"
+           dest="{{ spark_jobserver_src_dir }}/spark-jobserver-{{ spark_jobserver_version }}.tar.gz"
 
 - name: Extract Spark Jobserver distribution
   unarchive: src="{{ spark_jobserver_src_dir }}/spark-jobserver-{{ spark_jobserver_version }}.tar.gz"
-             dest="{{ spark_jobserver_usr_parent_dir }}"
+             dest="{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}"
              copy=no
              creates="{{ spark_jobserver_usr_parent_dir }}/spark-jobserver-{{ spark_jobserver_version }}"
 
