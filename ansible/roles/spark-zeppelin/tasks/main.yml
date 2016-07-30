@@ -51,3 +51,28 @@
 - name: Spark Zeppelin | Start service
   service: name=zeppelin state=started enabled=yes
   tags: ["service"]
+
+- stat: path=/etc/nginx/sites-enabled
+  register: nginxsitedir
+
+- name: Spark Zeppelin | Nginx default site deactivation
+  file: path=/etc/nginx/sites-enabled/default.conf state=absent
+  when: nginxsitedir.stat.exists
+
+- name: Spark Zeppelin | Nginx site configuration
+  template: src=nginx/zeppelin
+            dest="/etc/nginx/sites-available/zeppelin"
+  register: nginxconfig
+  when: nginxsitedir.stat.exists
+
+- name: Spark Zeppelin | Nginx site activation
+  file:
+    src: /etc/nginx/sites-available/zeppelin
+    dest: /etc/nginx/sites-enabled/zeppelin
+    state: link
+    force: yes
+  when: nginxsitedir.stat.exists
+
+- name: Spark Zeppelin | Nginx reload
+  shell: service nginx reload
+  when: nginxsitedir.stat.exists and nginxconfig.changed
