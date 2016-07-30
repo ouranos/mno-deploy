@@ -8,11 +8,6 @@
         groups="{{ spark_user_groups | join(',') }}"
   tags: ["spark-user"]
 
-- name: Ensure Spark configuration directory exists
-  file: path="{{ spark_conf_dir }}"
-        state=directory
-  tags: ["config"]
-
 - name: Ensure Spark log and run directories exist
   file: path="{{ item }}"
         owner={{ spark_user }}
