@@ -48,7 +48,7 @@
   tags: ["service"]
 
 - name: Spark Jobserver | Start service
-  service: name=spark-jobserver state=started enabled=yes
+  service: name=spark-jobserver state=restarted enabled=yes
   tags: ["service"]
 
 - stat: path=/etc/nginx/sites-enabled
@@ -73,5 +73,5 @@
   when: nginxsitedir.stat.exists
 
 - name: Spark Jobserver | Nginx reload
-  shell: service nginx reload
+  service: name=nginx state=reloaded enabled=yes
   when: nginxsitedir.stat.exists and nginxconfig.changed

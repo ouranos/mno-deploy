@@ -12,8 +12,8 @@
     - { role: swapfile, swapfile_swappiness: 10 }
     - { role: jdauphant.nginx, keep_only_specified: true, nginx_official_repo: True }
     - { role: spark }
-    - { role: spark-jobserver, spark_jobserver_users: spark_proto_config.users }
-    - { role: spark-zeppelin, spark_zeppelin_users: spark_proto_config.users }
+    - { role: spark-jobserver, spark_jobserver_users: "{{ spark_proto_config.users }}" }
+    - { role: spark-zeppelin, spark_zeppelin_users: "{{ spark_proto_config.users }}" }
     - role: logrotate
       logrotate_scripts:
         -

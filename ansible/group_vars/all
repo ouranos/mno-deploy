@@ -1324,8 +1324,9 @@ dev_platform_config:
 
 # Spark Prototype configuration
 spark_proto_config:
-  users: # puts users in <env_name>_<env>.yml file
-    root: changeme
+  users: {} # dictionary of users. To define in <env_name>_<env>.yml file
+    # root: changeme
+    # otheruser: somepassword
 
 # Rundeck configuration
 rundeck_config:
