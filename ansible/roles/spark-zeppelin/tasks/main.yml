@@ -49,7 +49,7 @@
   tags: ["service"]
 
 - name: Spark Zeppelin | Start service
-  service: name=zeppelin state=started enabled=yes
+  service: name=zeppelin state=restarted enabled=yes
   tags: ["service"]
 
 - stat: path=/etc/nginx/sites-enabled
@@ -74,5 +74,5 @@
   when: nginxsitedir.stat.exists
 
 - name: Spark Zeppelin | Nginx reload
-  shell: service nginx reload
+  service: name=nginx state=reloaded enabled=yes
   when: nginxsitedir.stat.exists and nginxconfig.changed
