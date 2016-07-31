@@ -1322,6 +1322,11 @@ dev_platform_config:
     timeout: 10000
   rails_secret_key: changeme
 
+# Spark Prototype configuration
+spark_proto_config:
+  users: # puts users in <env_name>_<env>.yml file
+    root: changeme
+
 # Rundeck configuration
 rundeck_config:
   domain: "{{ rundeck.dns_record.record }}"
