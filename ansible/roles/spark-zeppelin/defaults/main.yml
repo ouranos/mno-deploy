@@ -14,3 +14,11 @@ spark_user: "spark"
 # List of users with access to Zeppelin
 spark_zeppelin_users:
   root: changeme
+
+# Additional list of interpreters
+spark_zeppelin_extra_interpreters:
+  -
+    name: mongodb
+    jar: zeppelin-mongodb-0.6.0-SNAPSHOT-jar-with-dependencies.jar
+    src: "http://cdn.maestrano.com/pkg/zeppelin/interpreter/mongodb"
+    klass: 'org.apache.zeppelin.mongodb.MongoDbInterpreter'

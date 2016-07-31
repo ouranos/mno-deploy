@@ -42,6 +42,19 @@
     - shiro.ini
   tags: ["config"]
 
+- name: Spark Zeppelin | Create folders for extra interpreters
+  file: path="{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all/interpreter/{{ item.name }}"
+        owner={{ spark_user }}
+        group={{ spark_user }}
+        mode=0755
+        state=directory
+  with_items: "{{ spark_zeppelin_extra_interpreters }}"
+
+- name: Spark Zeppelin | Download extra interpreters
+  get_url: url="{{ item.src }}/{{ item.jar }}"
+           dest="{{ spark_zeppelin_usr_parent_dir }}/zeppelin-{{ spark_zeppelin_version }}-bin-all/interpreter/{{ item.name }}/{{ item.jar }}"
+  with_items: "{{ spark_zeppelin_extra_interpreters }}"
+
 - name: Spark Zeppelin | Add service script
   template: src=upstart/zeppelin.conf
             dest=/etc/init/zeppelin.conf
