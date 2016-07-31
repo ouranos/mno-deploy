@@ -1,4 +1,11 @@
 ---
+
+- name: Spark Zeppelin | Install required packages (Debian)
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - mongodb-clients
+  when: ansible_os_family == "Debian"
+
 - name: Spark Zeppelin | Create user account
   user: name={{ spark_user }}
   tags: ["spark-jobserver-user"]
