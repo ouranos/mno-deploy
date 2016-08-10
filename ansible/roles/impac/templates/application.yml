@@ -1,3 +1,6 @@
 newrelic_license_key: {{ newrelic_license_key }}
 REDIS_URL: redis://{{ impac.redis.endpoint }}:6379/0
 SPARKPOST_API_KEY: {{ impac_config.sparkpost_api_key }}
+PUSHER_APP_ID: {{ impac_config.pusher.app_id }}
+PUSHER_KEY: {{ impac_config.pusher.key }}
+PUSHER_SECRET: {{ impac_config.pusher.secret }}

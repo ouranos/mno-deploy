@@ -24,3 +24,7 @@ impac_config:
   newrelic:
     common:
       app_name: Impac
+  pusher:
+    app_id: changeme
+    key: changeme
+    secret: changeme
