@@ -10,7 +10,7 @@
   service: name=puma state=restarted enabled=yes
 
 - name: Impac | Add /etc/init/sidekiq.conf
-  template: src=etc_init_sidekiq.conf dest=/etc/init/sidekiq.conf force=yes mode=0755
+  template: src=sidekiq.conf dest=/etc/init/sidekiq.conf force=yes mode=0755
 
 - name: Impac | Add sidekiq to upstart
   service: name=sidekiq state=restarted enabled=yes

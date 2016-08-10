@@ -15,7 +15,7 @@ impac_config:
       xms: "{{ (0.40 * ansible_memtotal_mb)|int }}m"
       xmx: "{{ (0.40 * ansible_memtotal_mb)|int }}m" # Allocate 40% of server memory for Puma
       max_perm_size: 256m
-  jobs:
+  sidekiq:
     java_opts:
       xms: "{{ (0.30 * ansible_memtotal_mb)|int }}m"
       xmx: "{{ (0.30 * ansible_memtotal_mb)|int }}m" # Allocate 30% of server memory for Puma
