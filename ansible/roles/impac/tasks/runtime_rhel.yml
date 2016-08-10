@@ -11,3 +11,9 @@
 
 - name: Impac | Add puma to systemd
   service: name=puma state=restarted enabled=yes
+
+- name: Impac | Add /etc/systemd/system/sidekiq.service
+  template: src=sidekiq.service dest=/etc/systemd/system/sidekiq.service force=yes mode=0755
+
+- name: Impac | Add sidekiq to systemd
+  service: name=sidekiq state=restarted enabled=yes
