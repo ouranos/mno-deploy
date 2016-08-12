@@ -12,9 +12,19 @@ default_environment:
 impac_config:
   puma:
     java_opts:
-      xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
-      xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 70% of server memory for Puma
+      xms: "{{ (0.40 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.40 * ansible_memtotal_mb)|int }}m" # Allocate 40% of server memory for Puma
       max_perm_size: 256m
+  sidekiq:
+    java_opts:
+      xms: "{{ (0.30 * ansible_memtotal_mb)|int }}m"
+      xmx: "{{ (0.30 * ansible_memtotal_mb)|int }}m" # Allocate 30% of server memory for Puma
+      max_perm_size: 256m
+    worker_threads: 10
   newrelic:
     common:
       app_name: Impac
+  pusher:
+    app_id: changeme
+    key: changeme
+    secret: changeme

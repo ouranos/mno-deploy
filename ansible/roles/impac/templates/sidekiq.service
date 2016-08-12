@@ -1,0 +1,18 @@
+[Unit]
+Description=Sidekiq workers server
+After=network.target
+
+[Service]
+Type=simple
+User=deployer
+WorkingDirectory={{ deploy_directory }}/current
+EnvironmentFile=-/etc/systemd/system/sidekiq-env.conf
+
+PIDFile={{ deploy_directory }}/shared/pids/sidekiq.pid
+TimeoutSec=15
+Restart=always
+
+ExecStart=/opt/jruby/current/bin/jruby -S bundle exec sidekiq -c {{ impac_config.sidekiq.worker_threads }} -L {{ deploy_directory }}/shared/log/sidekiq.log
+
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,11 @@ connec:
   host: {{ connec_config.private_dns.host }}
   port: {{ 443 if connec_config.private_dns.scheme == 'https' else 80 }}
   cache_duration: <%= 20.minutes %>
+mnohub:
+  protocol: {{ mnohub_config.private_dns.scheme }}
+  host: {{ mnohub_config.private_dns.host }}
+  port: {{ 443 if mnohub_config.private_dns.scheme == 'https' else 80 }}
+  cache_duration: <%= 3.minutes %>
 idm:
   protocol: {{ mnohub_config.private_dns.scheme }}
   host: {{ mnohub_config.private_dns.host }}
@@ -13,3 +18,6 @@ open_exchange_rates:
   protocol: https
   host: openexchangerates.org
   root_path: api
+tenant_auth:
+  key: {{ mnohub_config.default_tenant.id }}
+  secret: {{ mnohub_config.default_tenant.key }}
