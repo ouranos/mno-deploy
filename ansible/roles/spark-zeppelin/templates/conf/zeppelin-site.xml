@@ -64,31 +64,31 @@
 
 <!-- Amazon S3 notebook storage -->
 <!-- Creates the following directory structure: s3://{bucket}/{username}/{notebook-id}/note.json -->
-<!--
+{% if spark_zeppelin_s3_backend.enabled is defined and spark_zeppelin_s3_backend.enabled %}
 <property>
   <name>zeppelin.notebook.s3.user</name>
-  <value>user</value>
+  <value>{{ spark_zeppelin_s3_backend.username }}</value>
   <description>user name for s3 folder structure</description>
 </property>
 
 <property>
   <name>zeppelin.notebook.s3.bucket</name>
-  <value>zeppelin</value>
+  <value>{{ spark_zeppelin_s3_backend.bucket_name }}</value>
   <description>bucket name for notebook storage</description>
 </property>
 
-<property>
+<!-- <property>
   <name>zeppelin.notebook.s3.endpoint</name>
   <value>s3.amazonaws.com</value>
   <description>endpoint for s3 bucket</description>
-</property>
+</property> -->
 
 <property>
   <name>zeppelin.notebook.storage</name>
   <value>org.apache.zeppelin.notebook.repo.S3NotebookRepo</value>
   <description>notebook persistence layer implementation</description>
 </property>
--->
+{% endif %}
 
 <!-- Additionally, encryption is supported for notebook data stored in S3 -->
 <!-- Use the AWS KMS to encrypt data -->
