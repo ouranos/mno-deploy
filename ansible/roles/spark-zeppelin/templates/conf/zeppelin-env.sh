@@ -36,6 +36,11 @@ export ZEPPELIN_PID_DIR={{ spark_zeppelin_run_dir }} # The pid files are stored.
 # export ZEPPELIN_IDENT_STRING   		# A string representing this instance of zeppelin. $USER by default.
 # export ZEPPELIN_NICENESS       		# The scheduling priority for daemons. Defaults to 0.
 
+{% if spark_zeppelin_s3_backend.enabled is defined and spark_zeppelin_s3_backend.enabled %}
+#### Spark S3 Backend configuration ####
+export AWS_ACCESS_KEY_ID={{ spark_zeppelin_s3_backend.aws_key }}
+export AWS_SECRET_ACCESS_KEY={{ spark_zeppelin_s3_backend.aws_secret }}
+{% endif %}
 
 #### Spark interpreter configuration ####
 

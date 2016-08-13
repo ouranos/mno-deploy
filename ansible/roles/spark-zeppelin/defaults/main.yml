@@ -15,6 +15,14 @@ spark_user: "spark"
 spark_zeppelin_users:
   root: changeme
 
+# S3 Storage Backend Configuration
+spark_zeppelin_s3_backend:
+  enabled: False
+  bucket_name: some-bucket
+  username: zeppelin
+  aws_key: some-key
+  aws_secret: some-secret
+
 # Additional list of interpreters
 spark_zeppelin_extra_interpreters:
   -
