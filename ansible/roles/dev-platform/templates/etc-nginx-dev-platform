@@ -16,8 +16,21 @@ server {
   root      {{ deploy_directory }}/current/public;
 
   # Location to route to the rails backend
-  location ~* ^/(api|ping|health_check|version|frontend|auth) {
+  location /ping {
+    try_files $uri @dev_platform;
+  }
+
+  location ~* ^/(api|health_check|version|frontend|auth) {
+    if ($http_x_forwarded_proto != 'https') {
+      rewrite ^ https://$host$request_uri? permanent;
+    }
     try_files $uri/index.html $uri @dev_platform;
+  }
+
+  location /index.html {
+    if ($http_x_forwarded_proto != 'https') {
+      rewrite ^ https://$host$request_uri? permanent;
+    }
   }
 
   # Everything else to the index page
