@@ -25,5 +25,5 @@ GOOGLE_CLIENT_SECRET: {{ dev_platform_config.google.secret }}
 # Fog configuration to upload assets to S3
 FOG_AWS_ACCESS_KEY_ID: {{ dev_platform_config.fog.aws_access_key_id }}
 FOG_AWS_SECRET_ACCESS_KEY: {{ dev_platform_config.fog.aws_secret_access_key }}
-FOG_AWS_REGION: {{ dev_platform_config.fog.aws_region
+FOG_AWS_REGION: {{ dev_platform_config.fog.aws_region }}
 FOG_DIRECTORY: {{ dev_platform_config.fog.directory }}
