@@ -1268,6 +1268,11 @@ dev_platform_config:
     pool: 10
     timeout: 10000
   rails_secret_key: changeme
+  fog:
+    aws_access_key_id: changeme
+    aws_secret_access_key: changeme
+    aws_region: changeme
+    directory: public-assets
 
 # Rundeck configuration
 rundeck_config:
