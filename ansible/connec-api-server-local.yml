@@ -10,9 +10,9 @@
     - { role: common }
     - { role: ntp }
     - { role: swapfile, swapfile_swappiness: 10 }
-    - { role: newrelic, when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
-    - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.connec.log_path }}", sumologic_host_name: "connec-api-{{ rails_environment }}", when: not(sumologic.skip) }
-    - { role: splunk }
+    - { role: newrelic, when: connec_config.new_relic.enabled and not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
+    - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.connec.log_path }}", sumologic_host_name: "connec-api-{{ rails_environment }}", when: connec_config.sumocollector.enabled and not(sumologic.skip) }
+    - { role: splunk, when: connec_config.splunk.enabled }
     - { role: jruby }
     - { role: jdauphant.nginx, keep_only_specified: true }
     - { role: connec, connec_config: {component: 'api', newrelic: {common: {app_name: 'Connec API'}}} }
