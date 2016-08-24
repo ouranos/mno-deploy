@@ -1140,6 +1140,12 @@ impac_config:
   private_dns:
     scheme: http
     host: "{{ impac.dns_record.record }}"
+  new_relic:
+    enabled: true
+  splunk:
+    enabled: true
+  sumocollector:
+    enabled: false
   sparkpost_api_key: changeme
 
 # Maestrano configuration
@@ -1199,6 +1205,12 @@ mnohub_config:
     password: changeme
     pool: 15
     timeout: 10000
+  new_relic:
+    enabled: true
+  splunk:
+    enabled: true
+  sumocollector:
+    enabled: false
 
 # Nex! Config
 nex_config:
@@ -1221,6 +1233,12 @@ connec_config:
     admin:
       client_id: "changeme-changeme-changeme"
       client_key: "changeme-changeme-changeme"
+  new_relic:
+    enabled: true
+  splunk:
+    enabled: true
+  sumocollector:
+    enabled: false
   oauth:
     xero:
       key:

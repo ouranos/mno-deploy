@@ -10,9 +10,9 @@
     - role: common
     - role: ntp
     - { role: swapfile, swapfile_swappiness: 10 }
-    - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.mnohub.log_path }}", sumologic_host_name: "mnohub-{{ rails_environment }}", when: not(sumologic.skip) }
-    - { role: splunk }
-    - { role: newrelic, when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
+    - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.mnohub.log_path }}", sumologic_host_name: "mnohub-{{ rails_environment }}", when: mnohub_config.sumocollector.enabled and not(sumologic.skip) }
+    - { role: splunk, when: mnohub_config.splunk.enabled }
+    - { role: newrelic, when: mnohub_config.new_relic.enabled and not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
     - { role: jruby }
     - { role: jdauphant.nginx, keep_only_specified: true }
     - { role: mnohub }
