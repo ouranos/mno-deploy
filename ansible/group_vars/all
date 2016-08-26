@@ -1291,6 +1291,11 @@ dev_platform_config:
     aws_secret_access_key: changeme
     aws_region: changeme
     directory: public-assets
+  smtp:
+    address: smtp.mandrillapp.com
+    domain: localhost:5001
+    username: it@maestrano.com
+    password: changeme
 
 # Rundeck configuration
 rundeck_config:
