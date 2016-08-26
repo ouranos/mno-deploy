@@ -1293,7 +1293,7 @@ dev_platform_config:
     directory: public-assets
   smtp:
     address: smtp.mandrillapp.com
-    domain: localhost:5001
+    domain: "{{ dev_platform.public_dns.host }}"
     username: it@maestrano.com
     password: changeme
 
