@@ -11,6 +11,8 @@
     - libsqlite3-dev
     - nodejs
     - ruby-dev
+    - imagemagick
+    - libmagickwand-dev
   when: ansible_os_family == "Debian"
 
 - name: Developer Platform | Install packages

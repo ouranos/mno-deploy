@@ -59,7 +59,7 @@ tenant_dropbox_s3_aws_region: "ap-southeast-2"
 environment_name: test
 application_name: maestrano
 rails_environment: uat
-keypair: maestrano
+keypair: "{{ environment_name }}"
 
 timezone: Australia/Sydney
 aws_availability_zone1: "{{ aws_region }}a"
@@ -1140,6 +1140,12 @@ impac_config:
   private_dns:
     scheme: http
     host: "{{ impac.dns_record.record }}"
+  new_relic:
+    enabled: true
+  splunk:
+    enabled: true
+  sumocollector:
+    enabled: false
   sparkpost_api_key: changeme
 
 # Maestrano configuration
@@ -1199,6 +1205,12 @@ mnohub_config:
     password: changeme
     pool: 15
     timeout: 10000
+  new_relic:
+    enabled: true
+  splunk:
+    enabled: true
+  sumocollector:
+    enabled: false
 
 # Nex! Config
 nex_config:
@@ -1221,6 +1233,12 @@ connec_config:
     admin:
       client_id: "changeme-changeme-changeme"
       client_key: "changeme-changeme-changeme"
+  new_relic:
+    enabled: true
+  splunk:
+    enabled: true
+  sumocollector:
+    enabled: false
   oauth:
     xero:
       key:
@@ -1268,6 +1286,16 @@ dev_platform_config:
     pool: 10
     timeout: 10000
   rails_secret_key: changeme
+  fog:
+    aws_access_key_id: changeme
+    aws_secret_access_key: changeme
+    aws_region: changeme
+    directory: public-assets
+  smtp:
+    address: smtp.mandrillapp.com
+    domain: "{{ dev_platform.public_dns.host }}"
+    username: it@maestrano.com
+    password: changeme
 
 # Rundeck configuration
 rundeck_config:

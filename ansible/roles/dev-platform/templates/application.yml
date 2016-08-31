@@ -21,3 +21,16 @@ GITHUB_CLIENT_SECRET: {{ dev_platform_config.github.secret }}
 # Oauth Google
 GOOGLE_CLIENT_ID: {{ dev_platform_config.google.id }}
 GOOGLE_CLIENT_SECRET: {{ dev_platform_config.google.secret }}
+
+# Fog configuration to upload assets to S3
+FOG_AWS_ACCESS_KEY_ID: {{ dev_platform_config.fog.aws_access_key_id }}
+FOG_AWS_SECRET_ACCESS_KEY: {{ dev_platform_config.fog.aws_secret_access_key }}
+FOG_AWS_REGION: {{ dev_platform_config.fog.aws_region }}
+FOG_DIRECTORY: {{ dev_platform_config.fog.directory }}
+FOG_ASSET_HOST: {{ dev_platform_config.public_dns.scheme }}://{{ dev_platform_config.public_dns.host }}
+
+# SMTP Settings
+SMTP_ADDRESS: {{ dev_platform_config.smtp.address }}
+SMTP_DOMAIN: {{ dev_platform_config.smtp.domain }}
+SMTP_USERNAME: {{ dev_platform_config.smtp.username }}
+SMTP_PASSWORD: {{ dev_platform_config.smtp.password }}

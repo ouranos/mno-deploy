@@ -4,6 +4,8 @@
   apt: "name={{ item }} state=present update_cache=yes"
   with_items:
     - nodejs
+    - imagemagick
+    - libmagickwand-dev
   when: ansible_os_family == "Debian"
 
 - name: MnoHub | Install packages
