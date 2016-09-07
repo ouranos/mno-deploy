@@ -22,7 +22,3 @@ maestrano:
     callback: {{ mnohub_config.private_dns.host }}/webhook/sync/:group_id/callback
 oauth:
   {{ connec_config.oauth | to_json }}
-sidekiq:
-  admin:
-    username: {{ connec_config.sidekiq.admin.username }}
-    password: {{ connec_config.sidekiq.admin.password }}

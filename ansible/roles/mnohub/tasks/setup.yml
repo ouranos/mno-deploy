@@ -3,6 +3,12 @@
 - name: MnoHub | Install packages
   apt: "name={{ item }} state=present update_cache=yes"
   with_items:
+    - curl
+    - libcurl3
+    - libcurl3-gnutls
+    - libcurl4-openssl-dev
+    - mysql-client
+    - libmysqlclient-dev
     - nodejs
     - imagemagick
     - libmagickwand-dev

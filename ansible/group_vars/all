@@ -59,7 +59,7 @@ tenant_dropbox_s3_aws_region: "ap-southeast-2"
 environment_name: test
 application_name: maestrano
 rails_environment: uat
-keypair: "{{ environment_name }}"
+keypair: "{{ application_name }}-{{ environment_name }}"
 
 timezone: Australia/Sydney
 aws_availability_zone1: "{{ aws_region }}a"
@@ -1293,7 +1293,7 @@ dev_platform_config:
     directory: public-assets
   smtp:
     address: smtp.mandrillapp.com
-    domain: "{{ dev_platform.public_dns.host }}"
+    domain: "{{ dev_platform.dns_record.record }}"
     username: it@maestrano.com
     password: changeme
 
