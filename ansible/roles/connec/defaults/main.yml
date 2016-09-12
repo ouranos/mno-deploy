@@ -16,7 +16,9 @@ connec_config:
       xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 80% of server memory for Puma
       max_perm_size: 256m
   sidekiq:
-    worker_threads: 25
+    worker_threads: 10
+    limits:
+      sync_job: 5
     java_opts:
       xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
       xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 75% of server memory for Sidekiq

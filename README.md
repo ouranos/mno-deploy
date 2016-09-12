@@ -53,7 +53,9 @@ This script can be modified to suit your needs if you want to pull a specific ve
 #### Setup the infrastructure
 To run the deployment scripts, you need to have Ansible installed on the machine running the setup script. It is recommended to use Ansible version 2.0.2.0.
 To create a new infrastructure, you need to have an AWS account with access keys having access to EC2, S3, Route53, RDS and Elasticache.
-Run the following script
+When running the script for the first time, make sure to set the AutoScaling Groups minimum and desired capacity to 0 so no instances are launched (see `ansible/vars/myenv_secrets.yml`).
+
+Run the following script:
 ```
 export AWS_ACCESS_KEY_ID=<some-key>
 export AWS_SECRET_ACCESS_KEY=<some-key>
@@ -64,7 +66,13 @@ export MNO_DEPLOY_VERSION=develop/latest
 sh scripts/setup_infrastructure.sh
 ```
 
-Follow the Ansible setup steps on screen and verify the AWS infrastructure has been created under the AWS console.
+Follow the Ansible setup steps on screen and verify the AWS infrastructure has been created under the AWS console:
+- A new VPC should be created under AWS > VPC
+- A new Hosted Zone should be created under AWS > Route 53
+Update the created Hosted Zone and associated the created VP to it (AWS > Route 53 > Select the Hosted Zone, under the right hand side menu, associate a new VPC)
+
+Now update the AutoScaling Groups to start instances by incrementing the minimum and desired capacities.
+Verify that the ansible scripts run properly by checking logs under `/var/log/ansible.log`
 
 ## Components configuration
 ### Common configuration

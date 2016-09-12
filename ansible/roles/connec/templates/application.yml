@@ -3,3 +3,7 @@
 newrelic_license_key: {{ newrelic_license_key }}
 
 REDIS_URL: redis://{{ connec.redis.endpoint }}:6379/0
+
+SIDEKIQ_USERNAME: {{ connec_config.sidekiq.admin.username }}
+SIDEKIQ_PASSWORD: {{ connec_config.sidekiq.admin.password }}
+SIDEKIQ_JOB_SYNC: {{ connec_config.sidekiq.limits.sync_job }}
