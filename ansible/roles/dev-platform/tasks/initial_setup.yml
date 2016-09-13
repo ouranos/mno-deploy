@@ -6,6 +6,7 @@
     - curl
     - libcurl3
     - libcurl3-gnutls
+    - libgmp3-dev
     - libcurl4-openssl-dev
     - libmysqlclient-dev
     - libsqlite3-dev
