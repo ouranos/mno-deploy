@@ -1269,6 +1269,13 @@ connec_config:
     admin:
       username: admin
       password: changeme
+  database:
+    host: "{{ mnohub_config.database.host }}"
+    database: "{{ mnohub_config.database.database }}"
+    pool: "{{ mnohub_config.database.pool }}"
+    timeout: "{{ mnohub_config.database.timeout }}"
+    username: "{{ mnohub_config.database.username }}"
+    password: "{{ mnohub_config.database.password }}"
 
 # Developer Platform configuration
 dev_platform_config:
