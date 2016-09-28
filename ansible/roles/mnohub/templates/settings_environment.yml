@@ -10,7 +10,7 @@ background_job:
   disable_recurring_jobs: {{ mnohub_config.background_jobs_disabled }}
 sso:
   virtual_email_domain: {{ mnohub_config.general.virtual_email_domain }}
-  delegation_idp: {{ mnohub_config.sso_idp_delegation }}
+  # delegation_idp: {{ mnohub_config.sso_idp_delegation }}
 contact:
   support: {{ mnohub_config.general.support_email }}
 mcluster:
