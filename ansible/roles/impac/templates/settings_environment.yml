@@ -8,6 +8,9 @@ mnohub:
   host: {{ mnohub_config.private_dns.host }}
   port: {{ 443 if mnohub_config.private_dns.scheme == 'https' else 80 }}
   cache_duration: <%= 3.minutes %>
+  paths:
+    alerts: /api/mnoe/v1/alert/:alert_id
+    kpis: /api/mnoe/v1/organizations/:organization_id/kpis
 idm:
   protocol: {{ mnohub_config.private_dns.scheme }}
   host: {{ mnohub_config.private_dns.host }}
