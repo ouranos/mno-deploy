@@ -7,6 +7,7 @@ default_environment:
   PATH: /opt/jruby/current/bin:{{ ansible_env.PATH }}
 
 mnohub_config:
+  puma_worker_threads: 128
   sidekiq_worker_threads: 25
   java_opts:
     xms: 1024m
