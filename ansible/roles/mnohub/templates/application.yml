@@ -28,8 +28,8 @@ default_tenant_host: {{ frontend_config.public_dns.host }}
 
 # Connection credentials for Nex!
 {% if nex_config is defined and nex_config.mnohub is defined %}
-mcluster_admin_token: {{ nex_config.mnohub.key }}
-mcluster_admin_password: "{{ nex_config.mnohub.secret }}"
+NEX_API_KEY: {{ nex_config.mnohub.key }}
+NEX_ENDPOINT: {{ mnohub_config.general.nex_host }}
 {% endif %}
 
 # Connection credentials for Connec!

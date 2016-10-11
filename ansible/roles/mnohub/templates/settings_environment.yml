@@ -14,13 +14,15 @@ sso:
 contact:
   support: {{ mnohub_config.general.support_email }}
 mcluster:
-  host: {{ mnohub_config.general.nex_host }}
   apps_domain: {{ mnohub_config.general.apps_domain }}
   fallback_region: {{ mnohub_config.general.fallback_region }}
   mnoe_lockdown_region: {{ mnohub_config.general.mnoe_lockdown_region }}
   autostop_disabled: {{ mnohub_config.mcluster_autostop_disabled }}
 encryption:
   key: <%= ENV['encryption_key'] %>
+hub_api:
+  protocol: {{ mnohub_config.public_dns.scheme }}
+  host: {{ mnohub_config.public_dns.host }}
 connec:
   protocol: {{ connec_config.private_dns.scheme }}
   host: {{ connec_config.private_dns.host }}
