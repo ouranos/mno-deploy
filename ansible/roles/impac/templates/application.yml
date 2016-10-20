@@ -4,3 +4,5 @@ SPARKPOST_API_KEY: {{ impac_config.sparkpost_api_key }}
 PUSHER_APP_ID: {{ impac_config.pusher.app_id }}
 PUSHER_KEY: {{ impac_config.pusher.key }}
 PUSHER_SECRET: {{ impac_config.pusher.secret }}
+SIDEKIQ_USERNAME: {{ impac_config.sidekiq.username }}
+SIDEKIQ_PASSWORD: {{ impac_config.sidekiq.password }}
