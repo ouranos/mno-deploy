@@ -9,7 +9,7 @@
         - {{ mongo.cluster.dns.master }}:27017
         - {{ mongo.cluster.dns.replica1 }}:27017
         - {{ mongo.cluster.dns.replica2 }}:27017
-      options:
+      options: &default_client_options
         user: {{ mongodb_user_connec }}
         password: {{ mongodb_password_connec }}
         auth_source: {{ mongodb_database_connec }}
@@ -19,6 +19,7 @@
     secondary:
       <<: *default_client
       options:
+        <<: *default_client_options
         read:
           mode: :secondary_preferred
 
