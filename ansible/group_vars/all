@@ -1147,6 +1147,9 @@ impac_config:
   sumocollector:
     enabled: false
   sparkpost_api_key: changeme
+  sidekiq:
+    username: admin
+    password: changeme
 
 # Maestrano configuration
 mnohub_config:
