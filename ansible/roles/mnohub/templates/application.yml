@@ -12,7 +12,9 @@ database_username: {{ mnohub_config.database.username }}
 database_password: {{ mnohub_config.database.password }}
 
 # Redis URL - Used for caching and background jobs
+# Lower case parameter should be removed after 01/01/2017
 redis_url: {{ mnohub_config.redis_url }}
+REDIS_URL: {{ mnohub_config.redis_url }}
 
 # Used for encrypting fields in database (e.g: oauth keys)
 encryption_key: {{ mnohub_config.secrets.encryption_key }}
