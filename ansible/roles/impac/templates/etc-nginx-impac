@@ -17,6 +17,10 @@ server {
 
   try_files $uri/index.html $uri @impac;
 
+  location ~ (\.php|.aspx|.asp|myadmin) {
+    return 404;
+  }
+
   location @impac {
     access_log off;
 
