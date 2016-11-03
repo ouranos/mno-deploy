@@ -13,6 +13,10 @@ server {
 
   try_files $uri/index.html $uri @connec;
 
+  location ~ (\.php|.aspx|.asp|myadmin) {
+    return 404;
+  }
+
   location @connec {
     access_log off;
 

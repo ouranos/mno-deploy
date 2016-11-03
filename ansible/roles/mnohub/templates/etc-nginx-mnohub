@@ -17,6 +17,10 @@ server {
 
   try_files $uri/index.html $uri @mnohub;
 
+  location ~ (\.php|.aspx|.asp|myadmin) {
+    return 404;
+  }
+
   location @mnohub {
     proxy_pass http://mnohub;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
