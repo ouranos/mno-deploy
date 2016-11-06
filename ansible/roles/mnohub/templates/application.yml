@@ -59,6 +59,7 @@ braintree_private_key: {{ mnohub_config.braintree.private_key }}
 
 # Newrelic api key
 newrelic_license_key: {{ newrelic_license_key }}
+newrelic_app_name: {{ mnohub_config.new_relic.app_name }}
 
 # DevPlatform
 DEV_PLATFORM_ENDPOINT: {{ dev_platform_config.public_dns.scheme }}://{{ dev_platform_config.public_dns.host }}

@@ -1,6 +1,12 @@
 # {{ ansible_managed }}
 
 newrelic_license_key: {{ newrelic_license_key }}
+{% if connec_config.component is defined and connec_config.component == 'api' %}
+newrelic_app_name: {{ connec_config.new_relic.app_name }} API
+{% endif %}
+{% if connec_config.component is defined and connec_config.component == 'jobs' %}
+newrelic_app_name: {{ connec_config.new_relic.app_name }} Jobs
+{% endif %}
 
 REDIS_URL: redis://{{ connec.redis.endpoint }}:6379/0
 

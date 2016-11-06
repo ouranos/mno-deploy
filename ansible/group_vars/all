@@ -1210,6 +1210,7 @@ mnohub_config:
     timeout: 10000
   new_relic:
     enabled: true
+    app_name: MnoHub
   splunk:
     enabled: true
   sumocollector:
@@ -1238,6 +1239,7 @@ connec_config:
       client_key: "changeme-changeme-changeme"
   new_relic:
     enabled: true
+    app_name: Connec
   splunk:
     enabled: true
   sumocollector:
