@@ -23,6 +23,3 @@ connec_config:
       xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
       xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 75% of server memory for Sidekiq
       max_perm_size: 512m
-  newrelic:
-    common:
-      app_name: Connec

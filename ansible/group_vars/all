@@ -1239,6 +1239,7 @@ connec_config:
       client_key: "changeme-changeme-changeme"
   new_relic:
     enabled: true
+    app_name: Connec
   splunk:
     enabled: true
   sumocollector:
