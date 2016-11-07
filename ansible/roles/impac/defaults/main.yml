@@ -28,4 +28,4 @@ impac_config:
     app_id: changeme
     key: changeme
     secret: changeme
-  disable_kpis: false
+  kpis_disabled: false
