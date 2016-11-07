@@ -26,3 +26,4 @@ open_exchange_rates:
 tenant_auth:
   key: {{ mnohub_config.default_tenant.id }}
   secret: {{ mnohub_config.default_tenant.key }}
+disable_kpis: {{ impac_config.disable_kpis }}
