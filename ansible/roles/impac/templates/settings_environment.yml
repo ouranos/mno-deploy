@@ -12,7 +12,7 @@ mnohub:
   cache_duration: <%= 3.minutes %>
   paths:
     alerts: /api/mnoe/v1/alert/:alert_id
-    organization: /api/mnoe/v1/organizations?filter%5Buid%5D=:organization_id
+    organization: /api/mnoe/v1/organizations?filter[uid]=:organization_id
     kpis: /api/mnoe/v1/organizations/:organization_id/kpis
     widgets: /api/mnoe/v1/organizations/:organization_id/widgets
 idm:
