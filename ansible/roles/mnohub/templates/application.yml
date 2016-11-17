@@ -28,8 +28,8 @@ default_tenant_scheme: {{ frontend_config.public_dns.scheme }}
 default_tenant_host: {{ frontend_config.public_dns.host }}
 {% endif %}
 
-# Connection credentials for Nex!
 {% if nex_config is defined and nex_config.mnohub is defined %}
+# Connection credentials for Nex!
 NEX_API_KEY: {{ nex_config.mnohub.key }}
 NEX_ENDPOINT: {{ mnohub_config.general.nex_host }}
 {% endif %}
@@ -52,10 +52,12 @@ eway_login: {{ mnohub_config.eway.login }}
 eway_username: {{ mnohub_config.eway.username }}
 eway_password: {{ mnohub_config.eway.password }}
 
+{% if mnohub_config.braintree is defined %}
 # Braintree - Payment gateway
 braintree_merchant_id: {{ mnohub_config.braintree.merchant_id }}
 braintree_public_key: {{ mnohub_config.braintree.public_key }}
 braintree_private_key: {{ mnohub_config.braintree.private_key }}
+{% endif %}
 
 # Newrelic api key
 newrelic_license_key: {{ newrelic_license_key }}
