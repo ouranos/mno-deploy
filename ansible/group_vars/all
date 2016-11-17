@@ -1188,6 +1188,8 @@ mnohub_config:
   secrets:
     encryption_key: "changeme-changeme-changeme"
     open_exchange_rate_id: a9e8556fb8344519b14e545c4e06541b
+    secret_token: changeme
+    secret_key_base: changeme
   s3_bucket:
     region: "ap-southeast-1"
     public: "{{ s3_buckets.public }}"
