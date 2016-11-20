@@ -27,4 +27,3 @@ open_exchange_rates:
   protocol: https
   host: openexchangerates.org
   root_path: api
-

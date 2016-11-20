@@ -1196,6 +1196,10 @@ mnohub_config:
     private: "{{ s3_buckets.private }}"
     access_key: "changeme-changeme-changeme"
     secret_access_key: "changeme-changeme-changeme"
+  carrierwave:
+    public_bucket: "{{ s3_buckets.public }}"
+    private_bucket: "{{ s3_buckets.private }}"
+    asset_host: "changeme"
   eway:
     # eWay Test Crendentials
     login: '87654321'
