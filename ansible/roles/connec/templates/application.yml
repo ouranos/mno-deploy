@@ -14,3 +14,4 @@ SIDEKIQ_USERNAME: {{ connec_config.sidekiq.admin.username }}
 SIDEKIQ_PASSWORD: {{ connec_config.sidekiq.admin.password }}
 SIDEKIQ_SYNC_JOB: {{ connec_config.sidekiq.limits.sync_job }}
 SIDEKIQ_DEMO_DATA_JOB: {{ connec_config.sidekiq.limits.demo_data }}
+SYNC_JOB_BATCHES: {{ connec_config.sidekiq.sync_job_batches }}

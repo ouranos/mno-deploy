@@ -17,6 +17,7 @@ connec_config:
       max_perm_size: 256m
   sidekiq:
     worker_threads: 20
+    sync_job_batches: 12
     limits:
       sync_job: 10
       demo_data: 2
