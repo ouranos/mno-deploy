@@ -29,4 +29,6 @@ impac_config:
     key: changeme
     secret: changeme
   kpis_disabled: false
-  # root_key: must be defined in secrets
+  root:
+    api_key: changeme
+    api_secret: changeme

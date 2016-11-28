@@ -7,4 +7,5 @@ PUSHER_KEY: {{ impac_config.pusher.key }}
 PUSHER_SECRET: {{ impac_config.pusher.secret }}
 SIDEKIQ_USERNAME: {{ impac_config.sidekiq.username }}
 SIDEKIQ_PASSWORD: {{ impac_config.sidekiq.password }}
-ROOT_KEY: {{ impac_config.root_key }}
+ROOT_KEY: {{ impac_config.root.api_key }}
+ROOT_SECRET: {{ impac_config.root.api_secret }}

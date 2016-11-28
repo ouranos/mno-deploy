@@ -74,7 +74,3 @@ MNOHUB_ENDPOINT: {{ mnohub_config.public_dns.scheme }}://{{ mnohub_config.public
 NEX_ENDPOINT: {{ nex_config.public_dns.scheme }}://{{ nex_config.public_dns.host }}
 CONNEC_ENDPOINT: {{ connec_config.public_dns.scheme }}://{{ connec_config.public_dns.host }}
 IMPAC_ENDPOINT: {{ impac_config.public_dns.scheme }}://{{ impac_config.public_dns.host }}
-
-# Root keys used by other components of the maestrano suite (currently Impac! API)
-# Keys must be separated by a comma ","
-ROOT_KEYS: {{ impac_config.root_key }}
