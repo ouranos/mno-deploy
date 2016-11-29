@@ -25,7 +25,4 @@ open_exchange_rates:
   protocol: https
   host: openexchangerates.org
   root_path: api
-tenant_auth:
-  key: {{ mnohub_config.default_tenant.id }}
-  secret: {{ mnohub_config.default_tenant.key }}
 kpis_disabled: {{ impac_config.kpis_disabled }}
