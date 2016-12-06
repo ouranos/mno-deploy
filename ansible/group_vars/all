@@ -566,6 +566,9 @@ mnohub:
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-mnohub-redis.{{ dns.base }}"
+    cache_port: 6379
+    cache_engine_version: 3.2.4
+    cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-mnohub-elb"
     connection_draining_timeout: 60
@@ -697,6 +700,9 @@ connec:
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-connec-redis.{{ dns.base }}"
+    cache_port: 6379
+    cache_engine_version: 3.2.4
+    cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-connec-elb"
     connection_draining_timeout: 600
@@ -783,6 +789,9 @@ impac:
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-impac-redis.{{ dns.base }}"
+    cache_port: 6379
+    cache_engine_version: 3.2.4
+    cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-impac-elb"
     connection_draining_timeout: 600
@@ -990,6 +999,9 @@ dev_platform:
     node_type: cache.t2.micro
     num_nodes: 1
     endpoint: "{{ environment_name }}-devp-redis.{{ dns.base }}"
+    cache_port: 6379
+    cache_engine_version: 3.2.4
+    cache_parameter_group: "default.redis3.2"
 
 # RDS database for MNO Hub, MCluster and any required frontend
 rds:

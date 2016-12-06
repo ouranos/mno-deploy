@@ -9,7 +9,9 @@
     name: "{{ dev_platform.redis.name }}"
     state: present
     engine: redis
-    cache_port: 6379
+    cache_port: "{{ dev_platform.redis.cache_port }}"
+    cache_engine_version: "{{ dev_platform.redis.cache_engine_version }}"
+    cache_parameter_group: "{{ dev_platform.redis.cache_parameter_group }}"
     node_type: "{{ dev_platform.redis.node_type }}"
     num_nodes: "{{ dev_platform.redis.num_nodes }}"
     cache_subnet_group: "{{ redis_group.name }}"
