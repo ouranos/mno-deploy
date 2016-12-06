@@ -9,7 +9,9 @@
     name: "{{ impac.redis.name }}"
     state: present
     engine: redis
-    cache_port: 6379
+    cache_port: "{{ impac.redis.cache_port }}"
+    cache_engine_version: "{{ impac.redis.cache_engine_version }}"
+    cache_parameter_group: "{{ impac.redis.cache_parameter_group }}"
     node_type: "{{ impac.redis.node_type }}"
     num_nodes: "{{ impac.redis.num_nodes }}"
     cache_subnet_group: "{{ redis_group.name }}"
