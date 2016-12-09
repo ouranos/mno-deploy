@@ -93,3 +93,19 @@ The list of file to include are:
 - privatekey.pem
 - entrust-cert.pem
 - entrust-private-nopass.pem
+
+### Redis configuration
+#### Custom parameter group
+Ansible AWS modules in their current versions do not allow to automate the creation of elasticache parameters groups - this operation has to be done manually after the infrastructure has been deployed.
+
+The default Redis parameter group sets the eviction policy at `volatile-lru`, which means only the cache keys **with an expiration date** will be removed as the cache fills, starting with the least recently used.
+For Redis caching to work properly with the different components of the Maestrano Suite, you need to configure this eviction policy in a different way. Indeed, most of the cache keys in Impac! won't have any expiration date set. As a result, if the eviction policy is kept at this default value, the cache keys will never be evicted and the cache will reach its limit.
+
+To avoid this scenario, the following has to be done:
+1. Create a new parameter group based on the default one.
+2. Set the value: `maxmemory-policy` to `allkeys-lru`: it will evict the least recently used cache keys regardless whether or not they have an expiration date set.
+3. Edit the Redis instance so they use the newly created parameters group.
+
+#### Useful links
+- https://docs.aws.amazon.com/AmazonElastiCache/latest/UserGuide/ParameterGroups.Redis.html
+- https://redis.io/topics/lru-cache
