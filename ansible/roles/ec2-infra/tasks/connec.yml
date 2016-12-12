@@ -8,7 +8,9 @@
     name: "{{ connec.redis.name }}"
     state: present
     engine: redis
-    cache_port: 6379
+    cache_port: "{{ connec.redis.cache_port }}"
+    cache_engine_version: "{{ connec.redis.cache_engine_version }}"
+    cache_parameter_group: "{{ connec.redis.cache_parameter_group }}"
     node_type: "{{ connec.redis.node_type }}"
     num_nodes: "{{ connec.redis.num_nodes }}"
     cache_subnet_group: "{{ redis_group.name }}"

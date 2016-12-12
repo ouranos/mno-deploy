@@ -9,7 +9,9 @@
     name: "{{ mnohub.redis.name }}"
     state: present
     engine: redis
-    cache_port: 6379
+    cache_port: "{{ mnohub.redis.cache_port }}"
+    cache_engine_version: "{{ mnohub.redis.cache_engine_version }}"
+    cache_parameter_group: "{{ mnohub.redis.cache_parameter_group }}"
     node_type: "{{ mnohub.redis.node_type }}"
     num_nodes: "{{ mnohub.redis.num_nodes }}"
     cache_subnet_group: "{{ redis_group.name }}"

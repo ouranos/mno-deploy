@@ -10,6 +10,6 @@ mnohub_config:
   puma_worker_threads: 128
   sidekiq_worker_threads: 25
   java_opts:
-    xms: 1024m
-    xmx: 2048m
+    xms: "{{ (0.50 * ansible_memtotal_mb)|int }}m"
+    xmx: "{{ (0.50 * ansible_memtotal_mb)|int }}m"
     max_perm_size: 512m
