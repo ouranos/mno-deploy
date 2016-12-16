@@ -10,6 +10,7 @@ default_environment:
   NO_PROXY: "{% if proxy_ignore is defined %}{{ proxy_ignore }}{% else %}localhost,169.254.169.254{% endif %}"
 
 connec_config:
+  puma_worker_threads: 64
   puma:
     java_opts:
       xms: "{{ (0.70 * ansible_memtotal_mb)|int }}m"
