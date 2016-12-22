@@ -9,3 +9,4 @@ SIDEKIQ_USERNAME: {{ impac_config.sidekiq.username }}
 SIDEKIQ_PASSWORD: {{ impac_config.sidekiq.password }}
 ROOT_KEY: {{ impac_config.root.api_key }}
 ROOT_SECRET: {{ impac_config.root.api_secret }}
+SECRET_KEY_BASE: {{ impac_config.secret_key_base }}
