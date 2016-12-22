@@ -32,3 +32,4 @@ impac_config:
   root:
     api_key: changeme
     api_secret: changeme
+  secret_key_base: changeme
