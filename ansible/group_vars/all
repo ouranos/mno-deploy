@@ -1152,6 +1152,7 @@ impac_config:
   private_dns:
     scheme: http
     host: "{{ impac.dns_record.record }}"
+  force_ssl: false
   new_relic:
     enabled: true
   splunk:
@@ -1255,6 +1256,7 @@ connec_config:
     admin:
       client_id: "changeme-changeme-changeme"
       client_key: "changeme-changeme-changeme"
+  force_ssl: false
   new_relic:
     enabled: true
     app_name: Connec
