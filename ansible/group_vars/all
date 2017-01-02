@@ -1177,6 +1177,7 @@ mnohub_config:
   private_dns:
     scheme: http
     host: "{{ maestrano.dns_record.record }}"
+  force_ssl: false
   general:
     contact_email: contact@example.com
     support_email: support@example.com
