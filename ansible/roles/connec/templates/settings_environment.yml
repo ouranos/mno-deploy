@@ -10,6 +10,8 @@ idm:
   host: {{ mnohub_config.private_dns.host }}
   port: {{ 443 if mnohub_config.private_dns.scheme == 'https' else 80 }}
   cache: 60
+mnohub:
+  url: {{ mnohub_config.private_dns.scheme }}://{{ mnohub_config.private_dns.host }}
 reports:
   cache: 3600
 maestrano:
