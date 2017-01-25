@@ -38,7 +38,6 @@
     - ntp
     - curl
     - git
-    - python-pip
     - unzip
     - ruby
   when: ansible_os_family == "Debian"
@@ -55,6 +54,15 @@
     - mysql
     - ruby
   when: ansible_os_family == "RedHat"
+
+- name: General | Download pip
+  get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/tmp
+
+- name: General | Install pip
+  command: "python /tmp/get-pip.py"
+
+- name: General | Delete get-pip.py
+  file: state=absent path=/tmp/get-pip.py
 
 - name: General | Git HTTP Proxy
   command: "git config --global http.proxy http://{{ proxy_host }}:{{ proxy_port }}"
