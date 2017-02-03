@@ -1214,6 +1214,7 @@ mnohub_config:
     public_bucket: "{{ s3_buckets.public }}"
     private_bucket: "{{ s3_buckets.private }}"
     asset_host: "changeme"
+    region: "ap-southeast-1"
   eway:
     # eWay Test Crendentials
     login: '87654321'
