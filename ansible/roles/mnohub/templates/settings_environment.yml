@@ -46,7 +46,7 @@ connec:
 oauth:
   {{ connec_config.oauth | to_json }}
 carrierwave:
-  region: ap-southeast-1 # irrelevant - S3 is not region specific
+  region: {{ mnohub_config.carrierwave.region }}
   public_bucket: {{ mnohub_config.carrierwave.public_bucket }}
   private_bucket: {{ mnohub_config.carrierwave.private_bucket }}
   asset_host: {{ mnohub_config.carrierwave.asset_host }}
