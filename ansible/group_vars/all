@@ -1270,10 +1270,9 @@ connec_config:
     xero:
       key:
       secret:
-      endpoint: https://api-partner.network.xero.com/api.xro/2.0
+      endpoint: https://api.xero.com/api.xro/2.0
+      site: https://api.xero.com
       private_key: "vendor/xero-certs/{{ rails_environment }}/privatekey.pem"
-      ssl_client_cert: "vendor/xero-certs/{{ rails_environment }}/entrust-cert.pem"
-      ssl_client_key: "vendor/xero-certs/{{ rails_environment }}/entrust-private-nopass.pem"
       signature_method: RSA-SHA1
       user_agent: "{{ application_name }} {{ rails_environment }}"
     quickbooks:

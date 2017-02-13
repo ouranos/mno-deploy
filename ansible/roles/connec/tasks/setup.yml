@@ -6,6 +6,8 @@
     - mongodb-clients
   when: ansible_os_family == "Debian"
 
+# This is to copy Xero hosts trusted certificates on Debian
+# Xero Certificate Authority may not be accepted an all distributions
 - name: Connec | Copy SSL Certification Authorities for Xero
   copy:
     src: "{{ item }}"
@@ -22,6 +24,7 @@
 - name: Connec | Install SSL Certification Authorities
   shell: 'update-ca-certificates'
   when: ansible_os_family == "Debian"
+  tags: [xero]
 
 - name: Connec | Nginx default site deactivation
   file: path=/etc/nginx/sites-enabled/default.conf state=absent
