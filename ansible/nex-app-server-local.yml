@@ -1,6 +1,6 @@
 ---
 
-- name: Configure Nex! instances
+- name: Configure Nex instances
   hosts: localhost
   connection: local
   vars_files:
@@ -11,12 +11,10 @@
     - role: ntp
     - { role: swapfile, swapfile_swappiness: 10 }
     - { role: newrelic, when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
-    - { role: newrelic-java, newrelic_app_name: "Torquebox Nex {{ rails_environment }}", when: not((newrelic_license_key is undefined) or (newrelic_license_key is none)) }
-    - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.nex.log_path }}", sumologic_host_name: "nex-{{ rails_environment }}", when: not(sumologic.skip) }
-    - { role: splunk }
-    - { role: torquebox }
+    - { role: rvm_io.rvm1-ruby, tags: ruby, rvm1_rubies: ['ruby-2.3.1'] }
     - { role: jdauphant.nginx, keep_only_specified: true }
+    - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.nex.log_path }}", sumologic_host_name: "core-nex-{{ rails_environment }}", when: not(sumologic.skip) }
+    - { role: splunk }
     - { role: nex }
-    - { role: logrotate, logrotate_scripts: [{name: torquebox, path: "/var/log/torquebox/torquebox.log", options: "{{ logrotate.options_torquebox }}"}] }
     - { role: logrotate, logrotate_scripts: [{name: nex, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options_torquebox }}"}] }
     - { role: logrotate, logrotate_scripts: [{name: newrelic, path: "{{ deploy_directory }}/shared/log/newrelic_agent.log", options: "{{ logrotate.options_torquebox }}"}] }

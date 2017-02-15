@@ -109,8 +109,16 @@
     state: link
     force: yes
 
+- name: Nex! | Configure settings file
+  copy:
+    content: "{{ lookup('file', 'files/nex/' + environment_name + '/' + rails_environment + '/' + settings.yml) }}"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/settings/{{ rails_environment }}.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
 - name: Nex! | Run bundle install
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} /opt/torquebox/jruby/bin/jruby -S bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
   sudo_user: deployer
 
 - name: Nex! | Replace previous version
@@ -140,8 +148,8 @@
   file:
     path: "{{ deploy_directory }}/shared/log"
     mode: 0755
-    owner: torquebox
-    group: torquebox
+    owner: deployer
+    group: deployer
     state: directory
     recurse: yes
 
@@ -151,18 +159,5 @@
   become: yes
   become_user: deployer
 
-- name: Nex! | Create nex-knob.yml file
-  template:
-    src: nex-knob.yml
-    dest: /opt/torquebox/jboss/standalone/deployments/nex-knob.yml
-    owner: torquebox
-    group: torquebox
-    mode: 0755
-
-- name: Nex! | (Re)Deploy JBoss Application
-  file:
-    path: /opt/torquebox/jboss/standalone/deployments/nex-knob.yml.dodeploy
-    state: touch
-    owner: torquebox
-    group: torquebox
-    mode: 0755
+- name: Nex! | Restart puma service
+  service: name=puma state=restarted
