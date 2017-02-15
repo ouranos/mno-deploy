@@ -154,10 +154,13 @@
     recurse: yes
 
 - name: Nex! | Migrate the database
-  shell: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
+  shell: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate"
   environment: "{{ default_environment }}"
   become: yes
   become_user: deployer
 
 - name: Nex! | Restart puma service
   service: name=puma state=restarted
+
+- name: Nex! | Restart sidekiq service
+  service: name=sidekiq state=restarted

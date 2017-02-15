@@ -10,6 +10,13 @@
 # Rails Secret
 SECRET_KEY_BASE: "{{ nex_config.rails_secret_key }}"
 
+# Redis endpoint
+REDIS_URL: redis://{{ nex.redis.endpoint }}:6379/0
+
+# Sidekiq dashboard
+SIDEKIQ_USERNAME: {{ nex_config.sidekiq.admin.username }}
+SIDEKIQ_PASSWORD: {{ nex_config.sidekiq.admin.password }}
+
 # Github OAuth Configuration
 GITHUB_OAUTH_KEY: "{{ nex_config.github.oauth_key }}"
 GITHUB_OAUTH_SECRET: "{{ nex_config.github.oauth_secret }}"

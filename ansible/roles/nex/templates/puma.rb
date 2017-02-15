@@ -2,7 +2,7 @@
 workers {{ ansible_processor_cores }}
 
 # Min and Max threads per worker
-threads 6, 512
+threads 6, {{ nex_config.puma_worker_threads }}
 
 app_dir = File.expand_path("../..", __FILE__)
 shared_dir = "{{ deploy_directory }}/shared"
