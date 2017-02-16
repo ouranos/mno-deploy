@@ -91,8 +91,6 @@ ssh_users:
 To support Xero API Partner access, certificate files must be added to `ansible/files/xero_certs/RAILS_ENVIRONMENT/`
 The list of file to include are:
 - privatekey.pem
-- entrust-cert.pem
-- entrust-private-nopass.pem
 
 ### Redis configuration
 #### Custom parameter group

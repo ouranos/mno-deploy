@@ -106,6 +106,7 @@
     - privatekey.pem
     - entrust-cert.pem
     - entrust-private-nopass.pem
+  ignore_errors: True
   tags: [xero]
 
 - name: Connec | Symbolic link to log directory
