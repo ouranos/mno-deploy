@@ -6,7 +6,7 @@
 - name: Nex! | Download application from S3 (nex-XXX.tar.gz)
   s3:
     bucket: "{{ mno_pkgs_bucket }}"
-    object: "nex/{{ nex_version }}/{{ nex_version }}.tar.gz"
+    object: "nex/{{ nex_folder }}/{{ nex_version }}.tar.gz"
     dest: "{{ deploy_directory }}/{{ nex_version }}.tar.gz"
     mode: get
     region: "{{ mno_pkgs_s3_aws_region }}"
