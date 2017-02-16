@@ -8,7 +8,7 @@ connec_version: latest
 connec_folder: releases
 impac_version: latest
 impac_folder: releases
-nex_app_orchestrator_version: latest
+nex_version: latest
 frontend_project: maestrano-enterprise
 frontend_version: latest
 dev_platform_version: latest

@@ -1,7 +1,7 @@
 ---
 
 deploy_directory: /apps/nex
-nex_app_orchestrator_version: latest
+nex_version: latest
 default_environment:
   RAILS_ENV: "{{ rails_environment }}"
   PATH: /usr/local/rvm/gems/ruby-2.3.1/bin:/usr/local/rvm/gems/ruby-2.3.1@global/bin:/usr/local/rvm/rubies/ruby-2.3.1/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/rvm/bin

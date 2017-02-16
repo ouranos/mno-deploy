@@ -6,8 +6,8 @@
 - name: Nex! | Download application from S3 (nex-XXX.tar.gz)
   s3:
     bucket: "{{ mno_pkgs_bucket }}"
-    object: "nex/{{ nex_app_orchestrator_version }}/{{ nex_app_orchestrator_version }}.tar.gz"
-    dest: "{{ deploy_directory }}/{{ nex_app_orchestrator_version }}.tar.gz"
+    object: "nex/{{ nex_version }}/{{ nex_version }}.tar.gz"
+    dest: "{{ deploy_directory }}/{{ nex_version }}.tar.gz"
     mode: get
     region: "{{ mno_pkgs_s3_aws_region }}"
     aws_access_key: "{{ mno_pkgs_s3_aws_access_key }}"
@@ -22,11 +22,11 @@
   file: path={{ deploy_directory }}/releases/{{ release_folder }} owner=deployer group=deployer state=directory
 
 - name: Nex! | Extract current version
-  command: "tar -xzf {{ deploy_directory }}/{{ nex_app_orchestrator_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
+  command: "tar -xzf {{ deploy_directory }}/{{ nex_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
 
 - name: Nex! | Clean up tar file
   file:
-    path: "{{ deploy_directory }}/{{ nex_app_orchestrator_version }}.tar.gz"
+    path: "{{ deploy_directory }}/{{ nex_version }}.tar.gz"
     state: absent
 
 - name: Nex! | Clean up gems

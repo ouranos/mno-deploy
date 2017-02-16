@@ -68,21 +68,6 @@
   register: created_security_groups
   tags: [infra_rds,infra_mnoe,infra_maestrano,infra_mnohub,infra_nex,infra_connec,infra_impac,infra_rundeck,infra_dev_platform]
 
-# Create the Security Groups
-- name: Create Nex! Security Groups
-  ec2_group:
-    name: "{{ item.name }}"
-    description: "{{ item.description }}"
-    rules: "{{ item.rules }}"
-    rules_egress: "{{ item.rules_egress }}"
-    region: "{{ aws_region }}"
-    ec2_access_key: "{{ aws_access_key }}"
-    ec2_secret_key: "{{ aws_secret_key }}"
-    vpc_id: "{{ created_vpc.vpc_id }}"
-  with_items: "{{ nex_security_groups }}"
-  register: created_nex_security_groups
-  when: not nex.skip
-
 - name: Tag the security groups
   ec2_tag:
     resource: "{{ item.group_id }}"
