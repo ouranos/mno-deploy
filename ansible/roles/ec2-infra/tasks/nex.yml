@@ -4,6 +4,33 @@
 
 - set_fact: maestrano_component="nex-app-server-local"
 
+- name: Nex! | Create Redis Store
+  elasticache:
+    name: "{{ nex.redis.name }}"
+    state: present
+    engine: redis
+    cache_port: "{{ nex.redis.cache_port }}"
+    cache_engine_version: "{{ nex.redis.cache_engine_version }}"
+    cache_parameter_group: "{{ nex.redis.cache_parameter_group }}"
+    node_type: "{{ nex.redis.node_type }}"
+    num_nodes: "{{ nex.redis.num_nodes }}"
+    cache_subnet_group: "{{ redis_group.name }}"
+    security_group_ids: "{{ redis_group.vpc_security_groups }}"
+    region: "{{ aws_region }}"
+    wait: yes
+  register: created_nex_redis
+
+- name: Nex! | Add Redis Store DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    record: "{{ nex.redis.endpoint }}"
+    type: CNAME
+    value: "{{ created_nex_redis.elasticache.data.CacheNodes[0].Endpoint.Address }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"
+
 - name: Nex! | Create Nex ELB
   ec2_elb_lb:
     name: "{{ nex.elastic_load_balancer.name }}"
@@ -18,22 +45,6 @@
     security_group_ids: "{{ nex.elastic_load_balancer.security_group_ids }}"
     listeners: "{{ nex.elastic_load_balancer.listeners }}"
   register: nex_elastic_load_balancer
-
-- name: Nex! | Create Apps Routing ELB
-  ec2_elb_lb:
-    name: "{{ nex.apps_elastic_load_balancer.name }}"
-    state: present
-    scheme: "{{ nex.apps_elastic_load_balancer.scheme | default('internet-facing')}}"
-    connection_draining_timeout: "{{ nex.apps_elastic_load_balancer.connection_draining_timeout }}"
-    cross_az_load_balancing: "yes"
-    region: "{{ aws_region }}"
-    ec2_access_key: "{{ aws_access_key }}"
-    ec2_secret_key: "{{ aws_secret_key }}"
-    subnets: "{{ nex.apps_elastic_load_balancer.subnets }}"
-    security_group_ids: "{{ nex.apps_elastic_load_balancer.security_group_ids }}"
-    listeners: "{{ nex.apps_elastic_load_balancer.listeners }}"
-    health_check: "{{ nex.elastic_load_balancer.health_check }}"
-  register: nex_apps_elastic_load_balancer
 
 - name: Add DNS record for ELB
   route53:

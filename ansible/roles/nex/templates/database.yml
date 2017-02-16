@@ -1,5 +1,5 @@
 {{ rails_environment }}:
-  adapter: jdbcmysql
+  adapter: mysql2
   encoding: utf8
   host: {{ rds.endpoint }}
   database: {{ nex_database_name }}
