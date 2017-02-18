@@ -1,0 +1,16 @@
+---
+
+- name: Nex! | Copy puma.rb config
+  template: src=puma.rb dest={{deploy_directory}}/shared/config/puma.rb owner=deployer group=deployer mode=0755
+
+- name: Nex! | Add /etc/systemd/system/puma.service
+  template: src=puma.service dest=/etc/systemd/system/puma.service force=yes mode=0755
+
+- name: Nex! | Add puma to systemd
+  service: name=puma state=restarted enabled=yes
+
+- name: Nex! | Add /etc/systemd/system/sidekiq.service
+  template: src=sidekiq.service dest=/etc/systemd/system/sidekiq.service force=yes mode=0755
+
+- name: Nex! | Add sidekiq to systemd
+  service: name=sidekiq state=restarted enabled=yes
