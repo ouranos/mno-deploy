@@ -589,10 +589,10 @@ mnohub:
 nex:
   skip: true
   redis:
-    name: nex-redis
+    name: "{{ environment_name }}-nex-redis"
     node_type: cache.t2.micro
     num_nodes: 1
-    endpoint: "{{ environment_name }}-connec-nex.{{ dns.base }}"
+    endpoint: "{{ environment_name }}-nex-redis.{{ dns.base }}"
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
