@@ -89,7 +89,7 @@
 
 - name: Nex! | Configure settings file
   copy:
-    content: "{{ lookup('file', 'files/nex/' + environment_name + '/' + rails_environment + '/' + settings.yml) }}"
+    content: "{{ lookup('file', 'files/nex/' + environment_name + '/' + rails_environment + '/settings.yml') }}"
     dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/settings/{{ rails_environment }}.yml"
     owner: deployer
     group: deployer
