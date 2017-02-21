@@ -1163,6 +1163,7 @@ impac_config:
   sidekiq:
     username: admin
     password: changeme
+  kpis_email_alerts_period: 60
 
 # Maestrano configuration
 mnohub_config:
