@@ -11,8 +11,8 @@ connec_version: changeme
 connec_folder: develop
 impac_version: changeme
 impac_folder: develop
-nex_app_orchestrator_version: changeme
-nex_app_orchestrator_folder: develop
+nex_version: changeme
+nex_folder: master
 frontend_project: changeme
 frontend_version: changeme
 frontend_folder: develop
@@ -144,7 +144,12 @@ splunk:
   nex:
     inputs:
       - {index: "main", monitor: "/var/log/ansible.log"}
-      - {index: "main", monitor: "/var/log/torquebox/torquebox.log"}
+      - {index: "main", monitor: "/var/log/nginx/access.log"}
+      - {index: "main", monitor: "/var/log/nginx/error.log"}
+      - {index: "main", monitor: "/var/log/auth.log"}
+      - {index: "main", monitor: "/var/log/syslog"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stderr.log"}
+      - {index: "main", monitor: "{{ deploy_directory }}/current/log/puma.stdout.log"}
       - {index: "main", monitor: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log"}
   dev_platform:
     inputs:
@@ -210,7 +215,6 @@ sumologic:
       - {name: "PUMA_ERR LOG", path: "{{ deploy_directory }}/current/log/puma.stderr.log", use_multiline: false, category: "APP"}
       - {name: "PUMA_OUT LOG", path: "{{ deploy_directory }}/current/log/puma.stdout.log", use_multiline: false, category: "APP"}
       - {name: "PUMA LOG", path: "{{ deploy_directory }}/current/log/{{ rails_environment }}.log", use_multiline: false, category: "APP"}
-      - {name: "SIDEKIQ LOG", path: "{{ deploy_directory }}/shared/log/sidekiq.log", use_multiline: false, category: "JOBS"}
   dev_platform:
     log_path:
       - {name: "ANSIBLE LOG", path: "/var/log/ansible.log", use_multiline: false, category: "ANSIBLE"}
@@ -449,47 +453,6 @@ security_groups:
         cidr_ip: "{{ vpc.cidr_block }}"
     rules_egress: []
 
-nex_security_groups:
-  #0
-  - name: "{{ vpc_base_name }}-nex-routing"
-    description: Nex! Compute Servers
-    rules:
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        cidr_ip: "0.0.0.0/0"
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: "{{ vpc.cidr_block }}"
-    rules_egress: []
-  #1
-  - name: "{{ vpc_base_name }}-nex-compute"
-    description: Nex! Compute Servers
-    rules:
-      - proto: tcp
-        from_port: 80
-        to_port: 80
-        group_name: "{{ vpc_base_name }}-nex-routing"
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: "{{ vpc.cidr_block }}"
-    rules_egress: []
-  #2
-  - name: "{{ vpc_base_name }}-nex-storage"
-    description: Nex! Compute Servers
-    rules:
-      - proto: tcp
-        from_port: 873
-        to_port: 873
-        group_name: "{{ vpc_base_name }}-nex-compute"
-      - proto: tcp
-        from_port: 22
-        to_port: 22
-        cidr_ip: "{{ vpc.cidr_block }}"
-    rules_egress: []
-
 # VPC NAT
 vpc_nat:
   skip: false
@@ -624,7 +587,15 @@ mnohub:
 
 # Nex! configuration
 nex:
-  skip: false
+  skip: true
+  redis:
+    name: "{{ environment_name }}-nex-redis"
+    node_type: cache.t2.micro
+    num_nodes: 1
+    endpoint: "{{ environment_name }}-nex-redis.{{ dns.base }}"
+    cache_port: 6379
+    cache_engine_version: 3.2.4
+    cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
     name: "{{ vpc_short_name }}-nex-elb"
     connection_draining_timeout: 60
@@ -647,20 +618,6 @@ nex:
       interval: 30 # seconds
       unhealthy_threshold: 2
       healthy_threshold: 4
-  apps_elastic_load_balancer:
-    name: "{{ vpc_short_name }}-nex-apps-elb"
-    connection_draining_timeout: 60
-    zones: "{{ aws_availability_zones }}"
-    alias_hosted_zone_id: "{{ route53.zone.id }}"
-    subnets:
-      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[4].resource_tags.Name) | map(attribute='id')| join('') }}" # ELB subnet
-      - "{{ created_vpc.subnets | selectattr('resource_tags.Name', 'equalto', vpc.subnets[5].resource_tags.Name) | map(attribute='id')| join('') }}" # ELB subnet
-    security_group_ids:
-      - "{{ created_security_groups.results[2].group_id }}" # ELB tier security group
-    listeners:
-      - protocol: http
-        load_balancer_port: 80
-        instance_port: 80
   dns_record:
     name: "{{ vpc_short_name }}-nex-dns"
     record: "api-nex.{{ dns.base }}"
@@ -687,7 +644,7 @@ nex:
     max_size: 4
     desired_capacity: 0
     tags:
-      - Name: "{{ vpc_short_name }}-nex-app-orchestrator"
+      - Name: "{{ vpc_short_name }}-nex"
         Environment: "{{ environment_name }}"
         Rails_Environment: "{{ rails_environment }}"
         Description: "Nex! server"

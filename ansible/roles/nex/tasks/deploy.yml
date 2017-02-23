@@ -6,8 +6,8 @@
 - name: Nex! | Download application from S3 (nex-XXX.tar.gz)
   s3:
     bucket: "{{ mno_pkgs_bucket }}"
-    object: "nex/{{ nex_app_orchestrator_version }}/{{ nex_app_orchestrator_version }}.tar.gz"
-    dest: "{{ deploy_directory }}/{{ nex_app_orchestrator_version }}.tar.gz"
+    object: "nex/{{ nex_folder }}/{{ nex_version }}.tar.gz"
+    dest: "{{ deploy_directory }}/{{ nex_version }}.tar.gz"
     mode: get
     region: "{{ mno_pkgs_s3_aws_region }}"
     aws_access_key: "{{ mno_pkgs_s3_aws_access_key }}"
@@ -22,11 +22,11 @@
   file: path={{ deploy_directory }}/releases/{{ release_folder }} owner=deployer group=deployer state=directory
 
 - name: Nex! | Extract current version
-  command: "tar -xzf {{ deploy_directory }}/{{ nex_app_orchestrator_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
+  command: "tar -xzf {{ deploy_directory }}/{{ nex_version }}.tar.gz -C {{ deploy_directory }}/releases/{{ release_folder }}"
 
 - name: Nex! | Clean up tar file
   file:
-    path: "{{ deploy_directory }}/{{ nex_app_orchestrator_version }}.tar.gz"
+    path: "{{ deploy_directory }}/{{ nex_version }}.tar.gz"
     state: absent
 
 - name: Nex! | Clean up gems
@@ -69,28 +69,6 @@
     state: link
     force: yes
 
-- name: Nex! | Configuration file config/conf.yml
-  template:
-    src: conf.yml
-    dest: "{{ deploy_directory }}/shared/config/conf.yml"
-    owner: deployer
-    group: deployer
-    mode: 0755
-
-- name: Nex! | Replace config/conf.yml
-  file:
-    path: "{{ deploy_directory }}/releases/{{ release_folder }}/config/conf.yml"
-    state: absent
-
-- name: Nex! | Symbolic link to config/conf.yml
-  file:
-    src: "{{ deploy_directory }}/shared/config/conf.yml"
-    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/conf.yml"
-    owner: deployer
-    group: deployer
-    state: link
-    force: yes
-
 - name: Nex! | Set directory permissions
   file:
     path: "{{ deploy_directory }}/releases/{{ release_folder }}"
@@ -109,8 +87,16 @@
     state: link
     force: yes
 
+- name: Nex! | Configure settings file
+  copy:
+    content: "{{ lookup('file', 'files/nex/' + environment_name + '/' + rails_environment + '/settings.yml') }}"
+    dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/settings/{{ rails_environment }}.yml"
+    owner: deployer
+    group: deployer
+    mode: 0755
+
 - name: Nex! | Run bundle install
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} /opt/torquebox/jruby/bin/jruby -S bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
   sudo_user: deployer
 
 - name: Nex! | Replace previous version
@@ -140,29 +126,19 @@
   file:
     path: "{{ deploy_directory }}/shared/log"
     mode: 0755
-    owner: torquebox
-    group: torquebox
+    owner: deployer
+    group: deployer
     state: directory
     recurse: yes
 
 - name: Nex! | Migrate the database
-  shell: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
+  shell: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate"
   environment: "{{ default_environment }}"
   become: yes
   become_user: deployer
 
-- name: Nex! | Create nex-knob.yml file
-  template:
-    src: nex-knob.yml
-    dest: /opt/torquebox/jboss/standalone/deployments/nex-knob.yml
-    owner: torquebox
-    group: torquebox
-    mode: 0755
+- name: Nex! | Restart puma service
+  service: name=puma state=restarted
 
-- name: Nex! | (Re)Deploy JBoss Application
-  file:
-    path: /opt/torquebox/jboss/standalone/deployments/nex-knob.yml.dodeploy
-    state: touch
-    owner: torquebox
-    group: torquebox
-    mode: 0755
+- name: Nex! | Restart sidekiq service
+  service: name=sidekiq state=restarted

@@ -1,0 +1,22 @@
+[Unit]
+Description=Sidekiq workers server
+After=network.target
+
+[Service]
+Type=simple
+User=deployer
+WorkingDirectory={{ deploy_directory }}/current
+Environment=RAILS_ENV={{ rails_environment }}
+{% if proxy_host is defined and proxy_port is defined %}
+Environment=http_proxy=http://{{ proxy_host }}:{{ proxy_port }}
+Environment=https_proxy=http://{{ proxy_host }}:{{ proxy_port }}
+Environment=no_proxy={{ proxy_ignore }}
+{% endif %}
+PIDFile={{ deploy_directory }}/shared/pids/sidekiq.pid
+TimeoutSec=15
+Restart=always
+
+ExecStart=/usr/local/bin/bundle exec sidekiq -c {{ nex_config.sidekiq.worker_threads }} -L {{ deploy_directory }}/shared/log/sidekiq.log
+
+[Install]
+WantedBy=multi-user.target
