@@ -11,3 +11,4 @@ ROOT_KEY: {{ impac_config.root.api_key }}
 ROOT_SECRET: {{ impac_config.root.api_secret }}
 SECRET_KEY_BASE: {{ impac_config.secret_key_base }}
 FORCE_SSL: {{ impac_config.force_ssl }}
+KPIS_EMAIL_ALERTS_PERIOD: {{ impac_config.kpis_email_alerts_period }}
