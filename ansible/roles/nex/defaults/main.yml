@@ -1,7 +1,13 @@
 ---
 
 deploy_directory: /apps/nex
-nex_app_orchestrator_version: 7614014
+nex_version: latest
 default_environment:
   RAILS_ENV: "{{ rails_environment }}"
-  PATH: /opt/torquebox/jruby/bin:/sbin:/bin:/usr/sbin:/usr/bin
+  PATH: /usr/local/rvm/gems/ruby-2.3.1/bin:/usr/local/rvm/gems/ruby-2.3.1@global/bin:/usr/local/rvm/rubies/ruby-2.3.1/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/rvm/bin
+  GEM_PATH: /usr/local/rvm/gems/ruby-2.3.1:/usr/local/rvm/gems/ruby-2.3.1@global
+
+nex_config:
+  puma_worker_threads: 64
+  sidekiq:
+    worker_threads: 10
