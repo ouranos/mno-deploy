@@ -157,13 +157,13 @@
   command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} /opt/jruby/current/bin/jruby -S bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
   sudo_user: deployer
 
-- name: Connec | Update MongoDB indexes
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:mongoid:create_indexes"
+- name: Connec | Run data migrations
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake mongoid:migrate"
   environment: "{{ default_environment }}"
   sudo_user: deployer
 
-- name: Connec | Run data migrations
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake mongoid:migrate"
+- name: Connec | Update MongoDB indexes
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:mongoid:remove_undefined_indexes db:mongoid:create_indexes"
   environment: "{{ default_environment }}"
   sudo_user: deployer
 
