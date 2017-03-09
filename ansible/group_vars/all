@@ -1121,6 +1121,9 @@ impac_config:
     username: admin
     password: changeme
   kpis_email_alerts_period: 60
+  root:
+    api_key: changeme
+    api_secret: changeme
 
 # Maestrano configuration
 mnohub_config:
@@ -1260,6 +1263,9 @@ connec_config:
     timeout: "{{ mnohub_config.database.timeout }}"
     username: "{{ mnohub_config.database.username }}"
     password: "{{ mnohub_config.database.password }}"
+  root:
+    api_key: changeme
+    api_secret: changeme
 
 # Developer Platform configuration
 dev_platform_config:

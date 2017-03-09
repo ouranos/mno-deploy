@@ -28,3 +28,5 @@ open_exchange_rates:
   protocol: https
   host: openexchangerates.org
   root_path: api
+mnohub:
+  url: {{ mnohub_config.private_dns.scheme }}://{{ mnohub_config.private_dns.host }}
