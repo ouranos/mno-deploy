@@ -16,6 +16,12 @@
                 "description": "The admin user of the server. Default: ubuntu"
             }
         },
+        "sshPublicKey": {
+          "type": "string",
+          "metadata": {
+            "description": "This field must be a valid SSH public key."
+          }
+        },
         "MnoPkgAwsAccessKeyId": {
             "type": "string",
             "metadata": {
