@@ -32,8 +32,9 @@
     "adminUsername": {
       "type": "string",
       "minLength": 1,
+      "defaultValue": "ubuntu",
       "metadata": {
-        "description": "Admin user name for VM and SQL Database."
+        "description": "Admin user for virtual machines"
       }
     },
     "numberOfInstances": {
@@ -90,21 +91,21 @@
     "vmSize": "Standard_F1s",
     "vhdStorageType": "Standard_LRS",
     "vhdStorageName": "[concat('vhdstorage', uniqueString(resourceGroup().id))]",
-    "availabilitySetName": "[concat(variables('vmName'), '-avset')]",
-    "subnetName": "[concat(variables('vmName'), '-subnet')]",
+    "availabilitySetName": "[concat(parameters('vmName'), '-avset')]",
+    "subnetName": "[concat(parameters('vmName'), '-subnet')]",
     "subnetRef": "[concat(variables('vnetId'), '/subnets/', variables('subnetName'))]",
-    "networkInterfaceNamePrefix": "[concat(variables('vmName'), '-nic')]",
-    "publicIpAddressName": "[concat(variables('vmName'), '-ip')]",
-    "loadBalancerName": "[concat(variables('vmName'), '-elb')]",
+    "networkInterfaceNamePrefix": "[concat(parameters('vmName'), '-nic')]",
+    "publicIpAddressName": "[concat(parameters('vmName'), '-ip')]",
+    "loadBalancerName": "[concat(parameters('vmName'), '-elb')]",
     "loadBalencerRule": "HTTP",
-    "lbBackEndPool": "[concat(variables('vmName'), '-lbpool')]",
+    "lbBackEndPool": "[concat(parameters('vmName'), '-lbpool')]",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
     "lbProbeID": "[concat(variables('lbID'),'/probes/lbprobe')]",
     "ipConfigID": "[concat(variables('lbID'),'/frontendIPConfigurations/LoadBalancerFrontEnd')]",
-    "virtualNetworkName": "[concat(variables('vmName'), '-network')]",
+    "virtualNetworkName": "[concat(parameters('vmName'), '-network')]",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "networkSecurityGroup": "[concat(variables('vmName'), '-sg')]",
+    "networkSecurityGroup": "[concat(parameters('vmName'), '-sg')]",
     "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]"
   },
 
@@ -191,14 +192,14 @@
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[variables('networkMask')]"
+            "[parameters('networkMask')]"
           ]
         },
         "subnets": [
           {
             "name": "[variables('subnetName')]",
             "properties": {
-              "addressPrefix": "[variables('networkMask')]",
+              "addressPrefix": "[parameters('networkMask')]",
               "networkSecurityGroup": {
                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroup'))]"
               }
