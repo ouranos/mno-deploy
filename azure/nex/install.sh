@@ -62,3 +62,6 @@ aws s3 cp s3://${MNO_DEPLOY_BUCKET}/$KEY ./mno-deploy-configuration.tar.gz
 # Extract the package and run install script
 tar -xzf mno-deploy-configuration.tar.gz
 sh scripts/setup_instance.sh nex-app-server-local $5
+
+# Avoid failure on install - continue provisioning flow
+exit 0
