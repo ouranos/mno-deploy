@@ -30,9 +30,23 @@ newrelic_app_name: "core-nex-{{ rails_environment }}"
 mandrill_username: "{{ nex_config.mandrill.login }}"
 mandrill_key: "{{ nex_config.mandrill.token }}"
 
+{% if nex_config.aws is defined %}
 # AWS Credentials - Infrastructure Management
 aws_access_key_id: "{{ nex_config.aws.access_key }}"
 aws_secret_access_key: "{{ nex_config.aws.secret_access_key }}"
+{% endif %}
+
+{% if nex_config.azure is defined %}
+# Azure Credentials - Infrastructure Management
+AZURE_RESOURCE_GROUP: "{{ nex_config.azure.resource_group }}"
+AZURE_TENANT_ID: "{{ nex_config.azure.tenant_id }}"
+AZURE_SUBSCRIPTION_ID: "{{ nex_config.azure.subscription_id }}"
+AZURE_CLIENT_ID: "{{ nex_config.azure.client_id }}"
+AZURE_CLIENT_SECRET: "{{ nex_config.azure.client_secret }}"
+
+# Azure SSH public key to use for initial admin user
+AZURE_SSH_PUBLIC_KEY: "{{ nex_config.azure.ssh_public_key }}"
+{% endif %}
 
 # Mandrill - Used to configure SMTP Relay on ComputeRacks
 # (emails sent by the applications)
