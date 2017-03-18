@@ -410,7 +410,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
-                "https://raw.githubusercontent.com/alachaum/mno-deploy/azure/nex/install.sh"
+                "https://raw.githubusercontent.com/alachaum/mno-deploy/nex-azure-setup/azure/nex/install.sh"
               ],
               "commandToExecute": "[concat('sh install.sh ', parameters('MnoPkgAwsAccessKeyId'), ' ', parameters('MnoPkgAwsSecretAccessKey'), ' ', parameters('ConfigurationBucket'), ' ', parameters('ConfigurationBranch'), ' ', parameters('ConfigurationEnvironment'))]"
             }
