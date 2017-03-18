@@ -421,7 +421,7 @@
               "fileUris": [
                 "https://raw.githubusercontent.com/alachaum/mno-deploy/nex-azure-setup/azure/nex/install.sh"
               ],
-              "commandToExecute": "[concat('sh install.sh ', parameters('MnoPkgAwsAccessKeyId'), ' ', parameters('MnoPkgAwsSecretAccessKey'), ' ', parameters('ConfigurationBucket'), ' ', parameters('ConfigurationBranch'), ' ', parameters('ConfigurationEnvironment'))]"
+              "commandToExecute": "[concat('bash install.sh ', parameters('MnoPkgAwsAccessKeyId'), ' ', parameters('MnoPkgAwsSecretAccessKey'), ' ', parameters('ConfigurationBucket'), ' ', parameters('ConfigurationBranch'), ' ', parameters('ConfigurationEnvironment'))]"
             }
           }
         }
