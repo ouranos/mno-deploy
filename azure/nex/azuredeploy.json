@@ -211,7 +211,7 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat(variables('networkInterfaceNamePrefix'), copyindex())]",
+      "name": "[concat(variables('networkInterfaceNamePrefix'), '-', copyindex())]",
       "location": "[parameters('location')]",
       "tags": {
         "displayName": "network-interface"
@@ -340,7 +340,7 @@
     {
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat(parameters('vmName'),copyindex())]",
+      "name": "[concat(parameters('vmName'),'-vm-',copyindex())]",
       "copy": {
         "name": "virtualMachineLoop",
         "count": "[parameters('numberOfInstances')]"
@@ -362,7 +362,7 @@
           "vmSize": "[variables('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[concat(parameters('vmName'),copyindex())]",
+          "computerName": "[concat(parameters('vmName'),'-vm-',copyindex())]",
           "adminUsername": "[parameters('adminUsername')]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": "true",
@@ -395,7 +395,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefix'), copyindex()))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('networkInterfaceNamePrefix'), '-', copyindex()))]"
             }
           ]
         }
@@ -407,7 +407,7 @@
           "location": "[parameters('location')]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmName'),copyindex()))]"
+            "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmName'),'-vm-',copyindex()))]"
           ],
           "tags": {
             "displayName": "config-app"
