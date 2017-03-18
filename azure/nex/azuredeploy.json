@@ -15,6 +15,14 @@
         "description": "Network mask (e.g. 10.0.0.0/24)"
       }
     },
+    "location": {
+      "type": "string",
+      "minLength": 1,
+      "defaultValue": "australiasoutheast",
+      "metadata": {
+        "description": "The location where this component should be deployed. E.g. australiaeast"
+      }
+    },
     "sshKeyData": {
       "type": "string",
       "metadata": {
@@ -44,35 +52,35 @@
       }
     },
     "MnoPkgAwsAccessKeyId": {
-        "type": "string",
-        "metadata": {
-            "description": "The AWS Access Key ID to use to access Maestrano packages"
-        }
+      "type": "string",
+      "metadata": {
+        "description": "The AWS Access Key ID to use to access Maestrano packages"
+      }
     },
     "MnoPkgAwsSecretAccessKey": {
-        "type": "securestring",
-        "metadata": {
-            "description": "The AWS Secret Key ID to use to access Maestrano packages"
-        }
+      "type": "securestring",
+      "metadata": {
+        "description": "The AWS Secret Key ID to use to access Maestrano packages"
+      }
     },
     "ConfigurationBucket": {
-        "type": "string",
-        "metadata": {
-            "description": "The AWS bucket containing the configuration package"
-        }
+      "type": "string",
+      "metadata": {
+        "description": "The AWS bucket containing the configuration package"
+      }
     },
     "ConfigurationBranch": {
-        "type": "string",
-        "defaultValue": "master",
-        "metadata": {
-            "description": "The configuration branch to use. E.g. develop, feature/myfeature"
-        }
+      "type": "string",
+      "defaultValue": "master",
+      "metadata": {
+        "description": "The configuration branch to use. E.g. develop, feature/myfeature"
+      }
     },
     "ConfigurationEnvironment": {
-        "type": "string",
-        "metadata": {
-            "description": "The name of the ansible configuration to use. E.g. maestrano_uat"
-        }
+      "type": "string",
+      "metadata": {
+        "description": "The name of the ansible configuration to use. E.g. maestrano_uat"
+      }
     }
   },
   "variables": {
@@ -105,7 +113,7 @@
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/networkSecurityGroups",
       "name": "[variables('networkSecurityGroup')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "network-security-group"
       },
@@ -146,7 +154,7 @@
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('vhdStorageName')]",
       "apiVersion": "2015-06-15",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "storage-account"
       },
@@ -158,7 +166,7 @@
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIpAddressName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "public-ip"
       },
@@ -173,7 +181,7 @@
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroup'))]"
       ],
@@ -203,7 +211,7 @@
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(variables('networkInterfaceNamePrefix'), copyindex())]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "network-interface"
       },
@@ -245,7 +253,7 @@
       "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/loadBalancers",
       "name": "[variables('loadBalancerName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "load-balancer"
       },
@@ -310,7 +318,7 @@
       "tags": {
         "displayName": "load-balancer-nat-rule"
       },
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "lbNatLoop",
         "count": "[parameters('numberOfInstances')]"
@@ -336,7 +344,7 @@
         "name": "virtualMachineLoop",
         "count": "[parameters('numberOfInstances')]"
       },
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "tags": {
         "displayName": "virtual-machine"
       },
@@ -395,7 +403,7 @@
         {
           "name": "config-app",
           "type": "extensions",
-          "location": "[resourceGroup().location]",
+          "location": "[parameters('location')]",
           "apiVersion": "2015-06-15",
           "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/', concat(parameters('vmName'),copyindex()))]"
@@ -421,7 +429,7 @@
     {
       "name": "[variables('availabilitySetName')]",
       "type": "Microsoft.Compute/availabilitySets",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "apiVersion": "2015-06-15",
       "dependsOn": [ ],
       "tags": {
