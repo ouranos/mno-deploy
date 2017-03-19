@@ -15,9 +15,6 @@
   include: deploy.yml
   tags: [deploy]
 
-- name: Nex! | Deploy application version
-  include: deploy.yml
-
 - name: Nex! | Gathering EC2 facts
   action: ec2_facts
   tags: [deploy]
