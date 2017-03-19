@@ -23,7 +23,7 @@
 if [ ! -f "/opt/maestrano/redeploy.sh" ]; then
   mkdir -p /opt/maestrano
   script=$(readlink -f $0) # path to self
-  echo "bash $script $1 $2 $3 $4" > /opt/maestrano/redeploy.sh
+  echo "bash $script $1 $2 $3 $4 $5" > /opt/maestrano/redeploy.sh
   chmod 775 /opt/maestrano/redeploy.sh
 fi
 
