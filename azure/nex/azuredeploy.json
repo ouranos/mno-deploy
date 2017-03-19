@@ -97,7 +97,7 @@
     "networkInterfaceNamePrefix": "[concat(parameters('vmName'), '-nic')]",
     "publicIpAddressName": "[concat(parameters('vmName'), '-ip')]",
     "loadBalancerName": "[concat(parameters('vmName'), '-elb')]",
-    "loadBalencerRule": "HTTP",
+    "loadBalancerRule": "HTTPS",
     "lbBackEndPool": "[concat(parameters('vmName'), '-lbpool')]",
     "lbId": "[resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName'))]",
     "lbPoolID": "[concat(variables('lbID'),'/backendAddressPools/',variables('lbBackEndPool'))]",
@@ -121,7 +121,7 @@
       "properties": {
         "securityRules": [
           {
-            "name": "http",
+            "name": "HTTP",
             "properties": {
               "description": "http endpoint",
               "protocol": "Tcp",
@@ -131,6 +131,20 @@
               "destinationAddressPrefix": "*",
               "access": "Allow",
               "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "HTTPS",
+            "properties": {
+              "description": "https endpoint",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 150,
               "direction": "Inbound"
             }
           },
@@ -280,7 +294,7 @@
         ],
         "loadBalancingRules": [
           {
-            "name": "[variables('loadBalencerRule')]",
+            "name": "[variables('loadBalancerRule')]",
             "properties": {
               "frontendIPConfiguration": {
                 "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('loadBalancerName')), '/frontendIPConfigurations/LoadBalancerFrontend')]"
@@ -290,7 +304,7 @@
               },
               "protocol": "Tcp",
               "frontendPort": 443,
-              "backendPort": 80,
+              "backendPort": 443,
               "enableFloatingIP": false,
               "idleTimeoutInMinutes": 5,
               "probe": {
