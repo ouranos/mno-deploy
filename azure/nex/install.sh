@@ -18,7 +18,17 @@
 # - mno_deploy_configuration_path
 
 #====================================================
-# 1 - Linux packages update
+# 1 - Create redeploy script
+#====================================================
+if [ ! -f "/opt/maestrano/redeploy.sh" ]; then
+  mkdir -p /opt/maestrano
+  script=$(readlink -f $0) # path to self
+  echo "bash $script $1 $2 $3 $4 $5" > /opt/maestrano/redeploy.sh
+  chmod 775 /opt/maestrano/redeploy.sh
+fi
+
+#====================================================
+# 2 - Linux packages update
 #====================================================
 # Ubuntu: Install Dependencies
 if [ "$(which apt-get > /dev/null 2>&1)$?" == "0" ]; then
@@ -36,7 +46,7 @@ fi
 pip install awscli
 
 #=====================================================
-# 2 - Download latest deployment scripts configuration
+# 3 - Download latest deployment scripts configuration
 #=====================================================
 # Keys used to retrieve the mno-deploy-configuration package
 export AWS_ACCESS_KEY_ID=$1
@@ -57,7 +67,7 @@ KEY=`aws s3 ls s3://${MNO_DEPLOY_BUCKET}${MNO_DEPLOY_PATH}/ --recursive | sort |
 aws s3 cp s3://${MNO_DEPLOY_BUCKET}/$KEY ./mno-deploy-configuration.tar.gz
 
 #====================================================
-# 3 - Run installation script
+# 4 - Run installation script
 #====================================================
 # Extract the package and run install script
 tar -xzf mno-deploy-configuration.tar.gz
