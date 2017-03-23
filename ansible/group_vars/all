@@ -1197,7 +1197,8 @@ mnohub_config:
     enabled: true
   sumocollector:
     enabled: false
-
+  google_map:
+    api_key: changeme
 # Nex! Config
 nex_config:
   public_dns:
