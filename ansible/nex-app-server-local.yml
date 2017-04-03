@@ -16,4 +16,4 @@
     - { role: sumocollector, sumologic_collector_application_log_path: "{{ sumologic.nex.log_path }}", sumologic_host_name: "core-nex-{{ rails_environment }}", when: not(sumologic.skip) }
     - { role: splunk }
     - { role: nex }
-    - { role: logrotate, logrotate_scripts: [{name: nex, path: "{{ deploy_directory }}/shared/log/*.log", options: "{{ logrotate.options_torquebox }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: nex, path: "{{ deploy_directory }}/shared/log/*.log", options: "{{ logrotate.options }}"}] }
