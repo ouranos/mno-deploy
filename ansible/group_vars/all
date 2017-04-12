@@ -1410,7 +1410,7 @@ rundeck_protocol: "{{ rundeck_config.protocol }}"
 rundeck_domain: "{{ rundeck_config.domain }}"
 rundeck_users: "{{ rundeck_config.users }}"
 rundeck_plugins:
-  - https://github.com/rundeck-plugins/rundeck-ec2-nodes-plugin/releases/download/v1.5.2/rundeck-ec2-nodes-plugin-1.5.2.jar
+  - https://github.com/rundeck-plugins/rundeck-ec2-nodes-plugin/releases/download/v1.5.4/rundeck-ec2-nodes-plugin-1.5.4.jar
 rundeck_generate_ssh: False
 rundeck_database_type: "{{ rundeck_config.database.type }}" # Defaults to hsqldb but can be set to postgresql or mysql to use those databases. Users and databases are not automatically created.
 rundeck_database_host: "{{ rundeck_config.database.host }}" # Defaults to localhost and only needs to be set if using an externally hosted database.
