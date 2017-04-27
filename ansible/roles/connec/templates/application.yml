@@ -24,3 +24,6 @@ XROV2_PARALLEL_THREADS: {{ connec_config.xrov2_parallel_threads }}
 
 MNO_ROOT_KEY: {{ connec_config.root.api_key }}
 MNO_ROOT_SECRET: {{ connec_config.root.api_secret }}
+
+CACHE_DISABLED: {{ connec_config.cache_disabled }}
+FX_DISABLED: {{ connec_config.fx_disabled }}
