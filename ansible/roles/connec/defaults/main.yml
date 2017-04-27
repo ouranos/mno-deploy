@@ -27,3 +27,5 @@ connec_config:
       xmx: "{{ (0.70 * ansible_memtotal_mb)|int }}m" # Allocate 75% of server memory for Sidekiq
       max_perm_size: 512m
   xrov2_parallel_threads: 2
+  cache_disabled: 'false'
+  fx_disabled: 'true'
