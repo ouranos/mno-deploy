@@ -1078,6 +1078,7 @@ mongodb_users:
 }
 
 # Nex database credentials
+nex_database_host: "{{ rds.endpoint }}"
 nex_database_name: mcluster
 nex_database_username: mcluster
 nex_database_password: blaaa465
