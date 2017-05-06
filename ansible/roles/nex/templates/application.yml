@@ -23,7 +23,6 @@ GITHUB_OAUTH_SECRET: "{{ nex_config.github.oauth_secret }}"
 
 # NewRelic Configuration
 newrelic_license_key: "{{ newrelic_license_key }}"
-newrelic_app_name: "core-nex-{{ rails_environment }}"
 
 # Main email service
 # Emails blocked at Mandrill level in development (can be seen in outbound dashboard)
