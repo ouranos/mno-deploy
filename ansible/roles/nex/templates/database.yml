@@ -1,7 +1,7 @@
 {{ rails_environment }}:
   adapter: mysql2
   encoding: utf8
-  host: {{ rds.endpoint }}
+  host: {{ nex_database_host }}
   database: {{ nex_database_name }}
   pool: {{ nex_database_pool }}
   timeout: {{ nex_database_timeout }}
