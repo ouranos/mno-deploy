@@ -27,7 +27,7 @@ server {
     # # Wide-open CORS config
     # if ($request_method = 'OPTIONS') {
     #   add_header 'Access-Control-Allow-Origin' '*';
-    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, OPTIONS';
     #   add_header 'Access-Control-Allow-Headers' 'Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,x-csrf-token,Authorization';
     #   add_header 'Access-Control-Max-Age' 1728000;
     #   add_header 'Content-Type' 'text/plain charset=UTF-8';
@@ -36,12 +36,17 @@ server {
     # }
     # if ($request_method = 'POST') {
     #   add_header 'Access-Control-Allow-Origin' '*';
-    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, OPTIONS';
+    #   add_header 'Access-Control-Allow-Headers' 'Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,x-csrf-token,Authorization';
+    # }
+    # if ($request_method = 'PUT') {
+    #   add_header 'Access-Control-Allow-Origin' '*';
+    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, OPTIONS';
     #   add_header 'Access-Control-Allow-Headers' 'Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,x-csrf-token,Authorization';
     # }
     # if ($request_method = 'GET') {
     #   add_header 'Access-Control-Allow-Origin' '*';
-    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
+    #   add_header 'Access-Control-Allow-Methods' 'GET, POST, PUT, OPTIONS';
     #   add_header 'Access-Control-Allow-Headers' 'Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization';
     # }
 
