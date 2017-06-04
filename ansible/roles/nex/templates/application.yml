@@ -10,33 +10,58 @@
 # Rails Secret
 SECRET_KEY_BASE: "{{ nex_config.rails_secret_key }}"
 
+{% if nex.redis is defined %}
 # Redis endpoint
 REDIS_URL: redis://{{ nex.redis.endpoint }}:6379/0
+REDIS_PASSWORD: "{{ nex.redis.password }}"
+{% endif %}
 
+{% if nex_config.sidekiq is defined %}
 # Sidekiq dashboard
 SIDEKIQ_USERNAME: {{ nex_config.sidekiq.admin.username }}
 SIDEKIQ_PASSWORD: {{ nex_config.sidekiq.admin.password }}
+{% endif %}
 
+{% if nex_config.github is defined %}
 # Github OAuth Configuration
 GITHUB_OAUTH_KEY: "{{ nex_config.github.oauth_key }}"
 GITHUB_OAUTH_SECRET: "{{ nex_config.github.oauth_secret }}"
+{% endif %}
 
 # NewRelic Configuration
 newrelic_license_key: "{{ newrelic_license_key }}"
 
+{% if nex_config.mandrill is defined %}
 # Main email service
 # Emails blocked at Mandrill level in development (can be seen in outbound dashboard)
 mandrill_username: "{{ nex_config.mandrill.login }}"
 mandrill_key: "{{ nex_config.mandrill.token }}"
+{% endif %}
 
+{% if nex_config.aws is defined %}
 # AWS Credentials - Infrastructure Management
 aws_access_key_id: "{{ nex_config.aws.access_key }}"
 aws_secret_access_key: "{{ nex_config.aws.secret_access_key }}"
+{% endif %}
 
+{% if nex_config.azure is defined %}
+# Azure Credentials - Infrastructure Management
+AZURE_RESOURCE_GROUP: "{{ nex_config.azure.resource_group }}"
+AZURE_TENANT_ID: "{{ nex_config.azure.tenant_id }}"
+AZURE_SUBSCRIPTION_ID: "{{ nex_config.azure.subscription_id }}"
+AZURE_CLIENT_ID: "{{ nex_config.azure.client_id }}"
+AZURE_CLIENT_SECRET: "{{ nex_config.azure.client_secret }}"
+
+# Azure SSH public key to use for initial admin user
+AZURE_SSH_PUBLIC_KEY: "{{ nex_config.azure.ssh_public_key }}"
+{% endif %}
+
+{% if nex_config.mandrill_grid is defined %}
 # Mandrill - Used to configure SMTP Relay on ComputeRacks
 # (emails sent by the applications)
 grid_mandrill_login: {{ nex_config.mandrill_grid.login }}
 grid_mandrill_token: {{ nex_config.mandrill_grid.token }}
+{% endif %}
 
 # Storage Rsync Key - Used to authenticate ComputeRack on
 # StorageRacks when pushing/pulling cubes
@@ -47,9 +72,11 @@ storage_rsync_key: "{{ nex_config.storage_rsync_key }}"
 {{ key }}: "{{ value }}"
 {% endfor %}
 
+{% if nex_config.ssl is defined %}
 # SSL Certificate
 ssl_cert_key_cube_default: "{{ nex_config.ssl.cert_key_cube_default }}"
 ssl_cert_chained_cube_default: "{{ nex_config.ssl.cert_chained_cube_default }}"
+{% endif %}
 
 # Routing Grid credentials
 routing_grid_key: "{{ nex_config.routing.key }}"
