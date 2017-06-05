@@ -13,7 +13,9 @@ SECRET_KEY_BASE: "{{ nex_config.rails_secret_key }}"
 {% if nex.redis is defined %}
 # Redis endpoint
 REDIS_URL: redis://{{ nex.redis.endpoint }}:6379/0
+{% if nex.redis.password is defined %}
 REDIS_PASSWORD: "{{ nex.redis.password }}"
+{% endif %}
 {% endif %}
 
 {% if nex_config.sidekiq is defined %}
