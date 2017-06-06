@@ -1,0 +1,10 @@
+{{ rails_environment }}:
+  host: {{ impac_config.database.host }}
+  database: {{ impac_config.database.database }}
+  username: {{ impac_config.database.username }}
+  password: {{ impac_config.database.password }}
+  adapter: <%=  ENV['DATABASE_ADAPTER'] || 'mysql2' %>
+  timeout: <%=  ENV['DATABASE_TIMEOUT'] || 10000 %>
+  port: <%=  ENV['DATABASE_PORT'] || 3306 %>
+  encoding: utf8
+  pool: <%=  ENV['DATABASE_POOL_SIZE'] || 20 %>

@@ -1,5 +1,8 @@
 ---
 
+- name: Impac | Setup RDS instance
+  include: rds.yml
+
 - name: Impac | Setup deployment directories
   include: setup.yml
 
