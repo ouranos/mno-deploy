@@ -1,0 +1,38 @@
+---
+
+- name: Impac | Install packages
+  apt: "name={{ item }} state=present update_cache=yes"
+  with_items:
+    - python-mysqldb
+  when: ansible_os_family == "Debian"
+
+- name: Impac | Install packages
+  yum: "name={{ item }} state=present"
+  with_items:
+    - MySQL-python
+  when: ansible_os_family == "RedHat"
+
+- name: Impac | Create RDS database
+  mysql_db:
+    login_host: "{{ rds.endpoint }}"
+    login_user: "{{ rds.username }}"
+    login_password: "{{ rds.password }}"
+    login_port: 3306
+    collation: utf8_general_ci
+    encoding: utf8
+    name: "{{ impac_config.database.database }}"
+    state: present
+  when: not rds.skip
+
+- name: Impac | Create RDS database user
+  mysql_user:
+    login_host: "{{ rds.endpoint }}"
+    login_user: "{{ rds.username }}"
+    login_password: "{{ rds.password }}"
+    login_port: 3306
+    host: '%'
+    name: "{{ impac_config.database.username }}"
+    password: "{{ impac_config.database.password }}"
+    priv: "{{ impac_config.database.database }}.*:ALL,GRANT"
+    state: present
+  when: not rds.skip
