@@ -1125,6 +1125,13 @@ impac_config:
   root:
     api_key: changeme
     api_secret: changeme
+  database:
+    host: "{{ rds.endpoint }}"
+    database: impac
+    username: impac
+    password: changeme
+    pool: 15
+    timeout: 10000
 
 # Maestrano configuration
 mnohub_config:
