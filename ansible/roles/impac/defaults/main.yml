@@ -34,3 +34,4 @@ impac_config:
     api_secret: changeme
   secret_key_base: changeme
   force_ssl: true
+  skip_migrations: false
