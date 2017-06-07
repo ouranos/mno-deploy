@@ -39,7 +39,7 @@
     path: "{{ deploy_directory }}/releases/{{ release_folder }}/vendor"
     state: directory
 
-- name: MnoHub | Database file config/database.yml
+- name: Impac | Database file config/database.yml
   template:
     src: database.yml
     dest: "{{ deploy_directory }}/releases/{{ release_folder }}/config/database.yml"
@@ -125,7 +125,7 @@
   command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} /opt/jruby/current/bin/jruby -S bundle install --path={{ deploy_directory }}/shared/vendor_bundle --gemfile={{ deploy_directory }}/releases/{{ release_folder }}/Gemfile --deployment --without development test"
   sudo_user: deployer
 
-- name: MNO Hub | Migrate the database
+- name: Impac | Migrate the database
   command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
   environment: "{{ default_environment }}"
   sudo_user: deployer
