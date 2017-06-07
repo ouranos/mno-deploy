@@ -126,7 +126,7 @@
   sudo_user: deployer
 
 - name: Impac | Migrate the database
-  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate_or_setup"
+  command: "chdir={{ deploy_directory }}/releases/{{ release_folder }} bundle exec rake db:migrate"
   environment: "{{ default_environment }}"
   sudo_user: deployer
   when: not impac_config.skip_migrations
