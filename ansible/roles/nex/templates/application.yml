@@ -18,12 +18,6 @@ REDIS_PASSWORD: "{{ nex.redis.password }}"
 {% endif %}
 {% endif %}
 
-{% if nex_config.sidekiq is defined %}
-# Sidekiq dashboard
-SIDEKIQ_USERNAME: {{ nex_config.sidekiq.admin.username }}
-SIDEKIQ_PASSWORD: {{ nex_config.sidekiq.admin.password }}
-{% endif %}
-
 {% if nex_config.github is defined %}
 # Github OAuth Configuration
 GITHUB_OAUTH_KEY: "{{ nex_config.github.oauth_key }}"
