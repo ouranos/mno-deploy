@@ -82,5 +82,7 @@ routing_grid_secret: "{{ nex_config.routing.secret }}"
 compute_grid_key: "{{ nex_config.compute.key }}"
 compute_grid_secret: "{{ nex_config.compute.secret }}"
 
+{% if nex_config.vpn_key is defined %}
 # VPN Key
 vpn_key: "{{ nex_config.vpn_key }}"
+{% endif %}
