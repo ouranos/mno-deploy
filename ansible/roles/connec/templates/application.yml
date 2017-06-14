@@ -17,6 +17,7 @@ SIDEKIQ_DEMO_DATA_JOB: {{ connec_config.sidekiq.limits.demo_data }}
 SYNC_JOB_BATCHES: {{ connec_config.sidekiq.sync_job_batches }}
 
 FORCE_SSL: {{ connec_config.force_ssl }}
+PUBLIC_HOSTNAME: {{ connec_config.public_dns.host }}
 
 OPENEXCHANGERATES_APP_ID: {{ mnohub_config.secrets.open_exchange_rate_id }}
 
