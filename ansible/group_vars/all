@@ -1229,6 +1229,8 @@ connec_config:
       client_id: "changeme-changeme-changeme"
       client_key: "changeme-changeme-changeme"
   force_ssl: false
+  secrets:
+    secret_key_base: changeme
   new_relic:
     enabled: true
     app_name: Connec

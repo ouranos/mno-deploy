@@ -1,5 +1,8 @@
 # {{ ansible_managed }}
 
+# Rails Secrets
+secret_key_base: {{ connec_config.secrets.secret_key_base }}
+
 newrelic_license_key: {{ newrelic_license_key }}
 {% if connec_config.component is defined and connec_config.component == 'api' %}
 newrelic_app_name: {{ connec_config.new_relic.app_name }} API
