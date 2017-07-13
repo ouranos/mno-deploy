@@ -18,3 +18,4 @@
     - { role: connec, connec_config: {component: 'jobs', newrelic: {common: {app_name: 'Connec Jobs'}}} }
     - { role: logrotate, logrotate_scripts: [{name: sidekiq, path: "{{ deploy_directory }}/shared/log/sidekiq.log", options: "{{ logrotate.options }}"}] }
     - { role: logrotate, logrotate_scripts: [{name: connec, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: newrelic, path: "{{ deploy_directory }}/shared/log/newrelic_agent.log", options: "{{ logrotate.options }}"}] }

@@ -17,4 +17,5 @@
     - { role: rvm_io.rvm1-ruby, tags: ruby, rvm1_rubies: ['ruby-2.3.1'] }
     - { role: jdauphant.nginx, keep_only_specified: true }
     - { role: dev-platform }
-    - { role: logrotate, logrotate_scripts: [{name: connec, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: dev-platform, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: newrelic, path: "{{ deploy_directory }}/shared/log/newrelic_agent.log", options: "{{ logrotate.options }}"}] }
