@@ -17,3 +17,4 @@
     - { role: splunk }
     - { role: nex }
     - { role: logrotate, logrotate_scripts: [{name: nex, path: "{{ deploy_directory }}/shared/log/*.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: newrelic, path: "{{ deploy_directory }}/shared/log/newrelic_agent.log", options: "{{ logrotate.options }}"}] }
