@@ -17,3 +17,4 @@
     - { role: jdauphant.nginx, keep_only_specified: true }
     - { role: connec, connec_config: {component: 'api', newrelic: {common: {app_name: 'Connec API'}}} }
     - { role: logrotate, logrotate_scripts: [{name: connec, path: "{{ deploy_directory }}/shared/log/{{ rails_environment }}.log", options: "{{ logrotate.options }}"}] }
+    - { role: logrotate, logrotate_scripts: [{name: newrelic, path: "{{ deploy_directory }}/shared/log/newrelic_agent.log", options: "{{ logrotate.options }}"}] }
