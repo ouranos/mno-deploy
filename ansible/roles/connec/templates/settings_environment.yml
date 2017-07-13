@@ -30,3 +30,5 @@ open_exchange_rates:
   root_path: api
 mnohub:
   url: {{ mnohub_config.private_dns.scheme }}://{{ mnohub_config.private_dns.host }}
+even:
+  url:
