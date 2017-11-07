@@ -18,11 +18,21 @@ require 'aws-sdk'
 require 'highline'
 
 # Check environment variables
-%w(AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION).each do |prop|
-  next if ENV[prop]
-  puts "Environment variable #{prop} must be set"
-  exit 1
+if ENV['AWS_PROFILE']
+  puts "Using the following AWS profile: #{ENV['AWS_PROFILE']}"
+
+  unless ENV['AWS_REGION']
+    puts "\nPlease set an AWS_REGION. e.g:\nexport AWS_REGION=ap-southeast-1"
+    exit 1
+  end
+else
+  %w(AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION).each do |prop|
+    next if ENV[prop]
+    puts "Environment variable #{prop} must be set"
+    exit 1
+  end
 end
+
 
 # Extract a resource name from Tag
 def tag_name(resource)
