@@ -36,15 +36,18 @@ export no_proxy="localhost,169.254.169.254"
 #====================================================
 # Ubuntu: Install Dependencies
 if [ "$(which apt-get > /dev/null 2>&1)$?" == "0" ]; then
-  apt-get -y update && apt-get install -y python-pip
+  apt-get -y update && apt-get install -y python-pip libffi-dev libssl-dev python-dev
 fi
 
 # RHEL: Install depdendencies
 if [ "$(which yum > /dev/null 2>&1)$?" == "0" ]; then
   # Enable EPEL
   rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-  yum -y update && yum install -y python-pip
+  yum -y update && yum install -y python-pip libffi-devel python-devel openssl-devel
 fi
+
+# Upgrade setup tools to avoid old versions on certain distributions
+pip install --upgrade setuptools
 
 # Install AWS CLI using pip
 pip install awscli

@@ -30,7 +30,8 @@ do_install() {
   apt-get -y update
   apt-get -y upgrade
   apt-get -y install build-essential
-  apt-get -q -y --no-install-recommends install unattended-upgrades git python-yaml libyaml-dev python-jinja2 python-httplib2 python-keyczar python-dev python-pip
+  apt-get -q -y --no-install-recommends install unattended-upgrades git python-yaml libyaml-dev python-jinja2 python-httplib2 python-keyczar python-dev libffi-dev libssl-dev python-pip
+  pip install --upgrade setuptools
   pip install -Iv ansible==2.0.2.0
   pip install boto pycrypto
 
