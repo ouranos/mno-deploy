@@ -68,6 +68,9 @@ DEV_PLATFORM_ENDPOINT: {{ dev_platform_config.public_dns.scheme }}://{{ dev_plat
 {% if dev_platform_config.shared_secret is defined %}
 DEV_PLATFORM_SHARED_SECRET: {{ dev_platform_config.shared_secret }}
 {% endif %}
+{% if dev_platform_config.preferred_marketplace_locale is defined %}
+PREFERRED_MARKETPLACE_LOCALE: {{ dev_platform_config.preferred_marketplace_locale }}
+{% endif %}
 
 # Platform components endpoints
 MNOHUB_ENDPOINT: {{ mnohub_config.public_dns.scheme }}://{{ mnohub_config.public_dns.host }}
