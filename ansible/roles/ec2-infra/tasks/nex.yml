@@ -24,6 +24,7 @@
   route53:
     command: create
     zone: "{{ (route53.zone.name|string) }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
     record: "{{ nex.redis.endpoint }}"
     type: CNAME
     value: "{{ created_nex_redis.elasticache.data.CacheNodes[0].Endpoint.Address }}"
