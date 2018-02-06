@@ -18,6 +18,7 @@
     security_group_ids: "{{ redis_group.vpc_security_groups }}"
     region: "{{ aws_region }}"
     wait: yes
+  when: not nex.redis.skip
   register: created_nex_redis
 
 - name: Nex! | Add Redis Store DNS record
@@ -31,6 +32,7 @@
     alias: False
     ttl: 60
     private_zone: "{{ route53.zone.private_zone }}"
+  when: not nex.redis.skip
 
 - name: Nex! | Create Nex ELB
   ec2_elb_lb:
@@ -45,6 +47,7 @@
     subnets: "{{ nex.elastic_load_balancer.subnets }}"
     security_group_ids: "{{ nex.elastic_load_balancer.security_group_ids }}"
     listeners: "{{ nex.elastic_load_balancer.listeners }}"
+  when: not nex.elastic_load_balancer.skip
   register: nex_elastic_load_balancer
 
 - name: Add DNS record for ELB
@@ -76,6 +79,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
+  when: not nex.launch_configuration.skip
 
 - name: Create Nex! Auto Scaling Group
   ec2_asg:
@@ -91,4 +95,5 @@
     availability_zones: "{{ nex.auto_scaling_group.availability_zones }}"
     load_balancers: "{{ nex.elastic_load_balancer.name }}"
     tags: "{{ nex.auto_scaling_group.tags }}"
+  when: not nex.auto_scaling_group.skip
   register: nex_auto_scaling_group

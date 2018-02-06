@@ -525,6 +525,7 @@ maestrano:
 mnohub:
   skip: true # new mnohub is not yet part of the default implementation
   redis:
+    skip: false
     name: "{{ environment_name }}-mnohub-redis"
     node_type: cache.t2.micro
     num_nodes: 1
@@ -533,6 +534,7 @@ mnohub:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-mnohub-elb"
     connection_draining_timeout: 60
     zones: "{{ aws_availability_zones }}"
@@ -562,6 +564,7 @@ mnohub:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     name: "{{ vpc_short_name }}-mnohub-lc"
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
@@ -571,6 +574,7 @@ mnohub:
       - "{{ created_security_groups.results[4].group_id }}" # RDS security group
       - "{{ created_security_groups.results[7].group_id }}" # TorqueBox cluster security group
   auto_scaling_group:
+    skip: false
     name: "{{ vpc_short_name }}-mnohub-asg"
     availability_zones: "{{ aws_availability_zones }}"
     vpc_zone_identifier:
@@ -589,6 +593,7 @@ mnohub:
 nex:
   skip: true
   redis:
+    skip: false
     name: "{{ environment_name }}-nex-redis"
     node_type: cache.t2.micro
     num_nodes: 1
@@ -597,6 +602,7 @@ nex:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-nex-elb"
     connection_draining_timeout: 60
     zones: "{{ aws_availability_zones }}"
@@ -626,6 +632,7 @@ nex:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     name: "{{ vpc_short_name }}-nex-lc"
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
@@ -635,6 +642,7 @@ nex:
       - "{{ created_security_groups.results[4].group_id }}" # RDS security group
       - "{{ created_security_groups.results[7].group_id }}" # TorqueBox cluster security group
   auto_scaling_group:
+    skip: false
     name: "{{ vpc_short_name }}-nex-asg"
     availability_zones: "{{ aws_availability_zones }}"
     vpc_zone_identifier:
@@ -653,6 +661,7 @@ nex:
 connec:
   skip: false
   redis:
+    skip: false
     name: connec-redis
     node_type: cache.t2.micro
     num_nodes: 1
@@ -661,6 +670,7 @@ connec:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-connec-elb"
     connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
@@ -690,6 +700,7 @@ connec:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     api:
       name: "{{ vpc_short_name }}-connec-api-lc"
       image_id: "{{ default_base_ami }}"
@@ -709,6 +720,7 @@ connec:
         - "{{ created_security_groups.results[4].group_id }}" # RDS security group
         - "{{ created_security_groups.results[5].group_id }}" # MongoDB security group
   auto_scaling_group:
+    skip: false
     api:
       name: "{{ vpc_short_name }}-connec-api-asg"
       availability_zones: "{{ aws_availability_zones }}"
@@ -742,6 +754,7 @@ connec:
 impac:
   skip: false
   redis:
+    skip: false
     name: impac-redis
     node_type: cache.t2.micro
     num_nodes: 1
@@ -750,6 +763,7 @@ impac:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-impac-elb"
     connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
@@ -779,6 +793,7 @@ impac:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     name: "{{ vpc_short_name }}-impac-lc"
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
@@ -786,6 +801,7 @@ impac:
     security_groups:
       - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
   auto_scaling_group:
+    skip: false
     name: "{{ vpc_short_name }}-impac-asg"
     availability_zones: "{{ aws_availability_zones }}"
     vpc_zone_identifier:

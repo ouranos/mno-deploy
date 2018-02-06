@@ -17,6 +17,7 @@
     security_group_ids: "{{ redis_group.vpc_security_groups }}"
     region: "{{ aws_region }}"
     wait: yes
+  when: not connec.redis.skip
   register: created_connec_redis
 
 - name: Add Redis Store DNS record
@@ -30,6 +31,7 @@
     alias: False
     ttl: 60
     private_zone: "{{ route53.zone.private_zone }}"
+  when: not connec.redis.skip
 
 - name: Create Connec! ELB
   ec2_elb_lb:
@@ -45,6 +47,7 @@
     security_group_ids: "{{ connec.elastic_load_balancer.security_group_ids }}"
     listeners: "{{ connec.elastic_load_balancer.listeners }}"
     health_check: "{{ connec.elastic_load_balancer.health_check }}"
+  when: not connec.elastic_load_balancer.skip
   register: connec_elastic_load_balancer
 
 - name: Add DNS record for ELB
@@ -59,6 +62,7 @@
     private_zone: "{{ route53.zone.private_zone }}"
     alias_hosted_zone_id: "{{ connec.elastic_load_balancer.alias_hosted_zone_id }}"
     overwrite: "{{ connec.dns_record.overwrite }}"
+  when: not connec.elastic_load_balancer.skip
 
 - set_fact: maestrano_component="connec-api-server-local"
 
@@ -78,7 +82,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
-  when: connec.launch_configuration.api.spot_price is undefined or connec.launch_configuration.api.spot_price is none
+  when: not connec.launch_configuration.skip and (connec.launch_configuration.api.spot_price is undefined or connec.launch_configuration.api.spot_price is none)
 
 - name: Create Connec! Launch Configuration API (spot instances)
   ec2_lc:
@@ -97,7 +101,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
-  when: connec.launch_configuration.api.spot_price is defined and connec.launch_configuration.api.spot_price is not none
+  when: not connec.launch_configuration.skip and (connec.launch_configuration.api.spot_price is defined and connec.launch_configuration.api.spot_price is not none)
 
 - name: Create Connec! Auto Scaling Group API
   ec2_asg:
@@ -113,6 +117,7 @@
     availability_zones: "{{ connec.auto_scaling_group.api.availability_zones }}"
     load_balancers: "{{ connec.elastic_load_balancer.name }}"
     tags: "{{ connec.auto_scaling_group.api.tags }}"
+  when: not connec.auto_scaling_group.skip
   register: connec_auto_scaling_group
 
 - set_fact: maestrano_component="connec-jobs-server-local"
@@ -133,7 +138,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
-  when: connec.launch_configuration.jobs.spot_price is undefined or connec.launch_configuration.jobs.spot_price is none
+  when: not connec.launch_configuration.skip and (connec.launch_configuration.jobs.spot_price is undefined or connec.launch_configuration.jobs.spot_price is none)
 
 - name: Create Connec! Launch Configuration Background Jobs (spot instances)
   ec2_lc:
@@ -152,7 +157,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
-  when: connec.launch_configuration.jobs.spot_price is defined and connec.launch_configuration.jobs.spot_price is not none
+  when: not connec.launch_configuration.skip and (connec.launch_configuration.jobs.spot_price is defined and connec.launch_configuration.jobs.spot_price is not none)
 
 - name: Create Connec! Auto Scaling Group Background Jobs
   ec2_asg:
@@ -167,4 +172,5 @@
     vpc_zone_identifier: "{{ connec.auto_scaling_group.jobs.vpc_zone_identifier }}"
     availability_zones: "{{ connec.auto_scaling_group.jobs.availability_zones }}"
     tags: "{{ connec.auto_scaling_group.jobs.tags }}"
+  when: not connec.auto_scaling_group.skip
   register: connec_auto_scaling_group
