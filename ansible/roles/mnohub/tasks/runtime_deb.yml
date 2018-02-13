@@ -9,6 +9,19 @@
 - name: MnoHub | Add /etc/init/sidekiq.conf
   template: src=sidekiq.conf dest=/etc/init/sidekiq.conf force=yes mode=0755
 
+# Use Systemd for Ubuntu 16.04+
+- stat:
+    path: /etc/systemd/system
+  register: systemd_service_path
+
+- name: MnoHub | Add /etc/systemd/system/puma.service
+  template: src=puma.service dest=/etc/systemd/system/puma.service force=yes mode=0755
+  when: systemd_service_path.stat.isdir is defined and systemd_service_path.stat.isdir
+
+- name: MnoHub | Add /etc/systemd/system/sidekiq.service
+  template: src=sidekiq.service dest=/etc/systemd/system/sidekiq.service force=yes mode=0755
+  when: systemd_service_path.stat.isdir is defined and systemd_service_path.stat.isdir
+
 - name: MnoHub | Add puma to upstart
   service: name=puma state=restarted enabled=yes
 
