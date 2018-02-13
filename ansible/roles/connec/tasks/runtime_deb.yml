@@ -8,6 +8,15 @@
   template: src=puma.conf dest=/etc/init/puma.conf force=yes mode=0755
   when: connec_config.component is defined and connec_config.component == 'api'
 
+# Use Systemd for Ubuntu 16.04+
+- stat:
+    path: /etc/systemd/system
+  register: systemd_service_path
+
+- name: Connec | Add /etc/systemd/system/puma.service
+  template: src=puma.service dest=/etc/systemd/system/puma.service force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'api' and systemd_service_path.stat.isdir is defined and systemd_service_path.stat.isdir
+
 - name: Connec | Add puma to upstart
   service: name=puma state=restarted enabled=yes
   when: connec_config.component is defined and connec_config.component == 'api'
@@ -15,6 +24,10 @@
 - name: Connec | Add /etc/init/sidekiq.conf
   template: src=sidekiq.conf dest=/etc/init/sidekiq.conf force=yes mode=0755
   when: connec_config.component is defined and connec_config.component == 'jobs'
+
+- name: Connec | Add /etc/systemd/system/sidekiq.service
+  template: src=sidekiq.service dest=/etc/systemd/system/sidekiq.service force=yes mode=0755
+  when: connec_config.component is defined and connec_config.component == 'jobs' and systemd_service_path.stat.isdir is defined and systemd_service_path.stat.isdir
 
 - name: Connec | Add sidekiq to upstart
   service: name=sidekiq state=restarted enabled=yes
