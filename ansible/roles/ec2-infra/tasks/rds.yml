@@ -35,6 +35,7 @@
   route53:
     command: create
     zone: "{{ (route53.zone.name|string) }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
     record: "{{ rds.endpoint }}"
     type: CNAME
     value: "{{ rds_maestrano.instance.endpoint }}"
