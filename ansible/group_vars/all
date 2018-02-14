@@ -1452,8 +1452,17 @@ logrotate:
 # Install path for rvm (defaults to single user)
 # NOTE: If you are doing a ROOT BASED INSTALL then make sure you
 #       set the install path to something like '/usr/local/rvm'
-rvm1_user: 'root'
 rvm1_install_path: '/usr/local/rvm'
+
+# Add or remove any install flags
+# NOTE: If you are doing a ROOT BASED INSTALL then
+#       make sure you REMOVE the --user-install flag below
+rvm1_install_flags: '--auto-dotfiles '
+
+# Set the owner for the rvm directory
+# NOTE: If you are doing a ROOT BASED INSTALL then
+#       make sure you set rvm1_user to 'root'
+rvm1_user: 'root'
 
 # RVM platform specific config, see https://rvm.io/rvm/autolibs
 # Only Maestrano Hub uses it at the moment. Will be removed.
