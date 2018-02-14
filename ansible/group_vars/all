@@ -1452,6 +1452,7 @@ logrotate:
 # Install path for rvm (defaults to single user)
 # NOTE: If you are doing a ROOT BASED INSTALL then make sure you
 #       set the install path to something like '/usr/local/rvm'
+rvm1_user: 'root'
 rvm1_install_path: '/usr/local/rvm'
 
 # RVM platform specific config, see https://rvm.io/rvm/autolibs
