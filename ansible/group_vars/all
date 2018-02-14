@@ -1449,6 +1449,14 @@ logrotate:
   options: ['su deployer deployer', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
   options_torquebox: ['su torquebox torquebox', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
 
+# Install 1 or more versions of ruby
+# The last ruby listed will be set as the default ruby
+rvm1_rubies:
+  - 'ruby-2.3.1'
+
+# Install the bundler gem
+rvm1_bundler_install: True
+
 # Install path for rvm (defaults to single user)
 # NOTE: If you are doing a ROOT BASED INSTALL then make sure you
 #       set the install path to something like '/usr/local/rvm'
