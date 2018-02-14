@@ -33,7 +33,7 @@ do_install() {
   apt-get -q -y --no-install-recommends install unattended-upgrades git python-yaml libyaml-dev python-jinja2 python-httplib2 python-keyczar python-dev libffi-dev libssl-dev python-pip
   pip install --upgrade setuptools
   pip install -Iv ansible==2.4.3.0
-  pip install boto pycrypto
+  pip install boto boto3 botocore pycrypto
 
   # Run Ansible
   cd /etc/ansible
