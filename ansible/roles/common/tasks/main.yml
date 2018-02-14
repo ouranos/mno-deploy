@@ -77,6 +77,12 @@
     HOME: /root
 
 - name: General | Install development packages
+  apt: "name={{ item }} state=present update_cache=yes cache_valid_time=3600"
+  with_items:
+    - ruby-dev
+  when: ansible_os_family == "Debian"
+
+- name: General | Install development packages
   shell: "yum groupinstall -y development"
   when: ansible_os_family == "RedHat"
 

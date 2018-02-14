@@ -1449,6 +1449,11 @@ logrotate:
   options: ['su deployer deployer', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
   options_torquebox: ['su torquebox torquebox', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
 
+# Install path for rvm (defaults to single user)
+# NOTE: If you are doing a ROOT BASED INSTALL then make sure you
+#       set the install path to something like '/usr/local/rvm'
+rvm1_install_path: '/usr/local/rvm'
+
 # RVM platform specific config, see https://rvm.io/rvm/autolibs
 # Only Maestrano Hub uses it at the moment. Will be removed.
 rvm1_autolib_mode: 3 # Use libs, install missing libs
