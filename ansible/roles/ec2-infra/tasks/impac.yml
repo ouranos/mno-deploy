@@ -4,7 +4,7 @@
 
 - set_fact: maestrano_component="impac-app-server-local"
 
-- name: Create Impac Redis Store
+- name: Impac! | Create Impac Redis Store
   elasticache:
     name: "{{ impac.redis.name }}"
     state: present
@@ -21,7 +21,7 @@
   when: not impac.redis.skip
   register: created_impac_redis
 
-- name: Add Redis Store DNS record
+- name: Impac! | Add Redis Store DNS record
   route53:
     command: create
     zone: "{{ (route53.zone.name|string) }}"
@@ -34,7 +34,53 @@
     private_zone: "{{ route53.zone.private_zone }}"
   when: not impac.redis.skip
 
-- name: Create Impac! ELB
+- name: Impac! | Create RDS subnets
+  rds_subnet_group:
+    name: "{{ environment_name }}-impac-rds-subnet"
+    description: Subnet Group for Impac! RDS instance
+    state: present
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    subnets: "{{ impac.rds.subnets }}"
+  when: not impac.rds.skip
+  register: rds_subnet_impac
+
+- name: Impac! | Create RDS instance
+  rds:
+    command: create
+    instance_name: "{{ impac.rds.name }}"
+    db_engine: "{{ impac.rds.db_engine }}"
+    size: "{{ impac.rds.size }}"
+    instance_type: "{{ impac.rds.instance_type }}"
+    multi_zone: "{{ impac.rds.multi_zone }}"
+    subnet: "{{ environment_name }}-impac-rds-subnet"
+    vpc_security_groups: "{{ impac.rds.vpc_security_groups }}"
+    username: "{{ impac.rds.username }}"
+    password: "{{ impac.rds.password }}"
+    wait: yes
+    wait_timeout: 2400
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    tags: "{{ impac.rds.tags }}"
+  when: not impac.rds.skip
+  register: rds_impac
+
+- name: Impac! | Add DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    record: "{{ impac.rds.endpoint }}"
+    type: CNAME
+    value: "{{ rds_impac.instance.endpoint }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"
+  when: not impac.rds.skip
+
+- name: Impac! | Create Impac! ELB
   ec2_elb_lb:
     name: "{{ impac.elastic_load_balancer.name }}"
     state: present
@@ -51,7 +97,7 @@
   when: not impac.elastic_load_balancer.skip
   register: impac_elastic_load_balancer
 
-- name: Add DNS record for ELB
+- name: Impac! | Add DNS record for ELB
   route53:
     command: create
     zone: "{{ (route53.zone.name|string) }}"
@@ -65,7 +111,7 @@
     overwrite: "{{ impac.dns_record.overwrite }}"
   when: not impac.elastic_load_balancer.skip
 
-- name: Create Impac! Launch Configuration
+- name: Impac! | Create Impac! Launch Configuration
   ec2_lc:
     name: "{{ impac.launch_configuration.name }}"
     key_name: "{{ impac.launch_configuration.key_name }}"
@@ -83,7 +129,7 @@
         delete_on_termination: true
   when: not impac.launch_configuration.skip and (impac.launch_configuration.spot_price is undefined or impac.launch_configuration.spot_price is none)
 
-- name: Create Impac! Launch Configuration (spot instances)
+- name: Impac! | Create Impac! Launch Configuration (spot instances)
   ec2_lc:
     name: "{{ impac.launch_configuration.name }}"
     key_name: "{{ impac.launch_configuration.key_name }}"
@@ -102,7 +148,7 @@
         delete_on_termination: true
   when: not impac.launch_configuration.skip and (impac.launch_configuration.spot_price is defined and impac.launch_configuration.spot_price is not none)
 
-- name: Create Impac! Auto Scaling Group
+- name: Impac! | Create Impac! Auto Scaling Group
   ec2_asg:
     name: "{{ impac.auto_scaling_group.name }}"
     region: "{{ aws_region }}"
