@@ -533,6 +533,24 @@ mnohub:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: false
+    name: "{{ environment_name }}-mnohub-rds"
+    endpoint: "{{ environment_name }}-mnohub-rds.{{ dns.base }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: db.t2.small
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
   elastic_load_balancer:
     skip: false
     name: "{{ vpc_short_name }}-mnohub-elb"
@@ -601,6 +619,24 @@ nex:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: false
+    name: "{{ environment_name }}-nex-rds"
+    endpoint: "{{ environment_name }}-nex-rds.{{ dns.base }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: db.t2.small
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
   elastic_load_balancer:
     skip: false
     name: "{{ vpc_short_name }}-nex-elb"
@@ -762,6 +798,24 @@ impac:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: false
+    name: "{{ environment_name }}-impac-rds"
+    endpoint: "{{ environment_name }}-impac-rds.{{ dns.base }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: db.t2.small
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
   elastic_load_balancer:
     skip: false
     name: "{{ vpc_short_name }}-impac-elb"
@@ -975,6 +1029,24 @@ dev_platform:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: false
+    name: "{{ environment_name }}-devp-rds"
+    endpoint: "{{ environment_name }}-devp-rds.{{ dns.base }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: db.t2.small
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
 
 # RDS database for MNO Hub, MCluster and any required frontend
 rds:
@@ -1094,7 +1166,7 @@ mongodb_users:
 }
 
 # Nex database credentials
-nex_database_host: "{{ rds.endpoint }}"
+nex_database_host: "{{ nex.rds.endpoint }}"
 nex_database_name: mcluster
 nex_database_username: mcluster
 nex_database_password: blaaa465
@@ -1142,7 +1214,7 @@ impac_config:
     api_key: changeme
     api_secret: changeme
   database:
-    host: "{{ rds.endpoint }}"
+    host: "{{ impac.rds.endpoint }}"
     database: impac
     username: impac
     password: changeme
@@ -1208,7 +1280,7 @@ mnohub_config:
   open_exchange_rates:
     app_id: changeme
   database:
-    host: "{{ rds.endpoint }}"
+    host: "{{ mnohub.rds.endpoint }}"
     database: maestrano
     username: maestrano
     password: changeme
