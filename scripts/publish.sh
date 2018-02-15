@@ -17,7 +17,7 @@
 bucket_location=mnoe-packages/mno-infrastructure/${CI_BRANCH}
 
 # Download AWS CLI
-pip install awscli
+pip install awscli boto boto3 botocore
 
 # Prepare package
 mkdir -p tmp-pkg
