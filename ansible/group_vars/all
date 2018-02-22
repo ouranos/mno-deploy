@@ -534,7 +534,7 @@ mnohub:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   rds:
-    skip: false
+    skip: "{{ rds.skip }}"
     name: "{{ environment_name }}-mnohub-rds"
     endpoint: "{{ environment_name }}-mnohub-rds.{{ dns.base }}"
     db_engine: MySQL
@@ -620,7 +620,7 @@ nex:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   rds:
-    skip: false
+    skip: "{{ rds.skip }}"
     name: "{{ environment_name }}-nex-rds"
     endpoint: "{{ environment_name }}-nex-rds.{{ dns.base }}"
     db_engine: MySQL
@@ -799,7 +799,7 @@ impac:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   rds:
-    skip: false
+    skip: "{{ rds.skip }}"
     name: "{{ environment_name }}-impac-rds"
     endpoint: "{{ environment_name }}-impac-rds.{{ dns.base }}"
     db_engine: MySQL
@@ -1166,7 +1166,7 @@ mongodb_users:
 }
 
 # Nex database credentials
-nex_database_host: "{{ nex.rds.endpoint }}"
+nex_database_host: "{{ nex.rds.endpoint or rds.endpoint }}"
 nex_database_name: mcluster
 nex_database_username: mcluster
 nex_database_password: blaaa465
