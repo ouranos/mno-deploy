@@ -535,8 +535,8 @@ mnohub:
     cache_parameter_group: "default.redis3.2"
   rds:
     skip: "{{ rds.skip }}"
-    name: "{{ environment_name }}-mnohub-rds"
-    endpoint: "{{ environment_name }}-mnohub-rds.{{ dns.base }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
     db_engine: MySQL
     size: 5
     instance_type: "{{ rds.instance_type }}"
@@ -621,8 +621,8 @@ nex:
     cache_parameter_group: "default.redis3.2"
   rds:
     skip: "{{ rds.skip }}"
-    name: "{{ environment_name }}-nex-rds"
-    endpoint: "{{ environment_name }}-nex-rds.{{ dns.base }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
     db_engine: MySQL
     size: 5
     instance_type: "{{ rds.instance_type }}"
@@ -800,8 +800,8 @@ impac:
     cache_parameter_group: "default.redis3.2"
   rds:
     skip: "{{ rds.skip }}"
-    name: "{{ environment_name }}-impac-rds"
-    endpoint: "{{ environment_name }}-impac-rds.{{ dns.base }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
     db_engine: MySQL
     size: 5
     instance_type: "{{ rds.instance_type }}"
@@ -1031,8 +1031,8 @@ dev_platform:
     cache_parameter_group: "default.redis3.2"
   rds:
     skip: "{{ rds.skip }}"
-    name: "{{ environment_name }}-devp-rds"
-    endpoint: "{{ environment_name }}-devp-rds.{{ dns.base }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
     db_engine: MySQL
     size: 5
     instance_type: "{{ rds.instance_type }}"
