@@ -525,6 +525,7 @@ maestrano:
 mnohub:
   skip: true # new mnohub is not yet part of the default implementation
   redis:
+    skip: false
     name: "{{ environment_name }}-mnohub-redis"
     node_type: cache.t2.micro
     num_nodes: 1
@@ -532,7 +533,26 @@ mnohub:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: "{{ rds.skip }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: "{{ rds.instance_type }}"
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-mnohub-elb"
     connection_draining_timeout: 60
     zones: "{{ aws_availability_zones }}"
@@ -562,6 +582,7 @@ mnohub:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     name: "{{ vpc_short_name }}-mnohub-lc"
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
@@ -571,6 +592,7 @@ mnohub:
       - "{{ created_security_groups.results[4].group_id }}" # RDS security group
       - "{{ created_security_groups.results[7].group_id }}" # TorqueBox cluster security group
   auto_scaling_group:
+    skip: false
     name: "{{ vpc_short_name }}-mnohub-asg"
     availability_zones: "{{ aws_availability_zones }}"
     vpc_zone_identifier:
@@ -589,6 +611,7 @@ mnohub:
 nex:
   skip: true
   redis:
+    skip: false
     name: "{{ environment_name }}-nex-redis"
     node_type: cache.t2.micro
     num_nodes: 1
@@ -596,7 +619,26 @@ nex:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: "{{ rds.skip }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: "{{ rds.instance_type }}"
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-nex-elb"
     connection_draining_timeout: 60
     zones: "{{ aws_availability_zones }}"
@@ -626,6 +668,7 @@ nex:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     name: "{{ vpc_short_name }}-nex-lc"
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
@@ -635,6 +678,7 @@ nex:
       - "{{ created_security_groups.results[4].group_id }}" # RDS security group
       - "{{ created_security_groups.results[7].group_id }}" # TorqueBox cluster security group
   auto_scaling_group:
+    skip: false
     name: "{{ vpc_short_name }}-nex-asg"
     availability_zones: "{{ aws_availability_zones }}"
     vpc_zone_identifier:
@@ -653,6 +697,7 @@ nex:
 connec:
   skip: false
   redis:
+    skip: false
     name: connec-redis
     node_type: cache.t2.micro
     num_nodes: 1
@@ -661,6 +706,7 @@ connec:
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-connec-elb"
     connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
@@ -690,6 +736,7 @@ connec:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     api:
       name: "{{ vpc_short_name }}-connec-api-lc"
       image_id: "{{ default_base_ami }}"
@@ -709,6 +756,7 @@ connec:
         - "{{ created_security_groups.results[4].group_id }}" # RDS security group
         - "{{ created_security_groups.results[5].group_id }}" # MongoDB security group
   auto_scaling_group:
+    skip: false
     api:
       name: "{{ vpc_short_name }}-connec-api-asg"
       availability_zones: "{{ aws_availability_zones }}"
@@ -742,6 +790,7 @@ connec:
 impac:
   skip: false
   redis:
+    skip: false
     name: impac-redis
     node_type: cache.t2.micro
     num_nodes: 1
@@ -749,7 +798,26 @@ impac:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: "{{ rds.skip }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: "{{ rds.instance_type }}"
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
   elastic_load_balancer:
+    skip: false
     name: "{{ vpc_short_name }}-impac-elb"
     connection_draining_timeout: 600
     zones: "{{ aws_availability_zones }}"
@@ -779,6 +847,7 @@ impac:
     ttl: 60
     overwrite: yes
   launch_configuration:
+    skip: false
     name: "{{ vpc_short_name }}-impac-lc"
     image_id: "{{ default_base_ami }}"
     key_name: "{{ keypair }}"
@@ -786,6 +855,7 @@ impac:
     security_groups:
       - "{{ created_security_groups.results[3].group_id }}" # Public tier security group
   auto_scaling_group:
+    skip: false
     name: "{{ vpc_short_name }}-impac-asg"
     availability_zones: "{{ aws_availability_zones }}"
     vpc_zone_identifier:
@@ -959,6 +1029,24 @@ dev_platform:
     cache_port: 6379
     cache_engine_version: 3.2.4
     cache_parameter_group: "default.redis3.2"
+  rds:
+    skip: "{{ rds.skip }}"
+    name: "{{ rds.name }}"
+    endpoint: "{{ rds.endpoint }}"
+    db_engine: MySQL
+    size: 5
+    instance_type: "{{ rds.instance_type }}"
+    multi_zone: yes
+    vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
+    subnets:
+      - "{{ created_vpc.subnets[2].id }}"
+      - "{{ created_vpc.subnets[3].id }}"
+    username: root
+    password: password
+    tags:
+      Environment: "{{ environment_name }}"
+      Rails_Environment: "{{ rails_environment }}"
+      Application: "{{ application_name }}"
 
 # RDS database for MNO Hub, MCluster and any required frontend
 rds:
@@ -967,7 +1055,7 @@ rds:
   endpoint: "rds.{{ dns.base }}"
   db_engine: MySQL
   size: 5
-  instance_type: db.m1.small
+  instance_type: db.t2.small
   multi_zone: yes
   vpc_security_groups: "{{ created_security_groups.results[4].group_id }}"
   subnets:
@@ -1078,7 +1166,7 @@ mongodb_users:
 }
 
 # Nex database credentials
-nex_database_host: "{{ rds.endpoint }}"
+nex_database_host: "{{ nex.rds.endpoint or rds.endpoint }}"
 nex_database_name: mcluster
 nex_database_username: mcluster
 nex_database_password: blaaa465
@@ -1126,7 +1214,7 @@ impac_config:
     api_key: changeme
     api_secret: changeme
   database:
-    host: "{{ rds.endpoint }}"
+    host: "{{ impac.rds.endpoint }}"
     database: impac
     username: impac
     password: changeme
@@ -1192,7 +1280,7 @@ mnohub_config:
   open_exchange_rates:
     app_id: changeme
   database:
-    host: "{{ rds.endpoint }}"
+    host: "{{ mnohub.rds.endpoint }}"
     database: maestrano
     username: maestrano
     password: changeme
@@ -1432,6 +1520,29 @@ rundeck_database_pass: "{{ rundeck_config.database.password }}" # Defaults to ru
 logrotate:
   options: ['su deployer deployer', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
   options_torquebox: ['su torquebox torquebox', 'rotate 2', 'daily', 'maxsize 100M', 'missingok', 'notifempty', 'sharedscripts', 'copytruncate', 'compress']
+
+# Install 1 or more versions of ruby
+# The last ruby listed will be set as the default ruby
+rvm1_rubies:
+  - 'ruby-2.3.1'
+
+# Install the bundler gem
+rvm1_bundler_install: True
+
+# Install path for rvm (defaults to single user)
+# NOTE: If you are doing a ROOT BASED INSTALL then make sure you
+#       set the install path to something like '/usr/local/rvm'
+rvm1_install_path: '/usr/local/rvm'
+
+# Add or remove any install flags
+# NOTE: If you are doing a ROOT BASED INSTALL then
+#       make sure you REMOVE the --user-install flag below
+rvm1_install_flags: '--auto-dotfiles '
+
+# Set the owner for the rvm directory
+# NOTE: If you are doing a ROOT BASED INSTALL then
+#       make sure you set rvm1_user to 'root'
+rvm1_user: 'root'
 
 # RVM platform specific config, see https://rvm.io/rvm/autolibs
 # Only Maestrano Hub uses it at the moment. Will be removed.

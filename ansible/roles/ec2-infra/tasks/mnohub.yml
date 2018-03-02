@@ -18,18 +18,67 @@
     security_group_ids: "{{ redis_group.vpc_security_groups }}"
     region: "{{ aws_region }}"
     wait: yes
+  when: not mnohub.redis.skip
   register: created_mnohub_redis
 
 - name: MnoHub | Add Redis Store DNS record
   route53:
     command: create
     zone: "{{ (route53.zone.name|string) }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
     record: "{{ mnohub.redis.endpoint }}"
     type: CNAME
     value: "{{ created_mnohub_redis.elasticache.data.CacheNodes[0].Endpoint.Address }}"
     alias: False
     ttl: 60
     private_zone: "{{ route53.zone.private_zone }}"
+  when: not mnohub.redis.skip
+
+- name: MnoHub | Create RDS subnets
+  rds_subnet_group:
+    name: "{{ environment_name }}-mnohub-rds-subnet"
+    description: Subnet Group for MnoHub RDS instance
+    state: present
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    subnets: "{{ mnohub.rds.subnets }}"
+  when: not mnohub.rds.skip
+  register: rds_subnet_mnohub
+
+- name: MnoHub | Create RDS instance
+  rds:
+    command: create
+    instance_name: "{{ mnohub.rds.name }}"
+    db_engine: "{{ mnohub.rds.db_engine }}"
+    size: "{{ mnohub.rds.size }}"
+    instance_type: "{{ mnohub.rds.instance_type }}"
+    multi_zone: "{{ mnohub.rds.multi_zone }}"
+    subnet: "{{ environment_name }}-mnohub-rds-subnet"
+    vpc_security_groups: "{{ mnohub.rds.vpc_security_groups }}"
+    username: "{{ mnohub.rds.username }}"
+    password: "{{ mnohub.rds.password }}"
+    wait: yes
+    wait_timeout: 2400
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    tags: "{{ mnohub.rds.tags }}"
+  when: not mnohub.rds.skip
+  register: rds_mnohub
+
+- name: MnoHub | Add DNS record
+  route53:
+    command: create
+    zone: "{{ (route53.zone.name|string) }}"
+    alias_hosted_zone_id: "{{ route53.zone.id }}"
+    record: "{{ mnohub.rds.endpoint }}"
+    type: CNAME
+    value: "{{ rds_mnohub.instance.endpoint }}"
+    alias: False
+    ttl: 60
+    private_zone: "{{ route53.zone.private_zone }}"
+  when: not mnohub.rds.skip
 
 - name: Create MnoHub ELB
   ec2_elb_lb:
@@ -45,6 +94,7 @@
     security_group_ids: "{{ mnohub.elastic_load_balancer.security_group_ids }}"
     listeners: "{{ mnohub.elastic_load_balancer.listeners }}"
     health_check: "{{ mnohub.elastic_load_balancer.health_check }}"
+  when: not mnohub.elastic_load_balancer.skip
   register: mnohub_elastic_load_balancer
 
 - name: Add DNS record for MnoHub ELB
@@ -59,6 +109,7 @@
     private_zone: "{{ route53.zone.private_zone }}"
     alias_hosted_zone_id: "{{ mnohub.elastic_load_balancer.alias_hosted_zone_id }}"
     overwrite: "{{ mnohub.dns_record.overwrite }}"
+  when: not mnohub.elastic_load_balancer.skip
 
 - name: Create MnoHub Launch Configuration
   ec2_lc:
@@ -76,7 +127,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
-  when: mnohub.launch_configuration.spot_price is undefined or mnohub.launch_configuration.spot_price is none
+  when: not mnohub.launch_configuration.skip and (mnohub.launch_configuration.spot_price is undefined or mnohub.launch_configuration.spot_price is none)
 
 - name: Create MnoHub Launch Configuration (spot instances)
   ec2_lc:
@@ -95,7 +146,7 @@
         volume_size: 50
         device_type: gp2 # SSD
         delete_on_termination: true
-  when: mnohub.launch_configuration.spot_price is defined and mnohub.launch_configuration.spot_price is not none
+  when: not mnohub.launch_configuration.skip and (mnohub.launch_configuration.spot_price is defined and mnohub.launch_configuration.spot_price is not none)
 
 - name: Create MnoHub Auto Scaling Group
   ec2_asg:
@@ -111,4 +162,5 @@
     availability_zones: "{{ mnohub.auto_scaling_group.availability_zones }}"
     load_balancers: "{{ mnohub.elastic_load_balancer.name }}"
     tags: "{{ mnohub.auto_scaling_group.tags }}"
+  when: not mnohub.auto_scaling_group.skip
   register: maestrano_auto_scaling_group

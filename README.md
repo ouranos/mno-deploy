@@ -6,7 +6,7 @@ The complete Maestrano infrastructure can be deployed on demand on AWS using the
 Creation of the infrastructure on AWS (Virtual Private Cloud, Auto Scaling Groups, Elastic Load Balancers, private DNS entries, etc…)
 Automatic setup of new servers launched by the ASGs
 
-*Tested with Ansible 2.0.2.0*
+*Tested with Ansible 2.4.3.0*
 
 ## Infrastructure configuration and setup
 The default cloud provider used to deploy the Maestrano platform is Amazon Web Services running inside a VPC. The different components of the platform are deployed independently (frontend, mnohub, nex!, connec!, impac!)
@@ -51,7 +51,7 @@ The provided default scripts/setup_infrastructure.sh sets up the infrastructure 
 This script can be modified to suit your needs if you want to pull a specific version of the deployment scripts or use your own version.
 
 #### Setup the infrastructure
-To run the deployment scripts, you need to have Ansible installed on the machine running the setup script. It is recommended to use Ansible version 2.0.2.0.
+To run the deployment scripts, you need to have Ansible installed on the machine running the setup script. It is recommended to use Ansible version 2.4.3.0.
 To create a new infrastructure, you need to have an AWS account with access keys having access to EC2, S3, Route53, RDS and Elasticache.
 When running the script for the first time, make sure to set the AutoScaling Groups minimum and desired capacity to 0 so no instances are launched (see `ansible/vars/myenv_secrets.yml`).
 

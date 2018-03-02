@@ -31,3 +31,4 @@ MNO_ROOT_SECRET: {{ connec_config.root.api_secret }}
 
 CACHE_DISABLED: {{ connec_config.cache_disabled }}
 FX_DISABLED: {{ connec_config.fx_disabled }}
+DISABLE_SYNC_STATUS_UPDATES: {{ connec_config.sync_status_update_disabled }}

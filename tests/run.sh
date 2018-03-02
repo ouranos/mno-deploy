@@ -3,8 +3,8 @@ APP_ROOT=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 
 # Install Ansible
 echo "[RUN] Installing ansible, boto and pycrypto ..."
-pip install -Iv ansible==2.0.2.0 > /dev/null
-pip install boto pycrypto > /dev/null
+pip install -Iv ansible==2.4.3.0 > /dev/null
+pip install boto boto3 botocore pycrypto > /dev/null
 
 # Move to test directory
 cd $APP_ROOT/tests
