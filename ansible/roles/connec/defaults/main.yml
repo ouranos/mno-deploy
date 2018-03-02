@@ -29,3 +29,4 @@ connec_config:
   xrov2_parallel_threads: 2
   cache_disabled: 'false'
   fx_disabled: 'true'
+  sync_status_update_disabled: 'true'
